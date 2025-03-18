@@ -6,30 +6,127 @@
  */
 
 plugins {
-    // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
     id 'war'
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
 
 dependencies {
-    // Use JUnit test framework.
     testImplementation libs.junit
 
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
     api libs.commons.math3
 
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation libs.guava
+
+    // Add other dependencies as needed for your project
+    // implementation 'org.springframework:spring-web:5.3.9'  // Example for Spring dependency
 }
 
-// Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
+
+sourceSets {
+    common {
+        java {
+            srcDir 'src/main/common/java'
+        }
+    }
+    account {
+        java {
+            srcDir 'src/main/account/java'
+        }
+    }
+    system {
+        java {
+            srcDir 'src/main/system/java'
+        }
+    }
+}
+
+task compileCommon(type: JavaCompile) {
+    source sourceSets.common.java
+    destinationDir = file("$buildDir/classes/common")
+    classpath = sourceSets.main.compileClasspath
+}
+
+task compileAccount(type: JavaCompile) {
+    dependsOn compileCommon
+    source sourceSets.account.java
+    destinationDir = file("$buildDir/classes/account")
+    classpath = sourceSets.main.compileClasspath
+}
+
+task compileSystem(type: JavaCompile) {
+    dependsOn compileCommon
+    source sourceSets.system.java
+    destinationDir = file("$buildDir/classes/system")
+    classpath = sourceSets.main.compileClasspath
+}
+
+tasks.withType(War) {
+    dependsOn compileCommon, compileAccount, compileSystem
+}
+
+build.dependsOn tasks.withType(War)
+
+task accountWar(type: War) {
+
+    from("$projectDir/src/main/account/webapp/WEB-INF") {
+        include 'web.xml'
+    }
+
+    from("$projectDir/src/main/account/resources") {
+        include '**/*'
+    }
+
+    from(configurations.runtimeClasspath) {
+        into 'WEB-INF/lib'
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    from("$buildDir/classes/common") {
+        include '**/*.class'
+    }
+
+    from("$buildDir/classes/account") {
+        include '**/*.class'
+    }
+
+    archiveBaseName = 'account'
+    archiveVersion = '1.0.0'
+}
+
+task systemWar(type: War) {
+
+    from("$projectDir/src/main/system/webapp/WEB-INF") {
+        include 'web.xml'
+    }
+
+    from("$projectDir/src/main/system/resources") {
+        include '**/*'
+    }
+
+    from(configurations.runtimeClasspath) {
+        into 'WEB-INF/lib'
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    from("$buildDir/classes/common") {
+        include '**/*.class'
+    }
+
+    from("$buildDir/classes/system") {
+        include '**/*.class'
+    }
+
+    archiveBaseName = 'system'
+    archiveVersion = '1.0.0'
+}
+
+build.dependsOn accountWar, systemWar
