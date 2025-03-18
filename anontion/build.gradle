@@ -92,10 +92,12 @@ task accountWar(type: War) {
 
     from("$buildDir/classes/common") {
         include '**/*.class'
+        into 'WEB-INF/classes'
     }
 
     from("$buildDir/classes/account") {
         include '**/*.class'
+        into 'WEB-INF/classes'
     }
 
     archiveBaseName = 'account'
@@ -119,10 +121,12 @@ task systemWar(type: War) {
 
     from("$buildDir/classes/common") {
         include '**/*.class'
+        into 'WEB-INF/classes'
     }
 
     from("$buildDir/classes/system") {
         include '**/*.class'
+        into 'WEB-INF/classes'
     }
 
     archiveBaseName = 'system'
