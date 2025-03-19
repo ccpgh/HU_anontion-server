@@ -1,0 +1,32 @@
+#!/bin/bash
+
+../../../../tomcat/apache-tomcat-9.0.71/bin/shutdown.sh
+
+if [[ "$?" != "0" ]]
+then
+  echo "server stop failed"
+  exit 1
+fi
+
+for i in account system
+do
+
+echo "copying ${i}"
+
+cp "../anontion/build/libs/${i}-1.0.0.war" "../../../../tomcat/apache-tomcat-9.0.71/webapps/${i}"
+
+if [[ "$?" != "0" ]]
+then
+  echo "war copy failed $i"
+  exit 1
+fi
+
+echo "completed ${i}"
+
+done
+
+../../../../tomcat/apache-tomcat-9.0.71/bin/startup.sh
+
+echo "fini."
+
+#tail -f "../../../../tomcat/apache-tomcat-9.0.71/logs/catalina.out"
