@@ -5,6 +5,10 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.13/userguide/building_java_projects.html in the Gradle documentation.
  */
 
+/**
+* WebAppInitializer
+*/
+
 plugins {
     id 'java-library'
     id 'war'
@@ -21,8 +25,12 @@ dependencies {
 
     implementation libs.guava
 
-    // Add other dependencies as needed for your project
-    // implementation 'org.springframework:spring-web:5.3.9'  // Example for Spring dependency
+    implementation 'org.springframework:spring-web:6.0.0'
+    implementation 'org.springframework:spring-context:6.0.0'
+    implementation 'org.springframework:spring-core:6.0.0'
+    implementation 'org.springframework:spring-webmvc:6.0.0'
+
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:5.0.0'
 }
 
 java {
@@ -75,10 +83,26 @@ tasks.withType(War) {
 
 build.dependsOn tasks.withType(War)
 
+task commonJar(type: Jar) {
+    dependsOn compileCommon
+
+    from("$buildDir/classes/common") {
+        include '**/*.class'
+    }
+
+    from("$projectDir/src/main/common/resources") {
+        include '**/*'
+    }
+
+    archiveBaseName = 'anontion-common'
+    archiveVersion = '1.0.0'
+}
+
 task accountWar(type: War) {
 
     from("$projectDir/src/main/account/webapp/WEB-INF") {
-        include 'web.xml'
+        include '*.xml'
+        into 'WEB-INF'
     }
 
     from("$projectDir/src/main/account/resources") {
@@ -88,11 +112,6 @@ task accountWar(type: War) {
     from(configurations.runtimeClasspath) {
         into 'WEB-INF/lib'
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
-
-    from("$buildDir/classes/common") {
-        include '**/*.class'
-        into 'WEB-INF/classes'
     }
 
     from("$buildDir/classes/account") {
@@ -107,7 +126,8 @@ task accountWar(type: War) {
 task systemWar(type: War) {
 
     from("$projectDir/src/main/system/webapp/WEB-INF") {
-        include 'web.xml'
+        include '*.xml'
+        into 'WEB-INF'
     }
 
     from("$projectDir/src/main/system/resources") {
@@ -119,11 +139,6 @@ task systemWar(type: War) {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
-    from("$buildDir/classes/common") {
-        include '**/*.class'
-        into 'WEB-INF/classes'
-    }
-
     from("$buildDir/classes/system") {
         include '**/*.class'
         into 'WEB-INF/classes'
@@ -133,4 +148,8 @@ task systemWar(type: War) {
     archiveVersion = '1.0.0'
 }
 
-build.dependsOn accountWar, systemWar
+build.dependsOn commonJar, accountWar, systemWar
+
+tasks.named('war') {
+    enabled = false
+}
