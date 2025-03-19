@@ -59,21 +59,21 @@ sourceSets {
 
 task compileCommon(type: JavaCompile) {
     source sourceSets.common.java
-    destinationDir = file("$buildDir/classes/common")
+    destinationDirectory = file("$buildDir/classes/common")
     classpath = sourceSets.main.compileClasspath
 }
 
 task compileAccount(type: JavaCompile) {
     dependsOn compileCommon
     source sourceSets.account.java
-    destinationDir = file("$buildDir/classes/account")
+    destinationDirectory = file("$buildDir/classes/account")
     classpath = sourceSets.main.compileClasspath
 }
 
 task compileSystem(type: JavaCompile) {
     dependsOn compileCommon
     source sourceSets.system.java
-    destinationDir = file("$buildDir/classes/system")
+    destinationDirectory = file("$buildDir/classes/system")
     classpath = sourceSets.main.compileClasspath
 }
 
