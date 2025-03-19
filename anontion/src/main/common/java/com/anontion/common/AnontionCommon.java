@@ -1,6 +1,6 @@
 package com.anontion.common;
 
-public class ACommon {
+public class AnontionCommon {
     public boolean f() {
         return true;
     }

@@ -1,6 +1,6 @@
 package com.anontion.account;
 
-public class AAccount {
+public class AnontionAccount {
     public boolean f() {
         return true;
     }

@@ -1,6 +1,6 @@
 package com.anontion.system;
 
-public class ASystem {
+public class AnontionSystem {
     public boolean f() {
         return true;
     }
