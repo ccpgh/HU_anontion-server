@@ -17,7 +17,7 @@ p://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.x
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
       <init-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>/WEB-INF/servlet-context.xml</param-value>
+        <param-value>/WEB-INF/applicationContext.xml</param-value>
       </init-param>  
     <load-on-startup>1</load-on-startup>
   </servlet>
@@ -26,5 +26,14 @@ p://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.x
     <servlet-name>dispatcher</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
+
+  <listener>
+   <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+        <init-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>/WEB-INF/applicationContext.xml</param-value>
+  </init-param>
+  </listener>
+    
 
 </web-app>

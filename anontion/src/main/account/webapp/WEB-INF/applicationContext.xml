@@ -1,0 +1,47 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/data/jpa
+           								 http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+
+    <context:component-scan base-package="com.anontion.account.controller, com.anontion.account.service, com.anontion.account.model, com.anontion.account.config, com.anontion.account.repository" />
+
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/anontion_live" />
+        <property name="username" value="anontion" />
+        <property name="password" value="NNNNN" />
+        <property name="validationQuery" value="SELECT 1" />
+        <property name="testOnBorrow" value="true" />
+        <property name="validationInterval" value="30000" />
+    </bean>
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="dataSource">
+     <property name="dataSource" ref="dataSource" />
+     <property name="packagesToScan" value="com.anontion.account.model" />
+     <property name="jpaVendorAdapter">
+         <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+             <property name="generateDdl" value="true"/>
+             <property name="showSql" value="true" />
+         </bean>
+     </property>
+     <property name="jpaProperties">
+         <props>
+             <prop key="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</prop>
+         </props>
+     </property>
+     <property name="entityManagerFactoryInterface" value="jakarta.persistence.EntityManagerFactory" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+        
+    <jpa:repositories base-package="com.anontion.account.repository" />
+</beans>
