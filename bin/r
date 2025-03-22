@@ -25,6 +25,14 @@ echo "completed ${i}"
 
 done
 
+cp "../anontion/build/libs/anontion-common-1.0.0.jar" "../../../../tomcat/current/lib/anontion-common.jar"
+
+if [[ "$?" != "0" ]]
+then
+  echo "jar copy failed common"
+  exit 1
+fi
+
 ../../../../tomcat/current/bin/startup.sh
 
 echo "fini."

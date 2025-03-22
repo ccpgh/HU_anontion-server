@@ -91,14 +91,16 @@ task compileAccount(type: JavaCompile) {
     dependsOn compileCommon
     source sourceSets.account.java
     destinationDirectory = file("$buildDir/classes/account")
-    classpath = sourceSets.main.compileClasspath
+    classpath = sourceSets.main.compileClasspath +
+    files("$buildDir/classes/common")
 }
 
 task compileSystem(type: JavaCompile) {
     dependsOn compileCommon
     source sourceSets.system.java
     destinationDirectory = file("$buildDir/classes/system")
-    classpath = sourceSets.main.compileClasspath
+    classpath = sourceSets.main.compileClasspath +
+    files("$buildDir/classes/common")
 }
 
 tasks.withType(War) {
