@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 //import org.springframework.context.annotation.LoadTimeWeavingConfigurer;
 //import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
 //import org.springframework.instrument.classloading.LoadTimeWeaver;
-import org.springframework.context.annotation.ComponentScan;
+//import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.anontion.account.service.AccountBean;
@@ -26,3 +26,4 @@ public class AccountConfig {
     return new AccountBean();
   }
 }
+
