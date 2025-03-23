@@ -1,10 +1,12 @@
 package com.anontion.account.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 
 //import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 //import org.springframework.context.annotation.EnableLoadTimeWeaving;
 //import org.springframework.context.annotation.LoadTimeWeavingConfigurer;
 //import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
@@ -18,6 +20,8 @@ import com.anontion.account.service.AccountBean;
 
 @Configuration
 @EnableWebMvc
+@ComponentScan(basePackages = "com.anontion.common, com.anontion.account, com.anontion.system")
+@Import(ValidationConfig.class) 
 public class AccountConfig {
 
   @Bean

@@ -2,16 +2,16 @@ package com.anontion.common.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-public class ApiResponseBodyErrorDTO extends ApiResponseBodyDTO {
+public class ResponseBodyErrorDTO extends ResponseBodyDTO {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String todo;
   
-  public ApiResponseBodyErrorDTO() {
+  public ResponseBodyErrorDTO() {
 
   } 
 
-  public ApiResponseBodyErrorDTO(String todo) {
+  public ResponseBodyErrorDTO(String todo) {
     
     this.todo = todo;
   }

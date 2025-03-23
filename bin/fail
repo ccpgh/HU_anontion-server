@@ -1,0 +1,2 @@
+curl -X POST "http://localhost:8080/account/" -H "Accept: application/json" -H "Content-Type: application/json" -d '{"header":{"originator":"exampleOriginator"},"bodies":{"id":"123e4567-e89b-12d3-a456-426614174000","ts":1234567890,"names":"cc"}}'
+echo ""
