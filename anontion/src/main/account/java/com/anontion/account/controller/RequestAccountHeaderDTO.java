@@ -1,17 +1,14 @@
 package com.anontion.account.controller;
 
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
-@Validated
 @Component
 public class RequestAccountHeaderDTO {
   
-  @NotNull(message = "originator cannot be null")
+  @NotBlank(message = "originator cannot be null")
   private String originator;
 
   public RequestAccountHeaderDTO() {

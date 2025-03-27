@@ -1,33 +1,32 @@
 package com.anontion.account.controller;
 
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Component
-@Validated
 public class PersonForm {
 
   public PersonForm() {
     
   }
   
-  @NotNull
-  //@Size(max=64)
+  @NotBlank
   private String name;
 
+  @NotBlank
   public String getName() {
     
     return name;
   }
 
+  @NotBlank
   public void setName(String name) {
   
     this.name = name;
   }
-  
-  //@Min(0)
-  //private int age;
 }
 
