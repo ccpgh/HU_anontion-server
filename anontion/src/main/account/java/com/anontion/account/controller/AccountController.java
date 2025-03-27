@@ -38,9 +38,6 @@ public class AccountController {
   //@Autowired
   //private AnontionAccountRepository accountRepository;
   
-  //@Autowired
-  //private Validator validator;
-
   @GetMapping("/")
   public ResponseEntity<ResponseDTO> getAccount() {
 
@@ -63,34 +60,6 @@ public class AccountController {
 		  return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
 	  }
   
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 0, "NYI"), new ResponseBodyErrorDTO());
-    
-    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
-  }
-  
-  //@PostMapping("/")
-//  @PostMapping(path = "/OFF", consumes = "application/json", produces = "application/json")
-//  public ResponseEntity<ResponseDTO> postAccount_OFF(@RequestBody @Valid RequestAccountDTO requestAccountDTO, BindingResult bindingResult) {
-//
-////    System.err.println("BindingResult " + bindingResult);
-//
-//    System.err.println("Validator " + validator);
-//
-//  // if (bindingResult.hasErrors()) {
-//    if (bindingResult.hasErrors()) {
-//
-//      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress 3"), new ResponseBodyErrorDTO());
-//      
-//      return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
-//    }
-
- //if (ParameterErrorCheck.check(requestAccountDTO, bindingResult, validator)) {
-
-    //    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress 3"), new ResponseBodyErrorDTO());
-     
-    //return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
-    //}
-
 //    if (bindingResult.hasErrors() || ParameterErrorCheck.check(requestAccountDTO, bindingResult, validator)) {
 //      
 //      String message = bindingResult.getAllErrors().stream()
@@ -192,9 +161,12 @@ public class AccountController {
 //      // If no validation errors, process the account creation logic
 //      ResponseDTO responseDTO = accountService.createAccount(requestAccountDTO);
 //      return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-//  }
-//  
-  
+	  
+    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 0, "NYI"), new ResponseBodyErrorDTO());
+    
+    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
+  }
+
   @PutMapping("/")
   public ResponseEntity<ResponseDTO> putAccount() {
 
