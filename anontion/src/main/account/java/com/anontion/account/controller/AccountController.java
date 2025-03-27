@@ -62,67 +62,8 @@ public class AccountController {
 		  return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
 	  }
 
-//
-//    System.err.println("bindingResult " + bindingResult);
-//
-//    // Extract the header and body
-//    RequestAccountHeaderDTO header = requestAccountDTO.getHeader();
-//    RequestAccountBodyDTO body = requestAccountDTO.getBody();
-//
-//    // Debug: Print out values (for example, logging or testing purposes)
-//    System.out.println("Originator: " + header.getOriginator());
-//    System.out.println("body: " + body);
-
-//  System.out.println("ID: " + body.getId());
-//  System.out.println("Timestamp: " + body.getTs());
-//  System.out.println("Name: " + body.getName());
+	  System.out.println("ID: " + requestAccountDTO.getBody().getId());
     
-    // Print the received JSON (via the DTO object)
-    //System.out.println("Received DTO: " + myDto);
-    
-    //String json = "{\n" +
-    //        "  \"foor\": \"" + dto.getBar() + "\",\n" +
-    //        "}";   
-    //System.out.println("Raw JSON received: " + json);
-    
-    /*
-    StringBuilder jsonString = new StringBuilder();
-    try (BufferedReader reader = request.getReader()) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-          jsonString.append(line);
-      }
-    } catch (java.io.IOException e) {
-
-      e.printStackTrace();
-    }
-    System.out.println("Raw JSON received: " + jsonString.toString());
-    */
-//    
-//    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress 2"), new ResponseBodyErrorDTO());
-//    
-//    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
-//  }
-
-//  private final AccountService accountService;
-//
-//  public AccountController(AccountService accountService) {
-//      this.accountService = accountService;
-//  }
-//
-//  @PostMapping("/account")
-//  public ResponseEntity<ApiResponseDTO> postAccount(@RequestBody RequestAccountDTO requestAccountDTO) {
-//      // Extract the header and body
-//      RequestAccountHeaderDTO header = requestAccountDTO.getHeader();
-//      RequestAccountBodyDTO body = requestAccountDTO.getBody();
-//
-//      // Debug: Print out values (for example, logging or testing purposes)
-//      System.out.println("Originator: " + header.getOriginator());
-//      System.out.println("ID: " + body.getId());
-//      System.out.println("Timestamp: " + body.getTs());
-//      System.out.println("Name: " + body.getName());
-//
-//      // Check if the account exists (add your business logic here)
 //      boolean accountExists = accountService.accountExists(body.getId());
 //
 //      if (accountExists) {
