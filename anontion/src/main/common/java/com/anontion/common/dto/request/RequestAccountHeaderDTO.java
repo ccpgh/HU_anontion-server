@@ -1,4 +1,4 @@
-package com.anontion.account.controller;
+package com.anontion.common.dto.request;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;

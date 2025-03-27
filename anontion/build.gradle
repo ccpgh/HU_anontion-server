@@ -144,6 +144,7 @@ task commonJar(type: Jar) {
 }
 
 task accountWar(type: War) {
+    dependsOn commonJar
 
     from("$projectDir/src/main/account/webapp/WEB-INF") {
         include '*.xml'
@@ -165,11 +166,17 @@ task accountWar(type: War) {
         into 'WEB-INF/classes'
     }
 
+    from("$buildDir/libs") {
+        include '**/anontion-common-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
     archiveBaseName = 'account'
     archiveVersion = '1.0.0'
 }
 
 task systemWar(type: War) {
+    dependsOn commonJar
 
     from("$projectDir/src/main/system/webapp/WEB-INF") {
         include '*.xml'
@@ -189,6 +196,11 @@ task systemWar(type: War) {
     from("$buildDir/classes/system") {
         include '**/*.class'
         into 'WEB-INF/classes'
+    }
+
+    from("$buildDir/libs") {
+        include '**/anontion-common-1.0.0.jar'
+        into 'WEB-INF/lib'
     }
 
     archiveBaseName = 'system'

@@ -1,4 +1,4 @@
-package com.anontion.account.controller;
+package com.anontion.common.dto.request;
 
 import java.util.UUID;
 

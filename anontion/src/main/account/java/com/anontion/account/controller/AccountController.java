@@ -18,6 +18,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.anontion.common.dto.request.RequestAccountDTO;
+
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
@@ -53,25 +55,13 @@ public class AccountController {
 	    
 		  String message = bindingResult.getAllErrors().stream()
 				  .map(ObjectError::getDefaultMessage)
-				  .collect(Collectors.joining("\n"));
+				  .collect(Collectors.joining("|"));
 
 		  ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Invalid parameters!"), new ResponseBodyErrorDTO(message));
 
 		  return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
 	  }
-  
-//    if (bindingResult.hasErrors() || ParameterErrorCheck.check(requestAccountDTO, bindingResult, validator)) {
-//      
-//      String message = bindingResult.getAllErrors().stream()
-//          .map(ObjectError::getDefaultMessage)
-//          .collect(Collectors.joining("\n"));
-//      
-//      System.err.println("Message: " + message);
-//      
-//      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad Request Information"), new ResponseBodyErrorDTO(message));
-//      
-//      return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);    
-//    }
+
 //
 //    System.err.println("bindingResult " + bindingResult);
 //
