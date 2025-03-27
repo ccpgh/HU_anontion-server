@@ -2,27 +2,30 @@ package com.anontion.common.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import jakarta.validation.constraints.NotNull;
+
 public class ResponseBodyErrorDTO extends ResponseBodyDTO {
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private String todo;
+  //@JsonInclude(JsonInclude.Include.NON_NULL) TODO
+  @NotNull(message = "Body detail cannot be null.")
+  private String detail;
   
   public ResponseBodyErrorDTO() {
 
   } 
 
-  public ResponseBodyErrorDTO(String todo) {
+  public ResponseBodyErrorDTO(String detail) {
     
-    this.todo = todo;
+    this.detail = detail;
   }
 
-  public String getTodo() {
+  public String getDetail() {
     
-    return todo;
+    return detail;
   }
 
-  public void setTodo(String todo) {
+  public void setDetail(String detail) {
   
-    this.todo = todo;
+    this.detail = detail;
   } 
 }

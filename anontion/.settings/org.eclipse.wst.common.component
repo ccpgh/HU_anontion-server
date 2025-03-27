@@ -2,6 +2,5 @@
 <project-modules id="moduleCoreId" project-version="1.5.0">
 	<wb-module deploy-name="anontion-anontion">
 		<property name="context-root" value="anontion"/>
-		<wb-resource deploy-path="/WEB-INF/classes" source-path="src/main/resources"/>
 	</wb-module>
 </project-modules>

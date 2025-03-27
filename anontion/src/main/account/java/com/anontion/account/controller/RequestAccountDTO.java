@@ -7,16 +7,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-@Validated
 @Component
 public class RequestAccountDTO {
   
   @Valid
-  @NotNull(message = "header cannot be null")
+  @NotNull(message = "Json header cannot be null.")
   private RequestAccountHeaderDTO header;
   
   @Valid
-  @NotNull(message = "body cannot be null")
+  @NotNull(message = "Json body cannot be null.")
   private RequestAccountBodyDTO body;
 
   public RequestAccountDTO() {

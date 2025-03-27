@@ -2,7 +2,6 @@ package com.anontion.account.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,16 +18,9 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
-//import com.anontion.account.model.AnontionAccount;
-//import com.anontion.account.repository.AnontionAccountRepository;
-//import com.anontion.account.service.AccountBean;
-//import org.springframework.stereotype.Service;
-//import jakarta.servlet.http.HttpServletRequest;
-//import java.io.BufferedReader;
-//import java.util.Optional;
-
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
@@ -37,13 +29,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
-import com.anontion.common.api.ParameterErrorCheck;
-import com.anontion.common.dto.response.ResponseBodyErrorDTO;
-
 import com.anontion.account.config.ValidationConfig;
-//import com.anontion.common.dto.request.PersonForm;
-
-
 
 @RestController
 @Validated
@@ -52,84 +38,32 @@ public class AccountController {
   //@Autowired
   //private AnontionAccountRepository accountRepository;
   
-  @Autowired
-  private Validator validator;
+  //@Autowired
+  //private Validator validator;
 
   @GetMapping("/")
   public ResponseEntity<ResponseDTO> getAccount() {
 
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress"), new ResponseBodyErrorDTO());
+    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
     
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
   }
   
   @PostMapping(path = "/")
-  @Validated
-  public ResponseEntity<ResponseDTO> postAccount(@Validated @RequestBody RequestAccountDTO requestAccountDTO, BindingResult bindingResult) {
+  public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestAccountDTO requestAccountDTO, BindingResult bindingResult) {
 
-    //if (bindingResult.hasErrors()) {
+	  if (bindingResult.hasErrors()) {
+	    
+		  String message = bindingResult.getAllErrors().stream()
+				  .map(ObjectError::getDefaultMessage)
+				  .collect(Collectors.joining("\n"));
 
-    //  ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress 3"), new ResponseBodyErrorDTO());
-      
-    //  return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
-    //}
+		  ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Invalid parameters!"), new ResponseBodyErrorDTO(message));
+
+		  return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
+	  }
   
-    PersonForm p = new PersonForm();
-
-    Set<ConstraintViolation<PersonForm>> violations1 = validator.validate(p);
-
-    System.out.println("violations p: " + violations1.size());
-
-    RequestAccountDTO a = new RequestAccountDTO();
-
-    Set<ConstraintViolation<RequestAccountDTO>> violations2 = validator.validate(a);
-
-    System.out.println("violations a: " + violations2.size());
-
-    System.out.println("Body: " + requestAccountDTO.getBody());
-
-    System.out.println("validator: " + validator.getClass());
-
-    if (bindingResult.hasErrors()) { //|| !violations.isEmpty()) {
-
-      String message = bindingResult.getAllErrors().stream()
-      .map(ObjectError::getDefaultMessage)
-      .collect(Collectors.joining("\n"));
-        
-        ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress 3"), new ResponseBodyErrorDTO(message));
-        
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
-      }
-
-    Set<ConstraintViolation<RequestAccountDTO>> violations = validator.validate(requestAccountDTO);
-
-    System.out.println("violations: " + violations.size());
-
-    if (bindingResult.hasErrors() || !violations.isEmpty()) {
-
-      String message = bindingResult.getAllErrors().stream()
-      .map(ObjectError::getDefaultMessage)
-      .collect(Collectors.joining("\n"));
-      
-      String violationsString = violations.stream()
-          .map(violation -> violation.getMessage())
-          .collect(Collectors.joining(", "));
-      
-      System.err.println("violationsString " + violationsString)
-        ;
-        ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress 3"), new ResponseBodyErrorDTO(violationsString));
-        
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
-      }
-    
-    if (requestAccountDTO.getBody() != null) {
-
-      System.out.println("body ts: " + requestAccountDTO.getBody().getTs());
-      
-      System.out.println("body id: " + requestAccountDTO.getBody().getId());
-    }
-    
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress 2"), new ResponseBodyErrorDTO());
+    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 0, "NYI"), new ResponseBodyErrorDTO());
     
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
   }
@@ -264,7 +198,7 @@ public class AccountController {
   @PutMapping("/")
   public ResponseEntity<ResponseDTO> putAccount() {
 
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress"), new ResponseBodyErrorDTO());
+    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
     
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
   }
@@ -272,7 +206,7 @@ public class AccountController {
   @DeleteMapping("/")
   public ResponseEntity<ResponseDTO> deleteAccount() {
 
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Work in progress"), new ResponseBodyErrorDTO());
+    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
     
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
   }

@@ -12,18 +12,16 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
-@Validated
 @Component
 public class RequestAccountBodyDTO {
   
-  @NotNull(message = "id cannot be null")
+  @NotNull(message = "Id cannot be null.")
   private UUID id;
 
-  @NotNull(message = "ts cannot be null")
-  @Max(value = 1, message = "ts must be zero")
+  @NotNull(message = "Timestamp cannot be null.")
   private Integer ts;
   
-  @NotBlank(message = "name cannot be null")
+  @NotBlank(message = "Name cannot be null.")
   private String name;
 
   public RequestAccountBodyDTO() {
