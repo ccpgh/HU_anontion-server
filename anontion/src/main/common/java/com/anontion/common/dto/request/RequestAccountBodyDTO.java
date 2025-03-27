@@ -3,13 +3,8 @@ package com.anontion.common.dto.request;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 @Component

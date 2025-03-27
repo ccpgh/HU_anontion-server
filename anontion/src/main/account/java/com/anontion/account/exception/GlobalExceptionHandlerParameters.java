@@ -7,12 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 import com.anontion.common.dto.response.ResponseDTO;
@@ -23,10 +20,6 @@ public class GlobalExceptionHandlerParameters {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ResponseDTO> handleValidationException(MethodArgumentNotValidException ex) {
-    
-    String message = ex.getBindingResult().getAllErrors().stream()
-        .map(ObjectError::getDefaultMessage)
-        .collect(Collectors.joining("\n"));
     
     Map<String, String> errors = new HashMap<>();
     

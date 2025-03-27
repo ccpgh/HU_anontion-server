@@ -1,10 +1,7 @@
 package com.anontion.common.dto.request;
 
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 @Component
