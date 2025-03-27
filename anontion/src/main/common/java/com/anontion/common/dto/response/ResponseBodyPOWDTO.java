@@ -2,7 +2,7 @@ package com.anontion.common.dto.response;
 
 import java.time.Instant;
 
-public class ApiResponseBodyPOWDTO extends ApiResponseBodyDTO {
+public class ResponseBodyPOWDTO extends ResponseBodyDTO {
 
   private String data;
 
@@ -10,13 +10,13 @@ public class ApiResponseBodyPOWDTO extends ApiResponseBodyDTO {
 
   private Instant ts;
 
-  private String signature;
+  private String signature; // TODO
 
-  public ApiResponseBodyPOWDTO() {
+  public ResponseBodyPOWDTO() {
 
   }
 
-  public ApiResponseBodyPOWDTO(String data, int target, Instant ts) {
+  public ResponseBodyPOWDTO(String data, int target, Instant ts) {
 
     this.data = data;
     this.target = target;

@@ -18,7 +18,7 @@ public class AnontionAccount {
   private Long id;
 
   @Column(nullable = false)
-  private String username;
+  private String name;
 
   public Long getId() {
     
@@ -30,14 +30,14 @@ public class AnontionAccount {
     this.id = id;
   }
 
-  public String getUsername() {
+  public String getName() {
     
-    return username;
+    return name;
   }
 
-  public void setUsername(String username) {
+  public void setName(String name) {
     
-    this.username = username;
+    this.name = name;
   }
 
 }

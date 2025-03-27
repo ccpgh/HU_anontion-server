@@ -1,17 +1,29 @@
 package com.anontion.common.dto.response;
 
   
-public class ApiResponseHeaderDTO {
+public class ResponseHeaderDTO {
 
+  private String originator;
   private boolean success;
   private int code;
   private String message;
   
-  public ApiResponseHeaderDTO(boolean success, int code, String message) {
+  public ResponseHeaderDTO(boolean success, int code, String message) {
 
+    this.originator = "server";
     this.success = success;
     this.code   = code;
     this.message = message;
+  }
+
+  public String getOriginator() {
+    
+    return originator;
+  }
+
+  public void setOriginator(String originator) {
+    
+    this.originator = originator;
   }
 
   public boolean isSuccess() {
