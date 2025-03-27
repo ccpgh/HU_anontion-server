@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,21 +25,21 @@ import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.Validator;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 
-import com.anontion.account.config.ValidationConfig;
+import com.anontion.account.model.AnontionApplication;
+import com.anontion.account.model.AnontionApplicationId;
+import com.anontion.account.repository.AnontionApplicationRepository;
 
 @RestController
-@Validated
+@Valid
 public class AccountController {
 
   //@Autowired
   //private AnontionAccountRepository accountRepository;
+  
+  @Autowired
+  private AnontionApplicationRepository applicationRepository;
   
   @GetMapping("/")
   public ResponseEntity<ResponseDTO> getAccount() {
@@ -55,47 +56,39 @@ public class AccountController {
 	    
 		  String message = bindingResult.getAllErrors().stream()
 				  .map(ObjectError::getDefaultMessage)
-				  .collect(Collectors.joining("|"));
+				  .collect(Collectors.joining(" "));
 
 		  ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Invalid parameters!"), new ResponseBodyErrorDTO(message));
 
 		  return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
 	  }
 
-	  System.out.println("ID: " + requestAccountDTO.getBody().getId());
+    String name = requestAccountDTO.getBody().getName();
+    Integer ts = requestAccountDTO.getBody().getTs();
+    UUID client = requestAccountDTO.getBody().getId();
     
-//      boolean accountExists = accountService.accountExists(body.getId());
-//
-//      if (accountExists) {
-//          // Return response indicating account exists
-//          return new ResponseEntity<>(new ApiResponseDTO("Account already exists"), HttpStatus.BAD_REQUEST);
-//      }
-//
-//      // If account does not exist, you can create or perform other logic
-//      accountService.createAccount(body);
-//
-//      // Return a success response
-//      return new ResponseEntity<>(new ApiResponseDTO("Account created successfully"), HttpStatus.OK);
-//  }
-//  
-//  @PostMapping("/account")
-//  public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestAccountDTO requestAccountDTO, 
-//                                                 BindingResult bindingResult) {
-//      if (bindingResult.hasErrors()) {
-//          // You can collect all errors and send them as a response
-//          List<String> errors = bindingResult.getAllErrors().stream()
-//                                            .map(ObjectError::getDefaultMessage)
-//                                            .collect(Collectors.toList());
-//          return new ResponseEntity<>(new ResponseDTO(errors), HttpStatus.BAD_REQUEST);
-//      }
-//
-//      // If no validation errors, process the account creation logic
-//      ResponseDTO responseDTO = accountService.createAccount(requestAccountDTO);
-//      return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-	  
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 0, "NYI"), new ResponseBodyErrorDTO());
+    System.out.println(String.format("Name/Id/Client: %s/%d/%s", name, ts, client));
+
+    AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
+
+    boolean exists = applicationRepository.existsById(applicationId);
+
+    if (exists) {
+
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Application already exists!"), new ResponseBodyErrorDTO()); // TODO - fix.
     
-    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+    
+    AnontionApplication newApplication = new AnontionApplication(name, ts, client);
+
+    System.out.println("Application: " + newApplication);
+
+    applicationRepository.save(newApplication);
+
+    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 0, "Success"), new ResponseBodyErrorDTO()); // TODO - fix.
+    
+    return new ResponseEntity<>(response, HttpStatus.CREATED);    
   }
 
   @PutMapping("/")
@@ -113,6 +106,5 @@ public class AccountController {
     
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
   }
-  
 }
 
