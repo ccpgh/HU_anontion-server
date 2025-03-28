@@ -84,7 +84,7 @@ public class ApplicationController {
 
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 0, "Success"), new ResponseBodyErrorDTO()); // TODO - fix.
     
-    return new ResponseEntity<>(response, HttpStatus.CREATED);    
+    return new ResponseEntity<>(response, HttpStatus.OK);    
   }
 
   @PutMapping(path = "/")
