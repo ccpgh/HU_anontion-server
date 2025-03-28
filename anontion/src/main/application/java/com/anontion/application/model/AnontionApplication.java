@@ -1,4 +1,4 @@
-package com.anontion.account.model;
+package com.anontion.application.model;
 
 import java.util.UUID;
 

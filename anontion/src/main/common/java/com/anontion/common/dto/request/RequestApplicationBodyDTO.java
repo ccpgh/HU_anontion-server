@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 
 @Component
-public class RequestAccountBodyDTO {
+public class RequestApplicationBodyDTO {
   
   @NotNull(message = "Id cannot be null.")
   private UUID id;
@@ -19,7 +19,7 @@ public class RequestAccountBodyDTO {
   @NotBlank(message = "Name cannot be null.")
   private String name;
 
-  public RequestAccountBodyDTO() {
+  public RequestApplicationBodyDTO() {
     
   }
   

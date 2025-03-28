@@ -6,35 +6,35 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 @Component
-public class RequestAccountDTO {
+public class RequestApplicationDTO {
   
   @Valid
   @NotNull(message = "Json header cannot be null.")
-  private RequestAccountHeaderDTO header;
+  private RequestApplicationHeaderDTO header;
   
   @Valid
   @NotNull(message = "Json body cannot be null.")
-  private RequestAccountBodyDTO body;
+  private RequestApplicationBodyDTO body;
 
-  public RequestAccountDTO() {
+  public RequestApplicationDTO() {
   }
 
-  public RequestAccountHeaderDTO getHeader() {
+  public RequestApplicationHeaderDTO getHeader() {
     
     return header;
   }
 
-  public void setHeader(RequestAccountHeaderDTO header) {
+  public void setHeader(RequestApplicationHeaderDTO header) {
     
     this.header = header;
   }
 
-  public RequestAccountBodyDTO getBody() {
+  public RequestApplicationBodyDTO getBody() {
     
     return body;
   }
 
-  public void setBody(RequestAccountBodyDTO body) {
+  public void setBody(RequestApplicationBodyDTO body) {
    
     this.body = body;
   }

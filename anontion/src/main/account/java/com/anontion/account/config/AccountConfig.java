@@ -14,7 +14,7 @@ import com.anontion.account.service.AccountBean;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "com.anontion.common, com.anontion.account, com.anontion.system")
+@ComponentScan(basePackages = "com.anontion.common, com.anontion.application, com.anontion.account, com.anontion.system")
 @PropertySource("classpath:application.properties")
 @Import(ValidationConfig.class) 
 public class AccountConfig {

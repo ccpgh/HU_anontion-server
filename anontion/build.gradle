@@ -56,8 +56,6 @@ dependencies {
     implementation 'org.hibernate:hibernate-validator-annotation-processor:8.0.2.Final'
     implementation 'org.hibernate.validator:hibernate-validator-cdi:8.0.2.Final'
 
-	  // === SANITY LINE
-	  
     implementation 'mysql:mysql-connector-java:8.0.28'
 
     //implementation 'org.slf4j:slf4j-api:2.0.0'
@@ -89,10 +87,15 @@ sourceSets {
             srcDir 'src/main/common/java'
         }
     }
+    application {
+        java {
+            srcDir 'src/main/application/java'
+        }
+    }
     account {
         java {
             srcDir 'src/main/account/java'
-        }
+        }        
     }
     system {
         java {
@@ -107,12 +110,21 @@ task compileCommon(type: JavaCompile) {
     classpath = sourceSets.main.compileClasspath
 }
 
-task compileAccount(type: JavaCompile) {
+task compileApplication(type: JavaCompile) {
     dependsOn compileCommon
+    source sourceSets.application.java
+    destinationDirectory = file("$buildDir/classes/application")
+    classpath = sourceSets.main.compileClasspath +
+    files("$buildDir/classes/common")
+}
+
+task compileAccount(type: JavaCompile) {
+    dependsOn compileApplication
     source sourceSets.account.java
     destinationDirectory = file("$buildDir/classes/account")
     classpath = sourceSets.main.compileClasspath +
-    files("$buildDir/classes/common")
+    files("$buildDir/classes/common") + 
+    files("$buildDir/classes/application") 
 }
 
 task compileSystem(type: JavaCompile) {
@@ -124,7 +136,7 @@ task compileSystem(type: JavaCompile) {
 }
 
 tasks.withType(War) {
-    dependsOn compileCommon, compileAccount, compileSystem
+    dependsOn compileCommon, compileApplication, compileAccount, compileSystem
 }
 
 build.dependsOn tasks.withType(War)
@@ -144,12 +156,54 @@ task commonJar(type: Jar) {
     archiveVersion = '1.0.0'
 }
 
-task accountWar(type: War) {
+task applicationWar(type: War) {
     dependsOn commonJar
+
+    from("$projectDir/src/main/application/webapp/WEB-INF") {
+        include '*.xml'
+        into 'WEB-INF'
+    }
+
+    //from("$projectDir/src/main/application/webapp/META-INF") {
+    //    include '*.xml'
+    //    into 'META-INF'
+    //}
+
+    from("$projectDir/src/main/application/resources") {
+        include '**/application.properties'
+        into 'WEB-INF/classes'
+    }
+
+    from(configurations.runtimeClasspath) {
+        into 'WEB-INF/lib'
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    from("$buildDir/classes/application") {
+        include '**/*.class'
+        into 'WEB-INF/classes'
+    }
+
+    from("$buildDir/libs") {
+        include '**/anontion-common-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
+    archiveBaseName = 'application'
+    archiveVersion = '1.0.0'
+}
+
+task accountWar(type: War) {
+    dependsOn applicationWar
 
     from("$projectDir/src/main/account/webapp/WEB-INF") {
         include '*.xml'
         into 'WEB-INF'
+    }
+
+    from("$projectDir/src/main/account/webapp/META-INF") {
+        include '*.*'
+        into 'META-INF'
     }
 
     from("$projectDir/src/main/account/resources") {
@@ -163,6 +217,11 @@ task accountWar(type: War) {
     }
 
     from("$buildDir/classes/account") {
+        include '**/*.class'
+        into 'WEB-INF/classes'
+    }
+
+    from("$buildDir/classes/application") {
         include '**/*.class'
         into 'WEB-INF/classes'
     }
@@ -183,6 +242,11 @@ task systemWar(type: War) {
         include '*.xml'
         into 'WEB-INF'
     }
+
+    //from("$projectDir/src/main/system/webapp/META-INF") {
+    //    include '*.xml'
+    //    into 'META-INF'
+    //}
 
     from("$projectDir/src/main/system/resources") {
         include '**/application.properties'
@@ -208,7 +272,7 @@ task systemWar(type: War) {
     archiveVersion = '1.0.0'
 }
 
-build.dependsOn commonJar, accountWar, systemWar
+build.dependsOn commonJar, applicationWar, accountWar, systemWar
 
 tasks.named('war') {
     enabled = false

@@ -5,15 +5,15 @@ import org.springframework.stereotype.Component;
 import jakarta.validation.constraints.NotNull;
 
 @Component
-public class RequestAccountHeaderDTO {
+public class RequestApplicationHeaderDTO {
   
   @NotNull(message = "Originator cannot be null.")
   private String originator;
 
-  public RequestAccountHeaderDTO() {
+  public RequestApplicationHeaderDTO() {
   }
 
-  public RequestAccountHeaderDTO(String originator) {
+  public RequestApplicationHeaderDTO(String originator) {
 
     this.originator = originator;
   }
