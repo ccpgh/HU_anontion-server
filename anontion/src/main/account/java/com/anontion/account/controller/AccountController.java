@@ -22,8 +22,6 @@ import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
 import jakarta.validation.Valid;
 
-import com.anontion.application.repository.AnontionApplicationRepository;
-
 @RestController
 @RequestMapping("/account")
 public class AccountController {

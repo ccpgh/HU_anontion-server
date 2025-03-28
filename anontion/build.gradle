@@ -164,7 +164,17 @@ task applicationWar(type: War) {
         into 'WEB-INF'
     }
 
-    //from("$projectDir/src/main/application/webapp/META-INF") {
+    from("$projectDir/src/main/common/webapp/WEB-INF") {
+        include 'application-context.xml'
+        into 'WEB-INF'
+    }
+
+    from("$projectDir/src/main/common/webapp/WEB-INF/classes") {
+        include 'logback.xml'
+        into 'WEB-INF/classes'
+    }
+
+    //from("$projectDir/src/main/common/webapp/META-INF") {
     //    include '*.xml'
     //    into 'META-INF'
     //}
@@ -201,10 +211,20 @@ task accountWar(type: War) {
         into 'WEB-INF'
     }
 
-    from("$projectDir/src/main/account/webapp/META-INF") {
-        include '*.*'
-        into 'META-INF'
+    from("$projectDir/src/main/common/webapp/WEB-INF") {
+        include 'application-context.xml'
+        into 'WEB-INF'
     }
+
+    from("$projectDir/src/main/common/webapp/WEB-INF/classes") {
+        include 'logback.xml'
+        into 'WEB-INF/classes'
+    }
+
+    //from("$projectDir/src/main/common/webapp/META-INF") {
+    //    include '*.*'
+    //    into 'META-INF'
+    //}
 
     from("$projectDir/src/main/account/resources") {
         include '**/application.properties'
@@ -243,7 +263,17 @@ task systemWar(type: War) {
         into 'WEB-INF'
     }
 
-    //from("$projectDir/src/main/system/webapp/META-INF") {
+    from("$projectDir/src/main/common/webapp/WEB-INF") {
+        include 'application-context.xml'
+        into 'WEB-INF'
+    }
+
+    from("$projectDir/src/main/common/webapp/WEB-INF/classes") {
+        include 'logback.xml'
+        into 'WEB-INF/classes'
+    }
+
+    //from("$projectDir/src/main/common/webapp/META-INF") {
     //    include '*.xml'
     //    into 'META-INF'
     //}
