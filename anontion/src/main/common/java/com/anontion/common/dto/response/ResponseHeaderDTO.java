@@ -1,14 +1,13 @@
 package com.anontion.common.dto.response;
-
   
 public class ResponseHeaderDTO {
 
   private String originator;
-  private boolean success;
-  private int code;
+  private Boolean success;
+  private Integer code;
   private String message;
   
-  public ResponseHeaderDTO(boolean success, int code, String message) {
+  public ResponseHeaderDTO(Boolean success, Integer code, String message) {
 
     this.originator = "server";
     this.success = success;
@@ -26,22 +25,22 @@ public class ResponseHeaderDTO {
     this.originator = originator;
   }
 
-  public boolean isSuccess() {
+  public Boolean isSuccess() {
     
     return success;
   }
 
-  public void setSuccess(boolean success) {
+  public void setSuccess(Boolean success) {
     
     this.success = success;
   }
 
-  public int getCode() {
+  public Integer getCode() {
     
     return code;
   }
 
-  public void setCode(int code) {
+  public void setCode(Integer code) {
     
     this.code = code;
   }

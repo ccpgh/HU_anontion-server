@@ -22,7 +22,9 @@ import com.anontion.common.dto.request.RequestApplicationDTO;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.security.pow.AnontionPOW;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
+import com.anontion.common.dto.response.ResponseBodyPOWDTO;
 
 import jakarta.validation.Valid;
 
@@ -63,15 +65,17 @@ public class ApplicationController {
     Integer ts = requestApplicationDTO.getBody().getTs();
     UUID client = requestApplicationDTO.getBody().getId();
     
-    System.out.println(String.format("Name/Id/Client: %s/%d/%s", name, ts, client));
-
+    String message = String.format("Primary Key is Name '%s' ts '%d' Client '%s'", name, ts, client);
+    
     AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
 
     boolean exists = applicationRepository.existsById(applicationId);
 
     if (exists) {
 
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Application already exists!"), new ResponseBodyErrorDTO()); // TODO - fix.
+      System.out.println("Pre-existing application for: " + message);
+
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Application already exists!"), new ResponseBodyErrorDTO(message));
     
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -82,7 +86,9 @@ public class ApplicationController {
 
     applicationRepository.save(newApplication);
 
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 0, "Success"), new ResponseBodyErrorDTO()); // TODO - fix.
+    AnontionPOW pow = new AnontionPOW();
+    
+    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Success"), new ResponseBodyPOWDTO(pow.getText(), pow.getTarget()));
     
     return new ResponseEntity<>(response, HttpStatus.OK);    
   }

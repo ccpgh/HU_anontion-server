@@ -1,55 +1,52 @@
 package com.anontion.common.dto.response;
 
-import java.time.Instant;
+import com.anontion.common.misc.AnontionTime;
 
 public class ResponseBodyPOWDTO extends ResponseBodyDTO {
 
-  private String data;
+  private String text;
 
-  private int target;
+  private Integer target;
 
-  private Instant ts;
-
-  private String signature; // TODO
+  private Long ts;
 
   public ResponseBodyPOWDTO() {
 
   }
 
-  public ResponseBodyPOWDTO(String data, int target, Instant ts) {
+  public ResponseBodyPOWDTO(String text, Integer target) {
 
-    this.data = data;
+    this.text = text;
     this.target = target;
-    this.ts = ts;
-    this.signature = data; // TODO fix - use signature
+    this.ts = AnontionTime.ts();
   }
 
-  public String getData() {
+  public String getText() {
     
-    return data;
+    return text;
   }
 
-  public void setData(String data) {
+  public void setText(String text) {
     
-    this.data = data;
+    this.text = text;
   }
 
-  public int getTarget() {
+  public Integer getTarget() {
     
     return target;
   }
 
-  public void setTarget(int target) {
+  public void setTarget(Integer target) {
     
     this.target = target;
   }
 
-  public Instant getTs() {
+  public Long getTs() {
     
     return ts;
   }
 
-  public void setTs(Instant ts) {
+  public void setTs(Long ts) {
 
     this.ts = ts;
   }
