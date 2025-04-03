@@ -7,8 +7,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
 
 @Entity
 @IdClass(AnontionApplicationId.class)
@@ -38,7 +36,7 @@ public class AnontionApplication {
 
   public AnontionApplication(String name, Integer ts, UUID client) {
 
-    this.id = UUID.randomUUID(); //TODO check unique
+    this.id = UUID.randomUUID();
     this.name = name;
     this.ts = ts;
     this.client = client;

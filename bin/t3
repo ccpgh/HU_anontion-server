@@ -1,1 +1,1 @@
-curl -X POST "http://localhost:8080/application/application/" -H "Accept: application/json" -H "Content-Type: application/json" -d '{ }}'
+curl -X POST "http://localhost:8080/application/application/" -H "Accept: application/json" -H "Content-Type: application/json" -d '{ }'

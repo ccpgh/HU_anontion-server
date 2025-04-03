@@ -88,7 +88,7 @@ public class ApplicationController {
 
     AnontionPOW pow = new AnontionPOW();
     
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Success"), new ResponseBodyPOWDTO(pow.getText(), pow.getTarget()));
+    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok"), new ResponseBodyPOWDTO(pow.getText(), pow.getTarget()));
     
     return new ResponseEntity<>(response, HttpStatus.OK);    
   }

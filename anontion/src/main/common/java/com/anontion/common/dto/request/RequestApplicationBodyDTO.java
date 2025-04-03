@@ -16,7 +16,7 @@ public class RequestApplicationBodyDTO {
   @NotNull(message = "Timestamp cannot be null.")
   private Integer ts;
   
-  @NotBlank(message = "Name cannot be null.")
+  @NotBlank(message = "Name cannot be blank.")
   private String name;
 
   public RequestApplicationBodyDTO() {
