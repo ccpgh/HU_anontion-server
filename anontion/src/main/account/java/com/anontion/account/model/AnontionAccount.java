@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 
 import java.util.UUID;
 
+import com.anontion.common.misc.AnontionJson;
 import com.anontion.common.security.AnontionSecurity;
 
 @Entity
@@ -26,22 +27,25 @@ public class AnontionAccount {
   private String name;
 
   @Column(nullable = false)
-  private UUID appplication;
+  private UUID application;
 
-  @Column(nullable = false)
+  @Column(name = "privatekey", columnDefinition = "VARCHAR(4096)", nullable = false)
   private String key;
+
+  @Column(name = "publickey", columnDefinition = "VARCHAR(4096)", nullable = false)
+  private String pub;
 
   public AnontionAccount() {
     
   }
 
-  public AnontionAccount(Integer ts, String name, UUID application) {
+  public AnontionAccount(Integer ts, String name, UUID application, String pub) {
 
-    this.id = UUID.randomUUID();
     this.ts = ts;
     this.name = name;
-    this.appplication = application;
+    this.application = application;
     this.key = AnontionSecurity.encodeKey(AnontionSecurity.getPrivateECDSAKey());
+    this.pub = pub;
   }
 
   public UUID getId() {
@@ -74,14 +78,14 @@ public class AnontionAccount {
     this.name = name;
   }
 
-  public UUID getAppplication() {
+  public UUID getApplication() {
     
-    return appplication;
+    return application;
   }
 
-  public void setAppplication(UUID appplication) {
+  public void setApplication(UUID application) {
     
-    this.appplication = appplication;
+    this.application = application;
   }
 
   public String getKey() {
@@ -94,4 +98,18 @@ public class AnontionAccount {
     this.key = key;
   }
 
+  public String getPub() {
+    
+    return pub;
+  }
+
+  public void setPub(String pub) {
+   
+    this.pub = pub;
+  }
+
+  public String toString() {
+    
+    return AnontionJson.o2Json(this);
+  }
 }

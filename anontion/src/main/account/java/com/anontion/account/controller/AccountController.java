@@ -29,13 +29,11 @@ import com.anontion.account.repository.AnontionAccountRepository;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.dto.response.ResponseBodyAccountDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/account")
@@ -75,9 +73,10 @@ public class AccountController {
     String high = requestAccountDTO.getBody().getHigh();
     String low = requestAccountDTO.getBody().getLow();
     String text = requestAccountDTO.getBody().getText();
-    Long target = requestAccountDTO.getBody().getTarget();
-        
-    String message = String.format("Primary Key is Name '%s' ts '%d' Client '%s' AND High '%s' Low '%s' Text '%s' Target '%l'", name, ts, client, high, low, text, target);
+    Long target = requestAccountDTO.getBody().getTarget();        
+    String pub = requestAccountDTO.getBody().getPub();
+    
+    System.out.println("RequestAccountDTO: " + requestAccountDTO);
     
     AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
 
@@ -87,16 +86,23 @@ public class AccountController {
             
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "No application."), new ResponseBodyErrorDTO("Application could not be found."));
       
-      return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
     }
 
-    AnontionAccount newAccount = new AnontionAccount(ts, name, client);
+    if (!AnontionSecurity.isValidPub(pub)) {
+      
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."), new ResponseBodyErrorDTO("Supplied client pub key invalid."));
+      
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
+    }
 
-    System.out.println("Account: " + newAccount);
+    AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub);
+
+    System.out.println("AnontionAccount: " + newAccount);
 
     AnontionAccount account = accountRepository.save(newAccount);
     
-    ResponseBodyAccountDTO body = new ResponseBodyAccountDTO(account.getId(), account.getTs(), account.getName(), account.getAppplication(), account.getKey());
+    ResponseBodyAccountDTO body = new ResponseBodyAccountDTO(account.getId(), account.getTs(), account.getName(), account.getApplication(), account.getKey());
     
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok."), body);
       

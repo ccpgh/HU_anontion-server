@@ -29,6 +29,9 @@ public class RequestAccountBodyDTO {
   @NotBlank(message = "Target cannot be blank.")
   private String text;
 
+  @NotBlank(message = "Pub cannot be blank.")
+  private String pub;
+
   @Min(0)
   private Long target;
 
@@ -104,6 +107,16 @@ public class RequestAccountBodyDTO {
   public void setTarget(Long target) {
  
     this.target = target;
+  }
+
+  public String getPub() {
+    
+    return pub;
+  }
+
+  public void setPub(String pub) {
+ 
+    this.pub = pub;
   }
 
 }

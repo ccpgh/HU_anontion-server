@@ -82,7 +82,7 @@ public class ApplicationController {
     
     AnontionApplication newApplication = new AnontionApplication(name, ts, client);
 
-    System.out.println("Application: " + newApplication);
+    System.out.println("AnontionApplication: " + newApplication);
 
     applicationRepository.save(newApplication);
 

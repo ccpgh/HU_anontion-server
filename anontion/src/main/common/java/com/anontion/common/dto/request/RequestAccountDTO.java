@@ -2,6 +2,8 @@ package com.anontion.common.dto.request;
 
 import org.springframework.stereotype.Component;
 
+import com.anontion.common.misc.AnontionJson;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -37,6 +39,11 @@ public class RequestAccountDTO {
   public void setBody(RequestAccountBodyDTO body) {
    
     this.body = body;
+  }
+  
+  public String toString() {
+        
+    return AnontionJson.o2Json(this);
   }
 }
 
