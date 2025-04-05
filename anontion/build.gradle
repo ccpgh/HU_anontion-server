@@ -73,6 +73,12 @@ dependencies {
     
     //implementation 'org.glassfish.expressly:expressly:5.0.0'
     //implementation 'org.glassfish:jakarta.el:4.0.0'
+
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.60'
+    
+    //implementation 'org.bouncycastle:bcprov-jdk18on:1.80'    
+    //implementation 'org.bouncycastle:bcpkix-jdk18on:1.80'
 }
 
 java {

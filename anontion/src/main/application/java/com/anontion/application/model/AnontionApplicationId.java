@@ -9,15 +9,15 @@ public class AnontionApplicationId implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String name;
-  private Integer ts;
+  private Integer cts;
   private UUID client;
 
   public AnontionApplicationId() {}
 
-  public AnontionApplicationId(String name, Integer ts, UUID client) {
+  public AnontionApplicationId(String name, Integer cts, UUID client) {
 
     this.name = name;
-    this.ts = ts;
+    this.cts = cts;
     this.client = client;
   }
 
@@ -31,14 +31,14 @@ public class AnontionApplicationId implements Serializable {
     this.name = name;
   }
 
-  public Integer getTs() {
+  public Integer getCts() {
 
-    return ts;
+    return cts;
   }
 
-  public void setTs(Integer ts) {
+  public void setCts(Integer cts) {
 
-    this.ts = ts;
+    this.cts = cts;
   }
 
   public UUID getClient() {
@@ -66,12 +66,12 @@ public class AnontionApplicationId implements Serializable {
 
     AnontionApplicationId that = (AnontionApplicationId) o;
 
-    return name.equals(that.name) && ts.equals(that.ts) && client.equals(that.client);
+    return name.equals(that.name) && cts.equals(that.cts) && client.equals(that.client);
   }
 
   @Override
   public int hashCode() {
 
-    return 31 * (name.hashCode() + ts.hashCode() + client.hashCode());
+    return 31 * (name.hashCode() + cts.hashCode() + client.hashCode());
   }
 }

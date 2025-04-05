@@ -12,19 +12,19 @@ public class ResponseBodyAccountDTO extends ResponseBodyDTO {
 
   private UUID application;
 
-  private String key;
+  private String pub;
 
   public ResponseBodyAccountDTO() {
 
   }
 
-  public ResponseBodyAccountDTO(UUID id, Integer ts, String name, UUID application, String key) {
+  public ResponseBodyAccountDTO(UUID id, Integer ts, String name, UUID application, String pub) {
 
     this.id = id;
     this.ts = ts;
     this.name = name;
     this.application = application;
-    this.key = key;
+    this.pub = pub;
   }
 
   public UUID getId() {
@@ -67,13 +67,13 @@ public class ResponseBodyAccountDTO extends ResponseBodyDTO {
     this.application = application;
   }
 
-  public String getKey() {
+  public String getPub() {
     
-    return key;
+    return pub;
   }
 
-  public void setKey(String key) {
+  public void setPub(String pub) {
     
-    this.key = key;
+    this.pub = pub;
   }
 }

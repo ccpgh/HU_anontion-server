@@ -44,8 +44,12 @@ public class AnontionAccount {
     this.ts = ts;
     this.name = name;
     this.application = application;
-    this.key = AnontionSecurity.encodeKey(AnontionSecurity.getPrivateECDSAKey());
+    this.key = AnontionSecurity.encodeKeyK1(AnontionSecurity.root());
     this.pub = pub;
+
+    System.out.println("DEBUG: AnontionAccount key " + this.key);
+    
+    System.out.println("DEBUG: AnontionAccount pub " + this.pub);
   }
 
   public UUID getId() {

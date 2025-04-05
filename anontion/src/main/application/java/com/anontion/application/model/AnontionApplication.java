@@ -21,26 +21,26 @@ public class AnontionApplication {
 
   @Id
   @Column(nullable = false)
-  private Integer ts;
+  private Integer cts;
 
   @Id
   @Column(nullable = false)
   private UUID client;
 
   @Column(nullable = false) 
-  private Integer now;
+  private Integer ts;
 
   public AnontionApplication() {
     
   }
 
-  public AnontionApplication(String name, Integer ts, UUID client) {
+  public AnontionApplication(String name, Integer cts, UUID client) {
 
     this.id = UUID.randomUUID();
     this.name = name;
-    this.ts = ts;
+    this.cts = cts;
     this.client = client;
-    this.now = (int) (System.currentTimeMillis() / 1000); 
+    this.ts = (int) (System.currentTimeMillis() / 1000); 
   }
 
   public UUID getId() {
@@ -63,14 +63,14 @@ public class AnontionApplication {
     this.name = name;
   }
 
-  public Integer getTs() {
+  public Integer getCts() {
     
-    return ts;
+    return cts;
   }
 
-  public void setTs(Integer ts) {
+  public void setCts(Integer cts) {
     
-    this.ts = ts;
+    this.cts = cts;
   }
 
   public UUID getClient() {
@@ -83,13 +83,13 @@ public class AnontionApplication {
     this.client = client;
   }
 
-  public Integer getNow() {
+  public Integer getTs() {
     
-    return now;
+    return ts;
   }
 
-  public void setNow(Integer now) {
+  public void setTs(Integer ts) {
     
-    this.now = now;
+    this.ts = ts;
   }
 }

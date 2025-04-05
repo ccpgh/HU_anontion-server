@@ -49,51 +49,55 @@ public class AccountController {
   public ResponseEntity<ResponseDTO> getAccount() {
 
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
-    
-    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
+
+    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
   }
-  
+
   @PostMapping(path = "/")
-  public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestAccountDTO requestAccountDTO, BindingResult bindingResult) {
+  public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestAccountDTO requestAccountDTO,
+      BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
-      
-      String message = bindingResult.getAllErrors().stream()
-          .map(ObjectError::getDefaultMessage)
+
+      String message = bindingResult.getAllErrors().stream().map(ObjectError::getDefaultMessage)
           .collect(Collectors.joining(" "));
 
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Invalid parameters!"), new ResponseBodyErrorDTO(message));
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Invalid parameters!"),
+          new ResponseBodyErrorDTO(message));
 
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-    
-    String name = requestAccountDTO.getBody().getName();
-    Integer ts = requestAccountDTO.getBody().getTs();
-    UUID client = requestAccountDTO.getBody().getId();
-    String high = requestAccountDTO.getBody().getHigh();
-    String low = requestAccountDTO.getBody().getLow();
-    String text = requestAccountDTO.getBody().getText();
-    Long target = requestAccountDTO.getBody().getTarget();        
-    String pub = requestAccountDTO.getBody().getPub();
-    
+
+    String  name   = requestAccountDTO.getBody().getName();
+    Integer ts     = requestAccountDTO.getBody().getTs();
+    UUID    client = requestAccountDTO.getBody().getId();
+    String  pub    = requestAccountDTO.getBody().getPub();
+
+    String  high   = requestAccountDTO.getBody().getHigh();
+    String  low    = requestAccountDTO.getBody().getLow();
+    String  text   = requestAccountDTO.getBody().getText();
+    Long    target = requestAccountDTO.getBody().getTarget();
+
     System.out.println("RequestAccountDTO: " + requestAccountDTO);
-    
+
     AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
 
     Optional<AnontionApplication> applicationOptional = applicationRepository.findById(applicationId);
 
     if (!applicationOptional.isPresent()) {
-            
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "No application."), new ResponseBodyErrorDTO("Application could not be found."));
-      
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
+
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "No application."),
+          new ResponseBodyErrorDTO("Application could not be found."));
+
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    if (!AnontionSecurity.isValidPub(pub)) {
-      
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."), new ResponseBodyErrorDTO("Supplied client pub key invalid."));
-      
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
+    if (AnontionSecurity.decodePublicKeyFromBase64XY(pub) == null) {
+
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
+          new ResponseBodyErrorDTO("Supplied client pub key invalid."));
+
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub);
@@ -101,28 +105,32 @@ public class AccountController {
     System.out.println("AnontionAccount: " + newAccount);
 
     AnontionAccount account = accountRepository.save(newAccount);
-    
-    ResponseBodyAccountDTO body = new ResponseBodyAccountDTO(account.getId(), account.getTs(), account.getName(), account.getApplication(), account.getKey());
-    
+
+    String remote = AnontionSecurity.encodePubK1(AnontionSecurity.pub());
+
+    System.out.println("DEBUG: postAccount remote " + remote);
+
+    ResponseBodyAccountDTO body = new ResponseBodyAccountDTO(account.getId(), account.getTs(), account.getName(),
+        account.getApplication(), remote);
+
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok."), body);
-      
-    return new ResponseEntity<>(response, HttpStatus.OK);    
+
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @PutMapping(path = "/")
   public ResponseEntity<ResponseDTO> putAccount() {
 
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
-    
-    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
+
+    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
   }
 
   @DeleteMapping(path = "/")
   public ResponseEntity<ResponseDTO> deleteAccount() {
 
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
-    
-    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
+
+    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
   }
 }
-
