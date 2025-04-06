@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
+import java.security.PublicKey;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -95,7 +96,15 @@ public class AccountController {
     if (AnontionSecurity.decodePublicKeyFromBase64XY(pub) == null) {
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
-          new ResponseBodyErrorDTO("Supplied client pub key invalid."));
+          new ResponseBodyErrorDTO("Supplied client pub key invalid[1]."));
+
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    if (AnontionSecurity.decodeECPublicKeyParametersFromBase64XY(pub) == null) {
+
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
+          new ResponseBodyErrorDTO("Supplied client pub key invalid[2]."));
 
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -106,8 +115,8 @@ public class AccountController {
 
     AnontionAccount account = accountRepository.save(newAccount);
 
-    String remote = AnontionSecurity.encodePubK1(AnontionSecurity.pub());
-
+    String remote = AnontionSecurity.encodePubK1XY(AnontionSecurity.pub());
+    
     System.out.println("DEBUG: postAccount remote " + remote);
 
     ResponseBodyAccountDTO body = new ResponseBodyAccountDTO(account.getId(), account.getTs(), account.getName(),

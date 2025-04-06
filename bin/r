@@ -33,7 +33,11 @@ then
   exit 1
 fi
 
+sleep 10
+
 ../../../../tomcat/current/bin/startup.sh
+
+ps -ef | grep tomcat 
 
 echo "fini."
 
