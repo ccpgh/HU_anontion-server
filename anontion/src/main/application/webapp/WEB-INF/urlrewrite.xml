@@ -1,0 +1,6 @@
+<urlrewrite>
+  <rule>
+    <from>^(?!/application(?!/)).*</from>
+    <to>/application/$1</to>
+  </rule>
+</urlrewrite>
