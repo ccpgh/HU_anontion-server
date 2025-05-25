@@ -6,7 +6,7 @@ public class ResponseBodyPOWDTO extends ResponseBodyDTO {
 
   private String text;
 
-  private Integer target;
+  private Long target;
 
   private Long ts;
 
@@ -14,7 +14,7 @@ public class ResponseBodyPOWDTO extends ResponseBodyDTO {
 
   }
 
-  public ResponseBodyPOWDTO(String text, Integer target) {
+  public ResponseBodyPOWDTO(String text, Long target) {
 
     this.text = text;
     this.target = target;
@@ -31,12 +31,12 @@ public class ResponseBodyPOWDTO extends ResponseBodyDTO {
     this.text = text;
   }
 
-  public Integer getTarget() {
+  public Long getTarget() {
     
     return target;
   }
 
-  public void setTarget(Integer target) {
+  public void setTarget(Long target) {
     
     this.target = target;
   }

@@ -7,9 +7,9 @@ public class AnontionPOW {
 
   final private String text;
 
-  final private Integer target;
+  final private Long target;
 
-  static private Integer CONST_TARGET = 1000000;
+  static private Long CONST_TARGET = 1000000000000L;
 
   static private Integer CONST_TEXT_LENGTH = 1024;
 
@@ -60,7 +60,7 @@ public class AnontionPOW {
     return text;
   }
   
-  public Integer getTarget() {
+  public Long getTarget() {
     
     return target;
   }
