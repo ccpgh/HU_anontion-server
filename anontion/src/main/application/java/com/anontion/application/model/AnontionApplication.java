@@ -2,11 +2,14 @@ package com.anontion.application.model;
 
 import java.util.UUID;
 
+import com.anontion.common.misc.AnontionTime;
+
 import jakarta.persistence.Column;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.Lob;
 
 @Entity
 @IdClass(AnontionApplicationId.class)
@@ -21,26 +24,46 @@ public class AnontionApplication {
 
   @Id
   @Column(nullable = false)
-  private Integer cts;
+  private Long cts;
 
   @Id
   @Column(nullable = false)
   private UUID client;
 
   @Column(nullable = false) 
-  private Integer ts;
+  private String pub;
+
+  @Column(nullable = false) 
+  private String hash;
+
+  @Column(nullable = false) 
+  private String sign;
+
+  @Column(nullable = false) 
+  private Long ts;
+
+  @Column(nullable = false, columnDefinition = "TEXT")
+  private String text;
+
+  @Column(nullable = false) 
+  private Long target;
 
   public AnontionApplication() {
     
   }
 
-  public AnontionApplication(String name, Integer cts, UUID client) {
+  public AnontionApplication(String name, Long cts, UUID client, String pub, String hash, String sign, String text, Long target) {
 
     this.id = UUID.randomUUID();
     this.name = name;
     this.cts = cts;
     this.client = client;
-    this.ts = (int) (System.currentTimeMillis() / 1000); 
+    this.pub = pub;
+    this.hash = hash;
+    this.sign = sign;
+    this.text = text;
+    this.target = target;
+    this.ts = AnontionTime.ts(); 
   }
 
   public UUID getId() {
@@ -63,12 +86,12 @@ public class AnontionApplication {
     this.name = name;
   }
 
-  public Integer getCts() {
+  public Long getCts() {
     
     return cts;
   }
 
-  public void setCts(Integer cts) {
+  public void setCts(Long cts) {
     
     this.cts = cts;
   }
@@ -83,13 +106,67 @@ public class AnontionApplication {
     this.client = client;
   }
 
-  public Integer getTs() {
+  public String getPub() {
+
+    return pub;
+  }
+
+  public void setPub(String pub) {
+
+    this.pub = pub;
+  }
+  
+  
+  public String getHash() {
+
+    return hash;
+  }
+
+  public void setHash(String hash) {
+
+    this.hash = hash;
+  }
+  
+  
+  public String getSign() {
+
+    return sign;
+  }
+
+  public void setSign(String sign) {
+
+    this.sign = sign;
+  }
+  
+  
+  public Long getTs() {
     
     return ts;
   }
 
-  public void setTs(Integer ts) {
+  public void setTs(Long ts) {
     
     this.ts = ts;
   }
+  
+  public String getText() {
+
+    return text;
+  }
+
+  public void setText(String text) {
+
+    this.text = text;
+  }
+  
+  public Long getTarget() {
+
+    return target;
+  }
+
+  public void setTarget(Long target) {
+
+    this.target = target;
+  }
+  
 }

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
-import java.security.PublicKey;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,7 +30,7 @@ import com.anontion.account.repository.AnontionAccountRepository;
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.security.AnontionSecurity;
-import com.anontion.common.dto.response.ResponseBodyAccountDTO;
+import com.anontion.common.dto.response.ResponseAccountBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
 import jakarta.validation.Valid;
@@ -70,9 +69,8 @@ public class AccountController {
     }
 
     String  name   = requestAccountDTO.getBody().getName();
-    Integer ts     = requestAccountDTO.getBody().getTs();
+    Long    ts     = requestAccountDTO.getBody().getTs();
     UUID    client = requestAccountDTO.getBody().getId();
-    String  pub    = requestAccountDTO.getBody().getPub();
 
     String  high   = requestAccountDTO.getBody().getHigh();
     String  low    = requestAccountDTO.getBody().getLow();
@@ -93,6 +91,21 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    AnontionApplication application = applicationOptional.get();
+    
+    if (!application.getText().equals(text) || !application.getTarget().equals(target)) {
+      
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "No application."),
+          new ResponseBodyErrorDTO("Application POW mismatch."));
+
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    String  pub    = application.getPub();
+    
+    String hash    = application.getHash();
+    
+
     if (AnontionSecurity.decodePublicKeyFromBase64XY(pub) == null) {
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
@@ -109,18 +122,18 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub);
+    boolean approved = true; // TODO check based on POW and timeout
+    
+    System.out.println("DEBUG: postAccount approved " + approved);
+
+    AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash);
 
     System.out.println("AnontionAccount: " + newAccount);
 
     AnontionAccount account = accountRepository.save(newAccount);
 
-    String remote = AnontionSecurity.encodePubK1XY(AnontionSecurity.pub());
-    
-    System.out.println("DEBUG: postAccount remote " + remote);
-
-    ResponseBodyAccountDTO body = new ResponseBodyAccountDTO(account.getId(), account.getTs(), account.getName(),
-        account.getApplication(), remote);
+    ResponseAccountBodyDTO body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
+        account.getApplication(), approved);
 
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok."), body);
 

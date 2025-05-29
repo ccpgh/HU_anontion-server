@@ -22,9 +22,11 @@ import com.anontion.common.dto.request.RequestApplicationDTO;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.misc.AnontionTime;
+import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.pow.AnontionPOW;
+import com.anontion.common.dto.response.ResponseApplicationBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
-import com.anontion.common.dto.response.ResponseBodyPOWDTO;
 
 import jakarta.validation.Valid;
 
@@ -62,10 +64,11 @@ public class ApplicationController {
 	  }
 
     String name = requestApplicationDTO.getBody().getName();
-    Integer ts = requestApplicationDTO.getBody().getTs();
+    Long ts = AnontionTime.ts();
     UUID client = requestApplicationDTO.getBody().getId();
+    String pub = requestApplicationDTO.getBody().getPub();
     
-    String message = String.format("Primary Key is Name '%s' ts '%d' Client '%s'", name, ts, client);
+    String message = String.format("Primary Key is name '%s' ts '%d' client '%s' PLUS pub '%s' ", name, ts, client, pub);
     
     AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
 
@@ -79,16 +82,30 @@ public class ApplicationController {
     
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-    
-    AnontionApplication newApplication = new AnontionApplication(name, ts, client);
-
-    System.out.println("AnontionApplication: " + newApplication);
-
-    applicationRepository.save(newApplication);
 
     AnontionPOW pow = new AnontionPOW();
     
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok"), new ResponseBodyPOWDTO(pow.getText(), pow.getTarget()));
+    String remote = AnontionSecurity.encodePubK1XY(AnontionSecurity.pub());
+    
+    System.out.println("DEBUG: postApplication remote " + remote);
+
+    String hash = "TODO hash"; // TODO generate real hash
+    
+    System.out.println("DEBUG: postApplication hash " + hash);
+
+    String sign = "TODO sign"; // TODO generate real hash
+
+    System.out.println("DEBUG: postApplication sign " + hash);
+
+    AnontionApplication newApplication = new AnontionApplication(name, ts, client, pub, hash, sign, pow.getText(), pow.getTarget());
+    
+    System.out.println("AnontionApplication: " + newApplication);
+
+    applicationRepository.save(newApplication);
+    
+    ResponseApplicationBodyDTO body =  new ResponseApplicationBodyDTO(newApplication.getText(), newApplication.getTarget(), remote, hash, sign);
+    
+    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok"), body);
     
     return new ResponseEntity<>(response, HttpStatus.OK);    
   }

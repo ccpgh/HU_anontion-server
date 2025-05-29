@@ -15,7 +15,7 @@ public class RequestAccountBodyDTO {
   private UUID id;
 
   @NotNull(message = "Timestamp cannot be null.")
-  private Integer ts;
+  private Long ts;
   
   @NotBlank(message = "Name cannot be blank.")
   private String name;
@@ -28,9 +28,6 @@ public class RequestAccountBodyDTO {
 
   @NotBlank(message = "Target cannot be blank.")
   private String text;
-
-  @NotBlank(message = "Pub cannot be blank.")
-  private String pub;
 
   @Min(0)
   private Long target;
@@ -49,12 +46,12 @@ public class RequestAccountBodyDTO {
     this.id = id;
   }
 
-  public Integer getTs() {
+  public Long getTs() {
     
     return ts;
   }
 
-  public void setTs(Integer ts) {
+  public void setTs(Long ts) {
     
     this.ts = ts;
   }
@@ -108,15 +105,4 @@ public class RequestAccountBodyDTO {
  
     this.target = target;
   }
-
-  public String getPub() {
-    
-    return pub;
-  }
-
-  public void setPub(String pub) {
- 
-    this.pub = pub;
-  }
-
 }

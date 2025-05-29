@@ -21,7 +21,7 @@ public class AnontionAccount {
   private UUID id;
 
   @Column(nullable = false)
-  private Integer ts;
+  private Long ts;
 
   @Column(nullable = false)
   private String name;
@@ -35,21 +35,27 @@ public class AnontionAccount {
   @Column(name = "publickey", columnDefinition = "VARCHAR(4096)", nullable = false)
   private String pub;
 
+  @Column(nullable = false)
+  private String hash;
+
   public AnontionAccount() {
     
   }
 
-  public AnontionAccount(Integer ts, String name, UUID application, String pub) {
+  public AnontionAccount(Long ts, String name, UUID application, String pub, String hash) {
 
     this.ts = ts;
     this.name = name;
     this.application = application;
     this.key = AnontionSecurity.encodeKeyK1(AnontionSecurity.root());
     this.pub = pub;
+    this.hash = hash;
 
     System.out.println("DEBUG: AnontionAccount key " + this.key);
     
     System.out.println("DEBUG: AnontionAccount pub " + this.pub);
+
+    System.out.println("DEBUG: AnontionAccount hash " + this.hash);
   }
 
   public UUID getId() {
@@ -62,12 +68,12 @@ public class AnontionAccount {
     this.id = id;
   }
 
-  public Integer getTs() {
+  public Long getTs() {
     
     return ts;
   }
 
-  public void setTs(Integer ts) {
+  public void setTs(Long ts) {
     
     this.ts = ts;
   }
@@ -110,6 +116,16 @@ public class AnontionAccount {
   public void setPub(String pub) {
    
     this.pub = pub;
+  }
+
+  public String getHash() {
+    
+    return hash;
+  }
+
+  public void setHash(String hash) {
+   
+    this.hash = hash;
   }
 
   public String toString() {

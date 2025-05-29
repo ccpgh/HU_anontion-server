@@ -9,6 +9,7 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPublicKeySpec;
 import java.util.Base64;
+import java.util.UUID;
 
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
@@ -293,6 +294,21 @@ abstract public class AnontionSecurity {
     
     return null;
   }
+  
+  public static String hash(String name, Long cts, UUID client, String pub) {
+
+    ECPrivateKeyParameters root = AnontionSecurity.root(); // TODO
+    
+    return "";
+  }
+  
+  public static String sign(String hash) {
+
+    ECPrivateKeyParameters root = AnontionSecurity.root(); // TODO
+    
+    return "";
+  }
+
 }
 
 

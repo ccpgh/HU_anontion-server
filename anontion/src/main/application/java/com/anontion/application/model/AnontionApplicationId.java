@@ -9,12 +9,12 @@ public class AnontionApplicationId implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String name;
-  private Integer cts;
+  private Long cts;
   private UUID client;
-
+  
   public AnontionApplicationId() {}
 
-  public AnontionApplicationId(String name, Integer cts, UUID client) {
+  public AnontionApplicationId(String name, Long cts, UUID client) {
 
     this.name = name;
     this.cts = cts;
@@ -31,12 +31,12 @@ public class AnontionApplicationId implements Serializable {
     this.name = name;
   }
 
-  public Integer getCts() {
+  public Long getCts() {
 
     return cts;
   }
 
-  public void setCts(Integer cts) {
+  public void setCts(Long cts) {
 
     this.cts = cts;
   }

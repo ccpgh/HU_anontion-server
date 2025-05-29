@@ -13,12 +13,12 @@ public class RequestApplicationBodyDTO {
   @NotNull(message = "Id cannot be null.")
   private UUID id;
 
-  @NotNull(message = "Timestamp cannot be null.")
-  private Integer ts;
-  
   @NotBlank(message = "Name cannot be blank.")
   private String name;
 
+  @NotBlank(message = "Pub cannot be blank.")
+  private String pub;
+  
   public RequestApplicationBodyDTO() {
     
   }
@@ -33,16 +33,6 @@ public class RequestApplicationBodyDTO {
     this.id = id;
   }
 
-  public Integer getTs() {
-    
-    return ts;
-  }
-
-  public void setTs(Integer ts) {
-    
-    this.ts = ts;
-  }
-
   public String getName() {
     
     return name;
@@ -51,5 +41,15 @@ public class RequestApplicationBodyDTO {
   public void setName(String name) {
  
     this.name = name;
+  }
+  
+  public String getPub() {
+    
+    return pub;
+  }
+
+  public void setPub(String pub) {
+ 
+    this.pub = pub;
   }
 }

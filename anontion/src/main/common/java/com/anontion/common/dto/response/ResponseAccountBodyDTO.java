@@ -2,29 +2,29 @@ package com.anontion.common.dto.response;
 
 import java.util.UUID;
 
-public class ResponseBodyAccountDTO extends ResponseBodyDTO {
+public class ResponseAccountBodyDTO extends ResponseBodyDTO {
 
   private UUID id;
 
-  private Integer ts;
+  private Long ts;
 
   private String name;
 
   private UUID application;
 
-  private String pub;
+  private boolean approved;
 
-  public ResponseBodyAccountDTO() {
+  public ResponseAccountBodyDTO() {
 
   }
 
-  public ResponseBodyAccountDTO(UUID id, Integer ts, String name, UUID application, String pub) {
-
+  public ResponseAccountBodyDTO(UUID id, Long ts, String name, UUID application, boolean approved) {
+    
     this.id = id;
     this.ts = ts;
     this.name = name;
     this.application = application;
-    this.pub = pub;
+    this.approved = approved;
   }
 
   public UUID getId() {
@@ -37,12 +37,12 @@ public class ResponseBodyAccountDTO extends ResponseBodyDTO {
     this.id = id;
   }
 
-  public Integer getTs() {
+  public Long getTs() {
     
     return ts;
   }
 
-  public void setTs(Integer ts) {
+  public void setTs(Long ts) {
     
     this.ts = ts;
   }
@@ -66,14 +66,15 @@ public class ResponseBodyAccountDTO extends ResponseBodyDTO {
     
     this.application = application;
   }
-
-  public String getPub() {
+  
+  public boolean getApproved() {
     
-    return pub;
+    return approved;
   }
 
-  public void setPub(String pub) {
+  public void setApproved(boolean approved) {
     
-    this.pub = pub;
+    this.approved = approved;
   }
 }
+
