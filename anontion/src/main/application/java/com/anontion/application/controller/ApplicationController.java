@@ -89,11 +89,11 @@ public class ApplicationController {
     
     System.out.println("DEBUG: postApplication remote " + remote);
 
-    String hash = "TODO hash"; // TODO generate real hash
+    String hash = AnontionSecurity.hash(name, ts, client, pub);
     
     System.out.println("DEBUG: postApplication hash " + hash);
 
-    String sign = "TODO sign"; // TODO generate real hash
+    String sign = AnontionSecurity.sign(hash);
 
     System.out.println("DEBUG: postApplication sign " + hash);
 
