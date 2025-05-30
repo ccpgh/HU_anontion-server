@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.util.UUID;
 
@@ -14,6 +16,10 @@ import com.anontion.common.misc.AnontionJson;
 import com.anontion.common.security.AnontionSecurity;
 
 @Entity
+@Table(
+  name = "AnontionAccount",
+  uniqueConstraints = @UniqueConstraint(columnNames = {"ts", "name", "application"})
+)
 public class AnontionAccount {
 
   @Id
@@ -40,7 +46,7 @@ public class AnontionAccount {
 
   @Column(nullable = false)
   private String counter;
-
+  
   public AnontionAccount() {
     
   }

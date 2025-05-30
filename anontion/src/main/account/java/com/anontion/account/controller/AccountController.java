@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -29,21 +30,31 @@ import com.anontion.account.repository.AnontionAccountRepository;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.dto.response.ResponseAccountBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
 import jakarta.validation.Valid;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.ServletContext;
 
 @RestController
 @RequestMapping("/account")
 public class AccountController {
 
+  static final private int _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT = 24 * 60 * 60; // 1 day
+
+  private int applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT;
+  
   @Autowired
   private AnontionAccountRepository accountRepository;
 
   @Autowired
   private AnontionApplicationRepository applicationRepository;
+
+  @Autowired
+  private ServletContext servletContext;
 
   @GetMapping("/")
   public ResponseEntity<ResponseDTO> getAccount() {
@@ -123,18 +134,47 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    boolean approved = true; // TODO check based on POW and timeout
+    boolean approved = false; 
+    
+    if ((AnontionTime.ts() - ts) > applicationTimeout) {
+
+      approved = true;
+    }
     
     System.out.println("DEBUG: postAccount approved " + approved);
 
-    AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash, counter);
+    Optional<AnontionAccount> accountOptional = accountRepository.findByTsAndNameAndApplication(ts, name, client);
 
-    System.out.println("AnontionAccount: " + newAccount);
+    AnontionAccount account = null;
+    
+    ResponseAccountBodyDTO body = null;
+    
+    if (accountOptional.isPresent()) {
+      
+      account = accountOptional.get();
+      
+      body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
+             account.getApplication(), true);
+      
+    } else {
 
-    AnontionAccount account = accountRepository.save(newAccount);
-
-    ResponseAccountBodyDTO body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
-        account.getApplication(), approved);
+      if (approved) {
+        
+        AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash, counter);
+      
+        System.out.println("AnontionAccount: " + newAccount);
+      
+        account = accountRepository.save(newAccount);
+        
+        body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
+            account.getApplication(), approved);
+      
+      } else {
+      
+        body = new ResponseAccountBodyDTO(new UUID(0L, 0L), ts, name, client, approved);
+      }
+      
+    }
 
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok."), body);
 
@@ -156,4 +196,30 @@ public class AccountController {
 
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
   }
+  
+  @PostConstruct
+  public void init() {
+    
+    String context = servletContext.getInitParameter("application-timeout");
+
+    
+    if (context != null) {
+      
+      try {
+      
+        applicationTimeout = Integer.parseInt(context);
+      
+      } catch (NumberFormatException e) {
+    
+        applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT;
+      }
+    
+    } else {
+    
+      applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT; 
+    }
+    
+    System.out.println("AnontionAccount: applicationTimeout " + applicationTimeout);
+  }
+
 }
