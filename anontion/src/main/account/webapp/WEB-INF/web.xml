@@ -52,7 +52,7 @@
     
   <context-param>
     <param-name>application-timeout</param-name>
-    <param-value>300</param-value>
+    <param-value>0</param-value>
   </context-param>
 
 </web-app>
