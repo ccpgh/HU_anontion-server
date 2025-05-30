@@ -71,6 +71,7 @@ public class AccountController {
     String  name   = requestAccountDTO.getBody().getName();
     Long    ts     = requestAccountDTO.getBody().getTs();
     UUID    client = requestAccountDTO.getBody().getId();
+    String  counter = requestAccountDTO.getBody().getCounter();
 
     String  high   = requestAccountDTO.getBody().getHigh();
     String  low    = requestAccountDTO.getBody().getLow();
@@ -101,9 +102,9 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    String  pub    = application.getPub();
+    String  pub = application.getPub();
     
-    String hash    = application.getHash();
+    String hash = application.getHash();
     
 
     if (AnontionSecurity.decodePublicKeyFromBase64XY(pub) == null) {
@@ -126,7 +127,7 @@ public class AccountController {
     
     System.out.println("DEBUG: postAccount approved " + approved);
 
-    AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash);
+    AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash, counter);
 
     System.out.println("AnontionAccount: " + newAccount);
 

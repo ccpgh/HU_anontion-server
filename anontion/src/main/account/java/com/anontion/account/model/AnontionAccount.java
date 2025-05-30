@@ -38,11 +38,14 @@ public class AnontionAccount {
   @Column(nullable = false)
   private String hash;
 
+  @Column(nullable = false)
+  private String counter;
+
   public AnontionAccount() {
     
   }
 
-  public AnontionAccount(Long ts, String name, UUID application, String pub, String hash) {
+  public AnontionAccount(Long ts, String name, UUID application, String pub, String hash, String counter) {
 
     this.ts = ts;
     this.name = name;
@@ -50,12 +53,7 @@ public class AnontionAccount {
     this.key = AnontionSecurity.encodeKeyK1(AnontionSecurity.root());
     this.pub = pub;
     this.hash = hash;
-
-    System.out.println("DEBUG: AnontionAccount key " + this.key);
-    
-    System.out.println("DEBUG: AnontionAccount pub " + this.pub);
-
-    System.out.println("DEBUG: AnontionAccount hash " + this.hash);
+    this.counter = counter;
   }
 
   public UUID getId() {
@@ -118,6 +116,16 @@ public class AnontionAccount {
     this.pub = pub;
   }
 
+  public String getCounter() {
+    
+    return counter;
+  }
+
+  public void setCounter(String counter) {
+   
+    this.counter = counter;
+  }
+  
   public String getHash() {
     
     return hash;

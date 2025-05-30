@@ -29,6 +29,9 @@ public class RequestAccountBodyDTO {
   @NotBlank(message = "Target cannot be blank.")
   private String text;
 
+  @NotBlank(message = "Counter cannot be blank.")
+  private String counter;
+
   @Min(0)
   private Long target;
 
@@ -105,4 +108,15 @@ public class RequestAccountBodyDTO {
  
     this.target = target;
   }
+  
+  public String getCounter() {
+    
+    return counter;
+  }
+
+  public void setCounter(String counter) {
+ 
+    this.counter = counter;
+  }
 }
+
