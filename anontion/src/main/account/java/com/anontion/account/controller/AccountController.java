@@ -13,7 +13,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -136,7 +135,9 @@ public class AccountController {
 
     boolean approved = false; 
     
-    if ((AnontionTime.ts() - ts) > applicationTimeout) {
+    Long now = AnontionTime.ts();
+    
+    if ((now - ts) > applicationTimeout) {
 
       approved = true;
     }
@@ -154,7 +155,7 @@ public class AccountController {
       account = accountOptional.get();
       
       body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
-             account.getApplication(), true);
+             account.getApplication(), 100.0f, true);
       
     } else {
 
@@ -167,11 +168,13 @@ public class AccountController {
         account = accountRepository.save(newAccount);
         
         body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
-            account.getApplication(), approved);
+            account.getApplication(), 100.0f, approved);
       
       } else {
       
-        body = new ResponseAccountBodyDTO(new UUID(0L, 0L), ts, name, client, approved);
+        Float progress = ((now - ts) / (float) applicationTimeout) * 100.0f;
+        
+        body = new ResponseAccountBodyDTO(new UUID(0L, 0L), ts, name, client, progress, approved);
       }
       
     }
