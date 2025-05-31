@@ -1,5 +1,9 @@
 package com.anontion.common.security;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -10,8 +14,9 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPublicKeySpec;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.Scanner;
 
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.params.ECDomainParameters;
@@ -23,6 +28,7 @@ import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
+import org.bouncycastle.math.ec.ECPoint;
 
 abstract public class AnontionSecurity {
 
@@ -30,21 +36,17 @@ abstract public class AnontionSecurity {
   
   private static SecureRandom _secureRandom = new SecureRandom();
 
-  private static ECKeyPairGenerator _generator = getGenerator();
+  private static ECPrivateKeyParameters _root = AnontionSecurity.load();
 
-  private static AsymmetricCipherKeyPair _pair = getPair();
-
-  private static ECPrivateKeyParameters _root = getRoot();
-
-  private static ECPublicKeyParameters _pub = getPub();
+  private static ECPublicKeyParameters _pub = toPublicKey(_root);
 
   public static ECPrivateKeyParameters root() {
-
+  
     return _root;
   }
 
   public static ECPublicKeyParameters pub() {
-
+  
     return _pub;
   }
 
@@ -57,6 +59,7 @@ abstract public class AnontionSecurity {
     return Base64.getEncoder().encodeToString(randomBytes);
   }
 
+  @SuppressWarnings("unused")
   private static ECKeyPairGenerator getGenerator() {
 
     ECNamedCurveParameterSpec curve = ECNamedCurveTable.getParameterSpec(_curve);
@@ -71,21 +74,6 @@ abstract public class AnontionSecurity {
     generator.init(keyParams);
 
     return generator;
-  }
-
-  private static AsymmetricCipherKeyPair getPair() {
-
-    return _generator.generateKeyPair();
-  }
-
-  private static ECPrivateKeyParameters getRoot() {
-
-    return (ECPrivateKeyParameters) _pair.getPrivate();
-  }
-
-  private static ECPublicKeyParameters getPub() {
-
-    return (ECPublicKeyParameters) _pair.getPublic();
   }
 
   public static String encodeKeyK1(ECPrivateKeyParameters key) {
@@ -415,6 +403,63 @@ abstract public class AnontionSecurity {
     return new ECPrivateKeyParameters(d, domain);
   }
 
+  private static ECPrivateKeyParameters load() {
+    
+    InputStream in = AnontionSecurity.class.getClassLoader().getResourceAsStream("server.key");
+    
+    if (in != null) {
+
+      BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+      
+      StringBuilder sb = new StringBuilder();
+      
+      String line;
+
+      try {
+      
+        while ((line = reader.readLine()) != null) {
+      
+          sb.append(line);
+        }
+        
+      } catch (IOException e) {
+        
+        System.out.println("Server key load eror " + e);
+
+        e.printStackTrace();
+
+        return null;
+      }
+
+      String base64Key = sb.toString().trim();
+
+      if (base64Key.isEmpty()) {
+        
+        System.out.println("Server keyfile is empty");
+        
+        return null;
+      }
+
+      return decodeECPrivateKeyParametersFromBase64D(base64Key);
+      
+    } else {
+    
+      System.out.println("Server key not found");
+    }
+    
+    return null;
+  }
+  
+  public static ECPublicKeyParameters toPublicKey(ECPrivateKeyParameters privateKey) {
+    
+    ECDomainParameters params = privateKey.getParameters();
+  
+    BigInteger d = privateKey.getD();
+
+    ECPoint q = params.getG().multiply(d).normalize();
+
+    return new ECPublicKeyParameters(q, params);
+  }
   
 }
 
