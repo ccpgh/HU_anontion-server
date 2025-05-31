@@ -1,7 +1,10 @@
 package com.anontion.system;
 
-public class AnontionSystem {
-    public boolean f() {
-        return true;
-    }
+import jakarta.servlet.http.HttpServlet;
+
+public class AnontionSystem extends HttpServlet {
+
+  private static final long serialVersionUID = 1L; 
+
+
 }
