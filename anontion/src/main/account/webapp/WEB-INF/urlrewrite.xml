@@ -1,6 +1,6 @@
 <urlrewrite>
-  <rule>
-    <from>^(?!/account(?!/)).*</from>
-    <to>/account/$1</to>
-  </rule>
+ <rule>
+  <from>^(?!/account)(/.*)?$</from>
+  <to>/account$1</to>
+</rule>
 </urlrewrite>
