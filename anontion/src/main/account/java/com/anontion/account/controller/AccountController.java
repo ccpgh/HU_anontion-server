@@ -159,7 +159,7 @@ public class AccountController {
 
       if (approved) {
         
-        AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash, counter);
+        AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash, counter, true);
       
         System.out.println("AnontionAccount: " + newAccount);
       
@@ -174,7 +174,6 @@ public class AccountController {
         
         body = new ResponseAccountBodyDTO(new UUID(0L, 0L), ts, name, client, progress, approved);
       }
-      
     }
 
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok."), body);

@@ -46,12 +46,15 @@ public class AnontionAccount {
 
   @Column(nullable = false)
   private String counter;
+
+  @Column(nullable = false)
+  private boolean active;
   
   public AnontionAccount() {
     
   }
 
-  public AnontionAccount(Long ts, String name, UUID application, String pub, String hash, String counter) {
+  public AnontionAccount(Long ts, String name, UUID application, String pub, String hash, String counter, boolean active) {
 
     this.ts = ts;
     this.name = name;
@@ -60,6 +63,7 @@ public class AnontionAccount {
     this.pub = pub;
     this.hash = hash;
     this.counter = counter;
+    this.active = active;
   }
 
   public UUID getId() {
@@ -142,8 +146,19 @@ public class AnontionAccount {
     this.hash = hash;
   }
 
+  public boolean getActive() {
+  
+    return active;
+  }
+
+  public void setActive(boolean active) {
+  
+    this.active = active;
+  }
+  
   public String toString() {
     
     return AnontionJson.o2Json(this);
   }
+  
 }
