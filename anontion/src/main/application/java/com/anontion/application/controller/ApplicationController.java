@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,7 @@ public class ApplicationController {
   
   @PostMapping(path = "/")
   public ResponseEntity<ResponseDTO> postApplication(@Valid @RequestBody RequestApplicationDTO requestApplicationDTO, BindingResult bindingResult) {
-
+    
 	  if (bindingResult.hasErrors()) {
 	    
 		  String message = bindingResult.getAllErrors().stream()
@@ -87,15 +88,9 @@ public class ApplicationController {
     
     String remote = AnontionSecurity.encodePubK1XY(AnontionSecurity.pub());
     
-    System.out.println("DEBUG: postApplication remote " + remote);
-
     String hash = AnontionSecurity.hash(name, ts, client, pub);
     
-    System.out.println("DEBUG: postApplication hash " + hash);
-
     String sign = AnontionSecurity.sign(hash);
-
-    System.out.println("DEBUG: postApplication sign " + hash);
 
     AnontionApplication newApplication = new AnontionApplication(name, ts, client, pub, hash, sign, pow.getText(), pow.getTarget());
     

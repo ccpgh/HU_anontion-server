@@ -142,8 +142,6 @@ public class AccountController {
       approved = true;
     }
     
-    System.out.println("DEBUG: postAccount approved " + approved);
-
     Optional<AnontionAccount> accountOptional = accountRepository.findByTsAndNameAndApplication(ts, name, client);
 
     AnontionAccount account = null;

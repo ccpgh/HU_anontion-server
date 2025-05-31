@@ -26,6 +26,8 @@ import org.bouncycastle.math.ec.ECCurve;
 
 abstract public class AnontionSecurity {
 
+  private static String _curve = "secp256k1";
+  
   private static SecureRandom _secureRandom = new SecureRandom();
 
   private static ECKeyPairGenerator _generator = getGenerator();
@@ -57,7 +59,7 @@ abstract public class AnontionSecurity {
 
   private static ECKeyPairGenerator getGenerator() {
 
-    ECNamedCurveParameterSpec curve = ECNamedCurveTable.getParameterSpec("secp256k1");
+    ECNamedCurveParameterSpec curve = ECNamedCurveTable.getParameterSpec(_curve);
 
     ECDomainParameters domainParams = new ECDomainParameters(curve.getCurve(), curve.getG(), curve.getN(), curve.getH(),
         curve.getSeed());
@@ -205,7 +207,7 @@ abstract public class AnontionSecurity {
 
     System.arraycopy(decodedKey, 33, yBytes, 0, 32);
 
-    ECNamedCurveParameterSpec params = ECNamedCurveTable.getParameterSpec("secp256k1");
+    ECNamedCurveParameterSpec params = ECNamedCurveTable.getParameterSpec(_curve);
 
     ECCurve curve = params.getCurve();
 
@@ -260,7 +262,7 @@ abstract public class AnontionSecurity {
 
     System.arraycopy(decodedKey, 33, yBytes, 0, 32);
 
-    ECNamedCurveParameterSpec params = ECNamedCurveTable.getParameterSpec("secp256k1");
+    ECNamedCurveParameterSpec params = ECNamedCurveTable.getParameterSpec(_curve);
 
     java.security.spec.ECPoint ecPoint = new java.security.spec.ECPoint(new BigInteger(1, xBytes),
         new BigInteger(1, yBytes));
@@ -360,4 +362,60 @@ abstract public class AnontionSecurity {
       throw new RuntimeException(e);
     }
   }
+   
+  public static String encodeKeyD(ECPrivateKeyParameters key) {
+    
+    BigInteger d = key.getD();
+
+    byte[] bytes = d.toByteArray();
+
+    if (bytes.length == 33 && bytes[0] == 0x00) {
+
+        byte[] trimmed = new byte[32];
+
+        System.arraycopy(bytes, 1, trimmed, 0, 32);
+        
+        bytes = trimmed;
+    
+    } else if (bytes.length < 32) {
+
+      byte[] padded = new byte[32];
+      
+      System.arraycopy(bytes, 0, padded, 32 - bytes.length, bytes.length);
+      
+      bytes = padded;
+    
+    } else if (bytes.length > 32) {
+    
+      throw new IllegalArgumentException("Private key too large");
+    }
+
+    return Base64.getEncoder().encodeToString(bytes);
+  }
+
+  public static ECPrivateKeyParameters decodeECPrivateKeyParametersFromBase64D(String base64Key) {
+
+    byte[] decoded = Base64.getDecoder().decode(base64Key);
+    
+    if (decoded.length != 32) {
+        
+      throw new IllegalArgumentException("Invalid private key length, expected 32 bytes");
+    }
+
+    BigInteger d = new BigInteger(1, decoded);
+
+    ECNamedCurveParameterSpec params = ECNamedCurveTable.getParameterSpec(_curve);
+ 
+    ECDomainParameters domain = new ECDomainParameters(
+        params.getCurve(),
+        params.getG(),
+        params.getN(),
+        params.getH());
+      
+    return new ECPrivateKeyParameters(d, domain);
+  }
+
+  
 }
+
+
