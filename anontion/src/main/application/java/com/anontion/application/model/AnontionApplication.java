@@ -2,8 +2,6 @@ package com.anontion.application.model;
 
 import java.util.UUID;
 
-import com.anontion.common.misc.AnontionTime;
-
 import jakarta.persistence.Column;
 
 import jakarta.persistence.Entity;
@@ -23,7 +21,7 @@ public class AnontionApplication {
 
   @Id
   @Column(nullable = false)
-  private Long cts;
+  private Long ts;
 
   @Id
   @Column(nullable = false)
@@ -38,9 +36,6 @@ public class AnontionApplication {
   @Column(nullable = false) 
   private String sign;
 
-  @Column(nullable = false) 
-  private Long ts;
-
   @Column(nullable = false, columnDefinition = "TEXT")
   private String text;
 
@@ -51,18 +46,17 @@ public class AnontionApplication {
     
   }
 
-  public AnontionApplication(String name, Long cts, UUID client, String pub, String hash, String sign, String text, Long target) {
+  public AnontionApplication(String name, Long ts, UUID client, String pub, String hash, String sign, String text, Long target) {
 
     this.id = UUID.randomUUID();
     this.name = name;
-    this.cts = cts;
+    this.ts = ts;
     this.client = client;
     this.pub = pub;
     this.hash = hash;
     this.sign = sign;
     this.text = text;
     this.target = target;
-    this.ts = AnontionTime.ts(); 
   }
 
   public UUID getId() {
@@ -85,14 +79,14 @@ public class AnontionApplication {
     this.name = name;
   }
 
-  public Long getCts() {
+  public Long getTs() {
     
-    return cts;
+    return ts;
   }
 
-  public void setCts(Long cts) {
+  public void setTs(Long ts) {
     
-    this.cts = cts;
+    this.ts = ts;
   }
 
   public UUID getClient() {
@@ -136,18 +130,7 @@ public class AnontionApplication {
 
     this.sign = sign;
   }
-  
-  
-  public Long getTs() {
     
-    return ts;
-  }
-
-  public void setTs(Long ts) {
-    
-    this.ts = ts;
-  }
-  
   public String getText() {
 
     return text;

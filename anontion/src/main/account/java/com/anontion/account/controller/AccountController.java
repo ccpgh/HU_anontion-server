@@ -97,7 +97,7 @@ public class AccountController {
     if (!applicationOptional.isPresent()) {
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "No application."),
-          new ResponseBodyErrorDTO("Application could not be found."));
+          new ResponseBodyErrorDTO("Application could not be found." + "name = '" + name + "', ts = '" + ts + "', client UUID " + client + "'"));
 
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -135,7 +135,7 @@ public class AccountController {
 
     boolean approved = false; 
     
-    Long now = AnontionTime.ts();
+    Long now = AnontionTime.tsN();
     
     if ((now - ts) > applicationTimeout) {
 

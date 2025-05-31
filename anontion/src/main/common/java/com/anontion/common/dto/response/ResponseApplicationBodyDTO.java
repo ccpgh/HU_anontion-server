@@ -1,7 +1,5 @@
 package com.anontion.common.dto.response;
 
-import com.anontion.common.misc.AnontionTime;
-
 public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
 
   private String text;
@@ -20,14 +18,14 @@ public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
 
   }
 
-  public ResponseApplicationBodyDTO(String text, Long target, String remote, String hash, String sign) {
+  public ResponseApplicationBodyDTO(String text, Long target, String remote, String hash, String sign, Long ts) {
 
     this.text = text;
     this.target = target;
     this.remote = remote;
     this.hash = hash;
     this.sign = sign;
-    this.ts = AnontionTime.ts();
+    this.ts = ts;
   }
 
   public String getText() {
@@ -79,14 +77,14 @@ public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
     
     this.sign = sign;
   }
-
+  
   public Long getTs() {
     
     return ts;
   }
 
   public void setTs(Long ts) {
-
+    
     this.ts = ts;
   }
 }

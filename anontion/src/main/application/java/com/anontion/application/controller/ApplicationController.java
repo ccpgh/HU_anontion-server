@@ -64,7 +64,7 @@ public class ApplicationController {
 	  }
 
     String name = requestApplicationDTO.getBody().getName();
-    Long ts = AnontionTime.ts();
+    Long ts = AnontionTime.tsN();
     UUID client = requestApplicationDTO.getBody().getId();
     String pub = requestApplicationDTO.getBody().getPub();
     
@@ -103,7 +103,7 @@ public class ApplicationController {
 
     applicationRepository.save(newApplication);
     
-    ResponseApplicationBodyDTO body =  new ResponseApplicationBodyDTO(newApplication.getText(), newApplication.getTarget(), remote, hash, sign);
+    ResponseApplicationBodyDTO body =  new ResponseApplicationBodyDTO(newApplication.getText(), newApplication.getTarget(), remote, hash, sign, ts);
     
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok"), body);
     

@@ -307,9 +307,9 @@ abstract public class AnontionSecurity {
     return null;
   }
 
-  public static String hash(String name, Long cts, UUID client, String pub) {
+  public static String hash(String name, Long ts, UUID client, String pub) {
 
-    String input = name + ":" + cts + ":" + client.toString() + ":" + pub;
+    String input = name + ":" + ts + ":" + client.toString() + ":" + pub;
 
     byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
 
