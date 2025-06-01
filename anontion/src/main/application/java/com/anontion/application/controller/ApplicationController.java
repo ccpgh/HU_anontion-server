@@ -24,7 +24,7 @@ import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
-import com.anontion.common.security.pow.AnontionPOW;
+import com.anontion.common.security.AnontionPOW;
 import com.anontion.common.dto.response.ResponseApplicationBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 

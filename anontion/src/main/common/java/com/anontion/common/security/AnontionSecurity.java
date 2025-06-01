@@ -14,21 +14,34 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPublicKeySpec;
 import java.util.Base64;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.Scanner;
 
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
 import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.ec.CustomNamedCurves;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.engines.AESFastEngine;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
+import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.modes.GCMBlockCipher;
+import org.bouncycastle.crypto.paddings.PKCS7Padding;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
+import org.bouncycastle.crypto.params.KDFParameters;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.util.BigIntegers;
 
 abstract public class AnontionSecurity {
 
@@ -461,6 +474,89 @@ abstract public class AnontionSecurity {
     return new ECPublicKeyParameters(q, params);
   }
   
+  public static String encrypt(String s) {
+    
+    try {
+
+      X9ECParameters e = CustomNamedCurves.getByName(_curve);
+      
+      if (e == null) {
+        
+        throw new IllegalArgumentException("Invalid curve");
+      }
+      
+      ECDomainParameters params = new ECDomainParameters(e.getCurve(), e.getG(), e.getN(), e.getH());
+      
+      BigInteger n = params.getN();
+      
+      BigInteger d = new BigInteger(n.bitLength() + 8, _secureRandom).mod(n.subtract(BigInteger.ONE)).add(BigInteger.ONE);
+      
+      ECPoint q = params.getG().multiply(d).normalize();
+
+      ECPrivateKeyParameters ekey = new ECPrivateKeyParameters(d, params);
+      
+      ECPublicKeyParameters epub = new ECPublicKeyParameters(q, params);
+      
+      ECDHBasicAgreement agreement = new ECDHBasicAgreement();
+
+      agreement.init(ekey);
+      
+      BigInteger sharedSecret = agreement.calculateAgreement(pub());
+
+      KDF2BytesGenerator kdf = new KDF2BytesGenerator(new SHA256Digest());
+      
+      byte[] secret = BigIntegers.asUnsignedByteArray((params.getCurve().getFieldSize() + 7) / 8, sharedSecret);
+
+      byte[] bytes = new byte[32];
+      
+      kdf.init(new KDFParameters(secret, null));
+      
+      kdf.generateBytes(bytes, 0, bytes.length);
+
+      byte[] iv = new byte[16];
+
+      _secureRandom.nextBytes(iv);
+      
+      KeyParameter aesKey = new KeyParameter(bytes);
+
+      AEADParameters aeadParams = new AEADParameters(aesKey, 128, iv, null);
+      
+      GCMBlockCipher cipher = new GCMBlockCipher(new AESEngine());
+
+      cipher.init(true, aeadParams);
+      
+      byte[] input = s.getBytes("UTF-8");
+      
+      byte[] output = new byte[cipher.getOutputSize(input.length)];
+      
+      int len = cipher.processBytes(input, 0, input.length, output, 0);
+      
+      len += cipher.doFinal(output, len);
+
+      byte[] text = new byte[len];
+      
+      System.arraycopy(output, 0, text, 0, len);
+
+      byte[] epubBytes = epub.getQ().getEncoded(false);
+
+      byte[] result = new byte[epubBytes.length + iv.length + text.length];
+
+      System.arraycopy(epubBytes, 0, result, 0, epubBytes.length);
+      
+      System.arraycopy(iv, 0, result, epubBytes.length, iv.length);
+      
+      System.arraycopy(text, 0, result, epubBytes.length + iv.length, text.length);
+
+      return Base64.getEncoder().encodeToString(result);
+
+    } catch (Exception e) {
+      
+      throw new RuntimeException("Encryption failed", e);
+    }
+  }
+
+
+
 }
 
 

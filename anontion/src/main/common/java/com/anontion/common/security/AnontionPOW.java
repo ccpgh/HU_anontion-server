@@ -1,4 +1,4 @@
-package com.anontion.common.security.pow;
+package com.anontion.common.security;
 
 import java.security.SecureRandom;
 import java.util.Base64;
