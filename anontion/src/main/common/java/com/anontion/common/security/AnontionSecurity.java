@@ -12,6 +12,7 @@ import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPublicKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -474,7 +475,7 @@ abstract public class AnontionSecurity {
     return new ECPublicKeyParameters(q, params);
   }
   
-  public static String encrypt(String s) {
+  public static String encrypt(String s) { // TODO tidy. extract repetition.
     
     try {
 
@@ -554,8 +555,69 @@ abstract public class AnontionSecurity {
       throw new RuntimeException("Encryption failed", e);
     }
   }
+  
+  public static String decrypt(String s) { // TODO tidy. extract repetition.
+    
+    try {
 
+      X9ECParameters e = CustomNamedCurves.getByName(_curve);
+      
+      if (e == null) {
+        
+        throw new IllegalArgumentException("Invalid curve");
+      }
+      
+      ECDomainParameters params = new ECDomainParameters(e.getCurve(), e.getG(), e.getN(), e.getH());
+         
+      byte[] data = Base64.getDecoder().decode(s);
 
+      byte[] ephPubBytes = Arrays.copyOfRange(data, 0, 65);
+      
+      byte[] iv = Arrays.copyOfRange(data, 65, 81);
+      
+      byte[] ciphertext = Arrays.copyOfRange(data, 81, data.length);
+
+      ECPoint ephQ = params.getCurve().decodePoint(ephPubBytes).normalize();
+      
+      ECPublicKeyParameters epub = new ECPublicKeyParameters(ephQ, params);
+
+      ECDHBasicAgreement agreement = new ECDHBasicAgreement();
+      
+      agreement.init(root());
+      
+      BigInteger shared = agreement.calculateAgreement(epub);
+      
+      byte[] secret = BigIntegers.asUnsignedByteArray((params.getCurve().getFieldSize() + 7) / 8, shared);
+
+      KDF2BytesGenerator kdf = new KDF2BytesGenerator(new SHA256Digest());
+      
+      byte[] keyBytes = new byte[32];
+      
+      kdf.init(new KDFParameters(secret, null));
+      
+      kdf.generateBytes(keyBytes, 0, keyBytes.length);
+
+      KeyParameter aesKey = new KeyParameter(keyBytes);
+      
+      AEADParameters aeadParams = new AEADParameters(aesKey, 128, iv, null);
+
+      GCMBlockCipher cipher = new GCMBlockCipher(new AESEngine());
+      
+      cipher.init(false, aeadParams);
+
+      byte[] output = new byte[cipher.getOutputSize(ciphertext.length)];
+      
+      int len = cipher.processBytes(ciphertext, 0, ciphertext.length, output, 0);
+      
+      len += cipher.doFinal(output, len);
+
+      return new String(output, 0, len, "UTF-8");
+
+    } catch (Exception e) {
+      
+      throw new RuntimeException("Decryption failed", e);
+    }
+  }
 
 }
 
