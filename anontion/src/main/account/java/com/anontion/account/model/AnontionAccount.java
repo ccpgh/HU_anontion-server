@@ -35,10 +35,10 @@ public class AnontionAccount {
   @Column(nullable = false)
   private UUID application;
 
-  @Column(name = "key", columnDefinition = "VARCHAR(4096)", nullable = false)
+  @Column(name = "ekey", columnDefinition = "VARCHAR(4096)", nullable = false)
   private String key;
 
-  @Column(name = "pub", columnDefinition = "VARCHAR(4096)", nullable = false)
+  @Column(name = "epub", columnDefinition = "VARCHAR(4096)", nullable = false)
   private String pub;
 
   @Column(nullable = false)
