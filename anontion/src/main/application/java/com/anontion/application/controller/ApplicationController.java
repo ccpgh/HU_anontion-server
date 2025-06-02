@@ -66,9 +66,10 @@ public class ApplicationController {
     String name = requestApplicationDTO.getBody().getName();
     Long ts = AnontionTime.tsN();
     UUID client = requestApplicationDTO.getBody().getId();
-    String pub = requestApplicationDTO.getBody().getPub();
+    String pub = requestApplicationDTO.getBody().getPub();   
+    String encrypt = requestApplicationDTO.getBody().getEncrypt();
     
-    String message = String.format("Primary Key is name '%s' ts '%d' client '%s' PLUS pub '%s' ", name, ts, client, pub);
+    String message = String.format("DEBUG Primary Key is name '%s' ts '%d' client '%s' PLUS pub '%s' encrypt '%s' ", name, ts, client, pub, encrypt);
     
     AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
 
@@ -76,7 +77,7 @@ public class ApplicationController {
 
     if (exists) {
 
-      System.out.println("Pre-existing application for: " + message);
+      System.out.println("DEBUG Pre-existing application for: " + message);
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Application already exists!"), new ResponseBodyErrorDTO(message));
     
@@ -91,9 +92,9 @@ public class ApplicationController {
     
     String sign = AnontionSecurity.sign(hash);
 
-    AnontionApplication newApplication = new AnontionApplication(name, ts, client, pub, hash, sign, pow.getText(), pow.getTarget());
+    AnontionApplication newApplication = new AnontionApplication(name, ts, client, pub, hash, sign, pow.getText(), pow.getTarget(), encrypt);
     
-    System.out.println("AnontionApplication: " + newApplication);
+    System.out.println("DEBUG AnontionApplication: " + newApplication);
 
     applicationRepository.save(newApplication);
     

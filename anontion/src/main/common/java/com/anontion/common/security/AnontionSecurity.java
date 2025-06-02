@@ -433,7 +433,7 @@ abstract public class AnontionSecurity {
         
       } catch (IOException e) {
         
-        System.out.println("Server key load eror " + e);
+        System.out.println("DEBUG Server key load eror " + e);
 
         e.printStackTrace();
 
@@ -444,7 +444,7 @@ abstract public class AnontionSecurity {
 
       if (base64Key.isEmpty()) {
         
-        System.out.println("Server keyfile is empty");
+        System.out.println("DEBUG Server keyfile is empty");
         
         return null;
       }
@@ -453,7 +453,7 @@ abstract public class AnontionSecurity {
       
     } else {
     
-      System.out.println("Server key not found");
+      System.out.println("DEBUG Server key not found");
     }
     
     return null;

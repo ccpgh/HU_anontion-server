@@ -88,7 +88,7 @@ public class AccountController {
     String  text   = requestAccountDTO.getBody().getText();
     Long    target = requestAccountDTO.getBody().getTarget();
 
-    System.out.println("RequestAccountDTO: " + requestAccountDTO);
+    System.out.println("DEBUG RequestAccountDTO: " + requestAccountDTO);
 
     AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
 
@@ -161,7 +161,7 @@ public class AccountController {
         
         AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash, counter, true);
       
-        System.out.println("AnontionAccount: " + newAccount);
+        System.out.println("DEBUG AnontionAccount: " + newAccount);
       
         account = accountRepository.save(newAccount);
         
@@ -219,7 +219,7 @@ public class AccountController {
       applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT; 
     }
     
-    System.out.println("AnontionAccount: applicationTimeout " + applicationTimeout);
+    System.out.println("DEBUG AnontionAccount: applicationTimeout " + applicationTimeout);
   }
 
 }
