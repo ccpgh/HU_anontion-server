@@ -42,7 +42,7 @@ public class AnontionAccount {
   private String pub;
 
   @Column(nullable = false)
-  private String hash;
+  private String plaintext;
 
   @Column(nullable = false)
   private String counter;
@@ -54,14 +54,14 @@ public class AnontionAccount {
     
   }
 
-  public AnontionAccount(Long ts, String name, UUID application, String pub, String hash, String counter, boolean active) {
+  public AnontionAccount(Long ts, String name, UUID application, String pub, String plaintext, String counter, boolean active) {
 
     this.ts = ts;
     this.name = name;
     this.application = application;
     this.key = AnontionSecurity.encodeKeyK1(AnontionSecurity.root());
     this.pub = pub;
-    this.hash = hash;
+    this.plaintext = plaintext;
     this.counter = counter;
     this.active = active;
   }
@@ -136,14 +136,14 @@ public class AnontionAccount {
     this.counter = counter;
   }
   
-  public String getHash() {
+  public String getPlaintext() {
     
-    return hash;
+    return plaintext;
   }
 
-  public void setHash(String hash) {
+  public void setPlaintext(String plaintext) {
    
-    this.hash = hash;
+    this.plaintext = plaintext;
   }
 
   public boolean getActive() {

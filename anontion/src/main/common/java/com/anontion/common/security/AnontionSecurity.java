@@ -16,17 +16,18 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.ec.CustomNamedCurves;
 import org.bouncycastle.crypto.engines.AESEngine;
-import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
 import org.bouncycastle.crypto.modes.GCMBlockCipher;
 import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.ECDomainParameters;
-import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.crypto.params.KDFParameters;
@@ -68,23 +69,6 @@ abstract public class AnontionSecurity {
     return Base64.getEncoder().encodeToString(randomBytes);
   }
 
-  @SuppressWarnings("unused")
-  private static ECKeyPairGenerator getGenerator() {
-
-    ECNamedCurveParameterSpec curve = ECNamedCurveTable.getParameterSpec(_curve);
-
-    ECDomainParameters domainParams = new ECDomainParameters(curve.getCurve(), curve.getG(), curve.getN(), curve.getH(),
-        curve.getSeed());
-
-    ECKeyGenerationParameters keyParams = new ECKeyGenerationParameters(domainParams, _secureRandom);
-
-    ECKeyPairGenerator generator = new ECKeyPairGenerator();
-
-    generator.init(keyParams);
-
-    return generator;
-  }
-
   public static String encodeKeyK1(ECPrivateKeyParameters key) {
 
     return key.getD().toString();
@@ -95,7 +79,275 @@ abstract public class AnontionSecurity {
     return pub.getQ().toString();
   }
 
-  public static String encodePubK1XY(PublicKey pub) {
+  private static ECPrivateKeyParameters load() {
+    
+    InputStream in = AnontionSecurity.class.getClassLoader().getResourceAsStream("server.key");
+    
+    if (in != null) {
+
+      BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+      
+      StringBuilder sb = new StringBuilder();
+      
+      String line;
+
+      try {
+      
+        while ((line = reader.readLine()) != null) {
+      
+          sb.append(line);
+        }
+        
+      } catch (IOException e) {
+        
+        System.out.println("DEBUG Server key load eror " + e);
+
+        e.printStackTrace();
+
+        return null;
+      }
+
+      String base64Key = sb.toString().trim();
+
+      if (base64Key.isEmpty()) {
+        
+        System.out.println("DEBUG Server keyfile is empty");
+        
+        return null;
+      }
+
+      return decodeECPrivateKeyParametersFromBase64D(base64Key);
+      
+    } else {
+    
+      System.out.println("DEBUG Server key not found");
+    }
+    
+    return null;
+  }
+  
+  public static String encodePubK1XYUncompressed(ECPublicKeyParameters pub) {
+
+    org.bouncycastle.math.ec.ECPoint publicKeyPoint = pub.getQ();
+
+    byte[] xBytes = publicKeyPoint.getAffineXCoord().toBigInteger().toByteArray(); 
+
+    byte[] yBytes = publicKeyPoint.getAffineYCoord().toBigInteger().toByteArray(); 
+
+    byte[] x32Bytes = new byte[32];
+
+    byte[] y32Bytes = new byte[32];
+
+    int xOffset = 0;
+
+    int yOffset = 0;
+
+    if (xBytes.length == 33 && xBytes[0] == 0x00) {
+
+      xOffset = 1;
+    }
+
+    if (yBytes.length == 33 && yBytes[0] == 0x00) {
+
+      yOffset = 1;
+    }
+
+    System.arraycopy(xBytes, xOffset, x32Bytes, 32 - (xBytes.length - xOffset), (xBytes.length - xOffset));
+
+    System.arraycopy(yBytes, yOffset, y32Bytes, 32 - (yBytes.length - yOffset), (yBytes.length - yOffset));
+
+    byte[] publicKeyBytes = new byte[65];
+
+    publicKeyBytes[0] = 0x04;
+
+    System.arraycopy(x32Bytes, 0, publicKeyBytes, 1, 32);
+
+    System.arraycopy(y32Bytes, 0, publicKeyBytes, 33, 32);
+
+    String s = Base64.getEncoder().encodeToString(publicKeyBytes);
+    
+    System.out.println("DEBUG encodePubK1XYUncompressed result s '" + s + "'");
+    
+    return s;
+  }
+    
+  public static String encodePubK1XYCompressed(ECPublicKeyParameters pub) {
+
+    ECPoint publicKeyPoint = pub.getQ();
+
+    byte[] compressed = publicKeyPoint.getEncoded(true); 
+
+    return Base64.getEncoder().encodeToString(compressed);
+  }
+  
+  public static ECPublicKeyParameters decodeECPublicKeyParametersFromBase64XYUncompressed(String base64Key) { 
+  
+    byte[] decodedKey = Base64.getDecoder().decode(base64Key);
+
+    byte[] xBytes = new byte[32];
+    
+    byte[] yBytes = new byte[32];
+    
+    System.arraycopy(decodedKey, 1, xBytes, 0, 32);
+    
+    System.arraycopy(decodedKey, 33, yBytes, 0, 32);
+        
+    ECNamedCurveParameterSpec params = ECNamedCurveTable.getParameterSpec(_curve);
+
+    ECCurve curve = params.getCurve();
+
+    org.bouncycastle.math.ec.ECPoint point = curve.decodePoint(decodedKey);
+
+    ECDomainParameters domainParams = new ECDomainParameters(curve, params.getG(), params.getN(), params.getH());
+
+    return new ECPublicKeyParameters(point, domainParams);
+  }
+  
+  //////////////////////////////////////////////////////////////////// SANITY LINE 
+  //////////////////////////////////////////////////////////////////// SANITY LINE  
+  //////////////////////////////////////////////////////////////////// SANITY LINE 
+  //////////////////////////////////////////////////////////////////// SANITY LINE   
+  
+  public static String sign(String plaintext) { // TODO - check works
+
+    ECPrivateKeyParameters root = AnontionSecurity.root();
+
+    byte[] bytes = plaintext.getBytes(StandardCharsets.UTF_8);
+    
+    SHA256Digest digest = new SHA256Digest();
+    
+    digest.update(bytes, 0, bytes.length);
+    
+    byte[] hash = new byte[digest.getDigestSize()];
+    
+    digest.doFinal(hash, 0);
+    
+    ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
+
+    signer.init(true, root);
+    
+    BigInteger[] components = signer.generateSignature(hash);
+
+    BigInteger r = components[0];
+
+    BigInteger s = components[1];
+
+    byte[] rBytes = pad(r, 32);
+  
+    byte[] sBytes = pad(s, 32);
+
+    byte[] buffer = new byte[64];
+    
+    System.arraycopy(rBytes, 0, buffer, 0, 32);
+    
+    System.arraycopy(sBytes, 0, buffer, 32, 32);
+
+    return Base64.getEncoder().encodeToString(buffer);
+  }
+  
+  public static boolean check(String text, String counter, ECPublicKeyParameters key) { // TODO - change to use raw signature. 
+    
+    try {
+
+      System.out.println("DEBUG text '" + text + "'");
+
+      System.out.println("DEBUG counter '" + counter + "'");
+
+      byte[] messageBytes = text.getBytes(StandardCharsets.UTF_8);
+      
+      SHA256Digest digest = new SHA256Digest();
+      
+      digest.update(messageBytes, 0, messageBytes.length);
+      
+      byte[] hash = new byte[digest.getDigestSize()];
+      
+      digest.doFinal(hash, 0);
+    
+      byte[] sigBytes = Base64.getDecoder().decode(counter);
+
+      BigInteger r = null;
+      
+      BigInteger s = null;
+      
+      if (sigBytes.length == 64) {
+
+        System.out.println("DEBUG raw path'");
+
+        byte[] rBytes = new byte[32];
+        
+        byte[] sBytes = new byte[32];
+        
+        System.arraycopy(sigBytes, 0, rBytes, 0, 32);
+        
+        System.arraycopy(sigBytes, 32, sBytes, 0, 32);
+        
+        r = new BigInteger(1, rBytes);
+      
+        s = new BigInteger(1, sBytes);
+      
+      } else {
+
+        System.out.println("DEBUG DER path");
+
+        ASN1Sequence seq = (ASN1Sequence) ASN1Primitive.fromByteArray(sigBytes);
+        
+        r = ((ASN1Integer) seq.getObjectAt(0)).getValue();
+        
+        s = ((ASN1Integer) seq.getObjectAt(1)).getValue();
+      }
+      
+      ECDSASigner signer = new ECDSASigner();
+      
+      signer.init(false, key);
+      
+      return signer.verifySignature(hash, r, s);
+      
+    } catch (Exception e) {
+
+      System.out.println("DEBUG exception " + e);
+
+      e.printStackTrace();
+      
+      return false;
+    }
+  }
+  
+  private static byte[] pad(BigInteger value, int length) { // TODO - check works
+    
+    byte[] bytes = value.toByteArray();
+
+    if (bytes.length == length) {
+    
+      return bytes;
+    }
+
+    // Drop leading zero if present (sign byte)
+    if (bytes.length == length + 1 && bytes[0] == 0) {
+      
+      byte[] tmp = new byte[length];
+      
+      System.arraycopy(bytes, 1, tmp, 0, length);
+      
+      return tmp;
+    }
+
+    byte[] result = new byte[length];
+    
+    if (bytes.length > length) {
+       
+      System.arraycopy(bytes, bytes.length - length, result, 0, length);
+    
+    } else {
+    
+      System.arraycopy(bytes, 0, result, length - bytes.length, bytes.length);
+    }
+
+    return result;
+  }
+  
+  // WORKLINE
+  
+  public static String encodePubK1XY(PublicKey pub) { // TODO - check works
 
     ECPublicKey ecPublicKey = (ECPublicKey) pub;
 
@@ -141,112 +393,13 @@ abstract public class AnontionSecurity {
 
     return Base64.getEncoder().encodeToString(publicKeyBytes);
   }
+  
 
-  public static String encodePubK1XY(ECPublicKeyParameters pub) {
-
-    org.bouncycastle.math.ec.ECPoint publicKeyPoint = pub.getQ();
-
-    BigInteger x = publicKeyPoint.getAffineXCoord().toBigInteger();
-
-    BigInteger y = publicKeyPoint.getAffineYCoord().toBigInteger();
-
-    byte[] xBytes = x.toByteArray();
-
-    byte[] yBytes = y.toByteArray();
-
-    byte[] x32Bytes = new byte[32];
-
-    byte[] y32Bytes = new byte[32];
-
-    int xOffset = 0;
-
-    int yOffset = 0;
-
-    if (xBytes.length == 33 && xBytes[0] == 0x00) {
-
-      xOffset = 1;
-    }
-
-    if (yBytes.length == 33 && yBytes[0] == 0x00) {
-
-      yOffset = 1;
-    }
-
-    System.arraycopy(xBytes, xOffset, x32Bytes, 32 - (xBytes.length - xOffset), (xBytes.length - xOffset));
-
-    System.arraycopy(yBytes, yOffset, y32Bytes, 32 - (yBytes.length - yOffset), (yBytes.length - yOffset));
-
-    byte[] publicKeyBytes = new byte[65];
-
-    publicKeyBytes[0] = 0x04;
-
-    System.arraycopy(x32Bytes, 0, publicKeyBytes, 1, 32);
-
-    System.arraycopy(y32Bytes, 0, publicKeyBytes, 33, 32);
-
-    return Base64.getEncoder().encodeToString(publicKeyBytes);
-  }
-
-  public static ECPublicKeyParameters decodeECPublicKeyParametersFromBase64XY(String base64Key) {
+  public static PublicKey decodePublicKeyFromBase64XY(String base64Key) { // TODO - check works
 
     byte[] decodedKey = Base64.getDecoder().decode(base64Key);
 
-    if (decodedKey.length != 65 || decodedKey[0] != 0x04) {
-
-      return null;
-    }
-
-    byte[] xBytes = new byte[32];
-
-    byte[] yBytes = new byte[32];
-
-    System.arraycopy(decodedKey, 1, xBytes, 0, 32);
-
-    System.arraycopy(decodedKey, 33, yBytes, 0, 32);
-
-    ECNamedCurveParameterSpec params = ECNamedCurveTable.getParameterSpec(_curve);
-
-    ECCurve curve = params.getCurve();
-
-    org.bouncycastle.math.ec.ECPoint g = params.getG(); // TODO needed?
-
-    BigInteger gx = g.getXCoord().toBigInteger(); // TODO needed?
-
-    BigInteger gy = g.getYCoord().toBigInteger(); // TODO needed?
-
-    // TODO check these two way conversion 
-
-    @SuppressWarnings("unused")
-    BigInteger gx_NEEDED_TODO = new BigInteger(1, xBytes);
-
-    @SuppressWarnings("unused")
-    BigInteger gy_NEEDED_TODO = new BigInteger(1, yBytes);
-
-    try {
-
-      org.bouncycastle.math.ec.ECPoint point = curve.createPoint(gx, gy);
-
-      ECDomainParameters domainParams = new ECDomainParameters(curve, params.getG(), params.getN(), params.getH());
-
-      ECPublicKeyParameters key = new ECPublicKeyParameters(point, domainParams);
-
-      System.out.println("DEBUG key = " + key);
-
-      return key;
-
-    } catch (Exception e) {
-
-      e.printStackTrace();
-    }
-
-    return null;
-  }
-
-  public static PublicKey decodePublicKeyFromBase64XY(String base64Key) {
-
-    byte[] decodedKey = Base64.getDecoder().decode(base64Key);
-
-    if (decodedKey.length != 65 || decodedKey[0] != 0x04) {
+    if (decodedKey.length != 65 || decodedKey[0] != 0x04) { // TODO 65 case handled?
 
       return null;
     }
@@ -306,11 +459,39 @@ abstract public class AnontionSecurity {
     return null;
   }
 
-  public static String hash(String name, Long ts, UUID client, String pub) {
+  public static String hash(String name, Long ts, UUID client, String pub) { // TODO - check works
 
-    String input = name + ":" + ts + ":" + client.toString() + ":" + pub;
+    String[] tokens = { name, ts.toString(), client.toString(), pub};
+    
+    return AnontionSecurity.hash(concat(tokens, ":"));
+  }
+  
+  public static String concat(String[] tokens, String delimiter) {
 
-    byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
+    StringBuffer buffer = new StringBuffer();
+    
+    boolean first = true;
+    
+    for (String token: tokens) {
+      
+      if (!first) {
+        
+        buffer.append(delimiter);
+      
+      } else {
+      
+        first = false;
+      }
+      
+      buffer.append(token.toLowerCase());      
+    } 
+    
+    return buffer.toString();
+  }
+
+  public static String hash(String text) { // TODO - check works
+
+    byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
 
     SHA256Digest digest = new SHA256Digest();
 
@@ -322,45 +503,8 @@ abstract public class AnontionSecurity {
 
     return Base64.getEncoder().encodeToString(hash);
   }
-
-  public static String sign(String hash) {
-
-    ECPrivateKeyParameters root = AnontionSecurity.root();
-
-    byte[] decoded = Base64.getDecoder().decode(hash);
-
-    ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
-
-    signer.init(true, root);
-
-    BigInteger[] components = signer.generateSignature(decoded);
-
-    byte[] der = encodeDER(components[0], components[1]);
-
-    return Base64.getEncoder().encodeToString(der);
-  }
-
-  private static byte[] encodeDER(BigInteger r, BigInteger s) {
    
-    try (java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream()) {
-    
-      org.bouncycastle.asn1.DERSequenceGenerator seq = new org.bouncycastle.asn1.DERSequenceGenerator(bos);
-      
-      seq.addObject(new org.bouncycastle.asn1.ASN1Integer(r));
-      
-      seq.addObject(new org.bouncycastle.asn1.ASN1Integer(s));
-      
-      seq.close();
-      
-      return bos.toByteArray();
-    
-    } catch (Exception e) {
-   
-      throw new RuntimeException(e);
-    }
-  }
-   
-  public static String encodeKeyD(ECPrivateKeyParameters key) {
+  public static String encodeKeyD(ECPrivateKeyParameters key) { // TODO - check works
     
     BigInteger d = key.getD();
 
@@ -390,7 +534,7 @@ abstract public class AnontionSecurity {
     return Base64.getEncoder().encodeToString(bytes);
   }
 
-  public static ECPrivateKeyParameters decodeECPrivateKeyParametersFromBase64D(String base64Key) {
+  public static ECPrivateKeyParameters decodeECPrivateKeyParametersFromBase64D(String base64Key) { // TODO - check works
 
     byte[] decoded = Base64.getDecoder().decode(base64Key);
     
@@ -411,55 +555,8 @@ abstract public class AnontionSecurity {
       
     return new ECPrivateKeyParameters(d, domain);
   }
-
-  private static ECPrivateKeyParameters load() {
-    
-    InputStream in = AnontionSecurity.class.getClassLoader().getResourceAsStream("server.key");
-    
-    if (in != null) {
-
-      BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-      
-      StringBuilder sb = new StringBuilder();
-      
-      String line;
-
-      try {
-      
-        while ((line = reader.readLine()) != null) {
-      
-          sb.append(line);
-        }
-        
-      } catch (IOException e) {
-        
-        System.out.println("DEBUG Server key load eror " + e);
-
-        e.printStackTrace();
-
-        return null;
-      }
-
-      String base64Key = sb.toString().trim();
-
-      if (base64Key.isEmpty()) {
-        
-        System.out.println("DEBUG Server keyfile is empty");
-        
-        return null;
-      }
-
-      return decodeECPrivateKeyParametersFromBase64D(base64Key);
-      
-    } else {
-    
-      System.out.println("DEBUG Server key not found");
-    }
-    
-    return null;
-  }
   
-  public static ECPublicKeyParameters toPublicKey(ECPrivateKeyParameters privateKey) {
+  public static ECPublicKeyParameters toPublicKey(ECPrivateKeyParameters privateKey) { // TODO - check works
     
     ECDomainParameters params = privateKey.getParameters();
   
@@ -613,6 +710,44 @@ abstract public class AnontionSecurity {
       throw new RuntimeException("Decryption failed", e);
     }
   }
+ 
+
+//private static byte[] encodeDER(BigInteger r, BigInteger s) {
+// 
+//  try (java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream()) {
+//  
+//    org.bouncycastle.asn1.DERSequenceGenerator seq = new org.bouncycastle.asn1.DERSequenceGenerator(bos);
+//    
+//    seq.addObject(new org.bouncycastle.asn1.ASN1Integer(r));
+//    
+//    seq.addObject(new org.bouncycastle.asn1.ASN1Integer(s));
+//    
+//    seq.close();
+//    
+//    return bos.toByteArray();
+//  
+//  } catch (Exception e) {
+// 
+//    throw new RuntimeException(e);
+//  }
+//}
+  
+//@SuppressWarnings("unused")
+//private static ECKeyPairGenerator getGenerator() {
+//
+//  ECNamedCurveParameterSpec curve = ECNamedCurveTable.getParameterSpec(_curve);
+//
+//  ECDomainParameters domainParams = new ECDomainParameters(curve.getCurve(), curve.getG(), curve.getN(), curve.getH(),
+//      curve.getSeed());
+//
+//  ECKeyGenerationParameters keyParams = new ECKeyGenerationParameters(domainParams, _secureRandom);
+//
+//  ECKeyPairGenerator generator = new ECKeyPairGenerator();
+//
+//  generator.init(keyParams);
+//
+//  return generator;
+//}
 
 }
 

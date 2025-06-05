@@ -86,19 +86,23 @@ public class ApplicationController {
 
     AnontionPOW pow = new AnontionPOW();
     
-    String remote = AnontionSecurity.encodePubK1XY(AnontionSecurity.pub());
+    int TODO;
     
-    String hash = AnontionSecurity.hash(name, ts, client, pub);
+    String remote = AnontionSecurity.encodePubK1XYUncompressed(AnontionSecurity.pub());
     
-    String sign = AnontionSecurity.sign(hash);
+    String[] tokens = { name, ts.toString(), client.toString(), pub};
 
-    AnontionApplication newApplication = new AnontionApplication(name, ts, client, pub, hash, sign, pow.getText(), pow.getTarget(), encrypt);
+    String plaintext = AnontionSecurity.concat(tokens, ":");
+
+    String sign = AnontionSecurity.sign(plaintext);
+
+    AnontionApplication newApplication = new AnontionApplication(name, ts, client, pub, plaintext, sign, pow.getText(), pow.getTarget(), encrypt);
     
-    System.out.println("DEBUG AnontionApplication: " + newApplication);
+    System.out.println("DEBUG new application plaintext: '" + plaintext + "'");
 
     applicationRepository.save(newApplication);
     
-    ResponseApplicationBodyDTO body =  new ResponseApplicationBodyDTO(newApplication.getText(), newApplication.getTarget(), remote, hash, sign, ts);
+    ResponseApplicationBodyDTO body =  new ResponseApplicationBodyDTO(newApplication.getText(), newApplication.getTarget(), remote, plaintext, sign, ts);
     
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok"), body);
     

@@ -31,7 +31,7 @@ public class AnontionApplication {
   private String pub;
 
   @Column(nullable = false) 
-  private String hash;
+  private String plaintext;
 
   @Column(nullable = false) 
   private String sign;
@@ -49,14 +49,14 @@ public class AnontionApplication {
     
   }
 
-  public AnontionApplication(String name, Long ts, UUID client, String pub, String hash, String sign, String text, Long target, String encrypt) {
+  public AnontionApplication(String name, Long ts, UUID client, String pub, String plaintext, String sign, String text, Long target, String encrypt) {
 
     this.id = UUID.randomUUID();
     this.name = name;
     this.ts = ts;
     this.client = client;
     this.pub = pub;
-    this.hash = hash;
+    this.plaintext = plaintext;
     this.sign = sign;
     this.text = text;
     this.target = target;
@@ -114,14 +114,14 @@ public class AnontionApplication {
   }
   
   
-  public String getHash() {
+  public String getPlaintext() {
 
-    return hash;
+    return plaintext;
   }
 
-  public void setHash(String hash) {
+  public void setHash(String plaintext) {
 
-    this.hash = hash;
+    this.plaintext = plaintext;
   }
   
   

@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
+import com.anontion.common.security.AnontionSecurityTests;
 import com.anontion.common.dto.response.ResponseAccountBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
@@ -85,10 +87,9 @@ public class AccountController {
 
     String  high   = requestAccountDTO.getBody().getHigh();
     String  low    = requestAccountDTO.getBody().getLow();
+    
     String  text   = requestAccountDTO.getBody().getText();
     Long    target = requestAccountDTO.getBody().getTarget();
-
-    System.out.println("DEBUG RequestAccountDTO: " + requestAccountDTO);
 
     AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
 
@@ -112,27 +113,62 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    String  pub = application.getPub();
+    String pub = application.getPub();
     
-    String hash = application.getHash();
+    String plaintext = application.getPlaintext();
     
-
     if (AnontionSecurity.decodePublicKeyFromBase64XY(pub) == null) {
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
-          new ResponseBodyErrorDTO("Supplied client pub key invalid[1]."));
+          new ResponseBodyErrorDTO("Received client pub key invalid PublicKey."));
 
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    if (AnontionSecurity.decodeECPublicKeyParametersFromBase64XY(pub) == null) {
+    //if (!AnontionSecurityTests.convertionKeyToStringToKeyToStringCompare()) {
+    //  
+    //  throw new RuntimeException("converstionKeyToStringToKeyToStringCompare1 failed");
+    //}
+    //
+    //if (!AnontionSecurityTests.conversionStringToKeyToStringCompare()) {
+    //  
+    //  throw new RuntimeException("converstionKeyToStringToKeyToStringCompare2 failed");
+    //}
+
+    ECPublicKeyParameters key = AnontionSecurity.decodeECPublicKeyParametersFromBase64XYUncompressed(pub);
+
+    if (key == null) {
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
-          new ResponseBodyErrorDTO("Supplied client pub key invalid[2]."));
+          new ResponseBodyErrorDTO("Received client pub key invalid ECPublicKeyParameters."));
 
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    System.out.println("DEBUG application plaintext: '" + plaintext + "'");
+
+    if (!AnontionSecurity.check(plaintext, counter, key)) {
+
+      System.out.println("DEBUG CHECK NOT OK");
+
+    } else {
+
+      System.out.println("DEBUG CHECK OK");
+    }
+
+//    {
+//      String plaintext2 = "";
+//      
+//      String sig = AnontionSecurity.sign(plaintext2);
+//      
+//      if (!AnontionSecurity.check(plaintext2, sig, AnontionSecurity.pub())) {
+//
+//        System.out.println("DEBUG2 CHECK NOT OK " + sig + " plaintext " + plaintext);
+//      } else {
+//        System.out.println("DEBUG2 CHECK OK " + sig + " plaintext " + plaintext);
+//      }
+//    }
+    
     boolean approved = false; 
     
     Long now = AnontionTime.tsN();
@@ -159,7 +195,7 @@ public class AccountController {
 
       if (approved) {
         
-        AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash, counter, true);
+        AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, plaintext, counter, true);
       
         System.out.println("DEBUG AnontionAccount: " + newAccount);
       
