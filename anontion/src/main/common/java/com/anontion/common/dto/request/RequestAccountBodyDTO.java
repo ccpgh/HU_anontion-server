@@ -29,8 +29,8 @@ public class RequestAccountBodyDTO {
   @NotBlank(message = "Target cannot be blank.")
   private String text;
 
-  @NotBlank(message = "Counter cannot be blank.")
-  private String counter;
+  @NotBlank(message = "Countersign cannot be blank.")
+  private String countersign;
 
   @Min(0)
   private Long target;
@@ -109,14 +109,14 @@ public class RequestAccountBodyDTO {
     this.target = target;
   }
   
-  public String getCounter() {
+  public String getCountersign() {
     
-    return counter;
+    return countersign;
   }
 
-  public void setCounter(String counter) {
+  public void setCounter(String countersign) {
  
-    this.counter = counter;
+    this.countersign = countersign;
   }
 }
 

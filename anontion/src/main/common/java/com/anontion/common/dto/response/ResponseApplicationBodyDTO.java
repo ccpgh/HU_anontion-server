@@ -88,3 +88,4 @@ public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
     this.ts = ts;
   }
 }
+

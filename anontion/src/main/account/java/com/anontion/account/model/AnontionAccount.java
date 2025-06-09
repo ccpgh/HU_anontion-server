@@ -13,7 +13,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 
 import com.anontion.common.misc.AnontionJson;
-import com.anontion.common.security.AnontionSecurity;
+import com.anontion.common.security.AnontionSecurityDSA;
 
 @Entity
 @Table(
@@ -45,7 +45,7 @@ public class AnontionAccount {
   private String plaintext;
 
   @Column(nullable = false)
-  private String counter;
+  private String countersign;
 
   @Column(nullable = false)
   private boolean active;
@@ -54,15 +54,15 @@ public class AnontionAccount {
     
   }
 
-  public AnontionAccount(Long ts, String name, UUID application, String pub, String plaintext, String counter, boolean active) {
+  public AnontionAccount(Long ts, String name, UUID application, String pub, String plaintext, String countersign, boolean active) {
 
     this.ts = ts;
     this.name = name;
     this.application = application;
-    this.key = AnontionSecurity.encodeKeyK1(AnontionSecurity.root());
+    this.key = AnontionSecurityDSA.encodeKeyK1(AnontionSecurityDSA.root());
     this.pub = pub;
     this.plaintext = plaintext;
-    this.counter = counter;
+    this.countersign = countersign;
     this.active = active;
   }
 
@@ -126,14 +126,14 @@ public class AnontionAccount {
     this.pub = pub;
   }
 
-  public String getCounter() {
+  public String getCountersign() {
     
-    return counter;
+    return countersign;
   }
 
-  public void setCounter(String counter) {
+  public void setCountersign(String countersign) {
    
-    this.counter = counter;
+    this.countersign = countersign;
   }
   
   public String getPlaintext() {
