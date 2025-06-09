@@ -12,13 +12,7 @@
 //
 //  public static boolean check(Object target, BindingResult bindingResult, Validator validator) { // TODO - replace by built-in spring error checks.
 //
-//    System.err.println("DEBUG Validator check");
-//
-//    System.err.println("DEBUG Validator BEFORE " + validator);
-//
 //    Set<ConstraintViolation<Object>> violations = validator.validate(target);
-//
-//    System.err.println("DEBUG Validator AFTER " + validator);
 //
 //    for (ConstraintViolation<Object> violation : violations) {
 //

@@ -22,8 +22,10 @@ import com.anontion.common.dto.request.RequestApplicationDTO;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.misc.AnontionLog;
+import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
-import com.anontion.common.security.AnontionSecurity;
+import com.anontion.common.security.AnontionSecurityDSA;
 import com.anontion.common.security.AnontionPOW;
 import com.anontion.common.dto.response.ResponseApplicationBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
@@ -63,13 +65,12 @@ public class ApplicationController {
 		  return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
 	  }
 
-    String name = requestApplicationDTO.getBody().getName();
-    Long ts = AnontionTime.tsN();
     UUID client = requestApplicationDTO.getBody().getId();
     String pub = requestApplicationDTO.getBody().getPub();   
+    String name = requestApplicationDTO.getBody().getName();
     String encrypt = requestApplicationDTO.getBody().getEncrypt();
-    
-    String message = String.format("DEBUG Primary Key is name '%s' ts '%d' client '%s' PLUS pub '%s' encrypt '%s' ", name, ts, client, pub, encrypt);
+
+    Long ts = AnontionTime.tsN();
     
     AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
 
@@ -77,30 +78,31 @@ public class ApplicationController {
 
     if (exists) {
 
-      System.out.println("DEBUG Pre-existing application for: " + message);
-
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Application already exists!"), new ResponseBodyErrorDTO(message));
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Application already exists!"), 
+          new ResponseBodyErrorDTO(String.format("Primary Key is name '%s' ts '%d' client '%s'", name, ts, client)));
     
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     AnontionPOW pow = new AnontionPOW();
     
-    String remote = AnontionSecurity.encodePubK1XY(AnontionSecurity.pub());
+    String remote = AnontionSecurityDSA.encodePubK1XY(AnontionSecurityDSA.pub());
     
-    String hash = AnontionSecurity.hash(name, ts, client, pub);
-    
-    String sign = AnontionSecurity.sign(hash);
+    String[] tokens = { name, ts.toString(), client.toString(), pub};
 
-    AnontionApplication newApplication = new AnontionApplication(name, ts, client, pub, hash, sign, pow.getText(), pow.getTarget(), encrypt);
-    
-    System.out.println("DEBUG AnontionApplication: " + newApplication);
+    String plaintext = AnontionStrings.concat(tokens, ":");
 
+    String sign = AnontionSecurityDSA.sign(plaintext);
+
+    AnontionApplication newApplication = new AnontionApplication(name, ts, client, pub, plaintext, sign, pow.getText(), pow.getTarget(), encrypt);
+    
     applicationRepository.save(newApplication);
     
-    ResponseApplicationBodyDTO body =  new ResponseApplicationBodyDTO(newApplication.getText(), newApplication.getTarget(), remote, hash, sign, ts);
+    ResponseApplicationBodyDTO body =  new ResponseApplicationBodyDTO(newApplication.getText(), newApplication.getTarget(), remote, plaintext, sign, ts);
     
     ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok"), body);
+    
+    _logger.info("Application created ok");
     
     return new ResponseEntity<>(response, HttpStatus.OK);    
   }
@@ -120,5 +122,8 @@ public class ApplicationController {
     
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);    
   }
+  
+  final private static AnontionLog _logger = new AnontionLog(ApplicationController.class.getName());
 }
+ 
 

@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,9 @@ import com.anontion.account.repository.AnontionAccountRepository;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionTime;
-import com.anontion.common.security.AnontionSecurity;
+import com.anontion.common.security.AnontionSecurityDSA;
 import com.anontion.common.dto.response.ResponseAccountBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
@@ -78,17 +80,14 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    String  name   = requestAccountDTO.getBody().getName();
-    Long    ts     = requestAccountDTO.getBody().getTs();
-    UUID    client = requestAccountDTO.getBody().getId();
-    String  counter = requestAccountDTO.getBody().getCounter();
-
-    String  high   = requestAccountDTO.getBody().getHigh();
-    String  low    = requestAccountDTO.getBody().getLow();
-    String  text   = requestAccountDTO.getBody().getText();
-    Long    target = requestAccountDTO.getBody().getTarget();
-
-    System.out.println("DEBUG RequestAccountDTO: " + requestAccountDTO);
+    UUID    client      = requestAccountDTO.getBody().getId();
+    String  countersign = requestAccountDTO.getBody().getCountersign();
+    String  high        = requestAccountDTO.getBody().getHigh();
+    String  low         = requestAccountDTO.getBody().getLow();
+    String  name        = requestAccountDTO.getBody().getName();
+    Long    target      = requestAccountDTO.getBody().getTarget();
+    String  text        = requestAccountDTO.getBody().getText();
+    Long    ts          = requestAccountDTO.getBody().getTs();
 
     AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
 
@@ -112,27 +111,37 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    String  pub = application.getPub();
+    String pub = application.getPub();
     
-    String hash = application.getHash();
+    String plaintext = application.getPlaintext();
     
-
-    if (AnontionSecurity.decodePublicKeyFromBase64XY(pub) == null) {
+    if (AnontionSecurityDSA.decodePublicKeyFromBase64XY(pub) == null) {
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
-          new ResponseBodyErrorDTO("Supplied client pub key invalid[1]."));
+          new ResponseBodyErrorDTO("Received client pub key invalid PublicKey."));
 
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    if (AnontionSecurity.decodeECPublicKeyParametersFromBase64XY(pub) == null) {
+    ECPublicKeyParameters publicKey = AnontionSecurityDSA.decodeECPublicKeyParametersFromBase64XY(pub);
+
+    if (publicKey == null) {
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
-          new ResponseBodyErrorDTO("Supplied client pub key invalid[2]."));
+          new ResponseBodyErrorDTO("Received client pub key invalid ECPublicKeyParameters."));
 
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    if (!AnontionSecurityDSA.check(plaintext, countersign, publicKey)) {
+
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
+          new ResponseBodyErrorDTO("Client countersign of proof token invalid."));
+
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    } 
+    
+    
     boolean approved = false; 
     
     Long now = AnontionTime.tsN();
@@ -159,10 +168,10 @@ public class AccountController {
 
       if (approved) {
         
-        AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, hash, counter, true);
-      
-        System.out.println("DEBUG AnontionAccount: " + newAccount);
-      
+        AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, plaintext, countersign, true);
+
+        _logger.info("New Account: " + newAccount);
+
         account = accountRepository.save(newAccount);
         
         body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
@@ -218,8 +227,11 @@ public class AccountController {
     
       applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT; 
     }
-    
-    System.out.println("DEBUG AnontionAccount: applicationTimeout " + applicationTimeout);
+
+    _logger.info("Application timeout is " + applicationTimeout);
   }
 
+  final private static AnontionLog _logger = new AnontionLog(AccountController.class.getName());
 }
+
+

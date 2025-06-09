@@ -8,7 +8,7 @@ public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
 
   private String remote;
 
-  private String hash;
+  private String plaintext;
   
   private String sign;
 
@@ -18,12 +18,12 @@ public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
 
   }
 
-  public ResponseApplicationBodyDTO(String text, Long target, String remote, String hash, String sign, Long ts) {
+  public ResponseApplicationBodyDTO(String text, Long target, String remote, String plaintext, String sign, Long ts) {
 
     this.text = text;
     this.target = target;
     this.remote = remote;
-    this.hash = hash;
+    this.plaintext = plaintext;
     this.sign = sign;
     this.ts = ts;
   }
@@ -58,14 +58,14 @@ public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
     this.remote = remote;
   }
   
-  public String getHash() {
+  public String getPlaintext() {
     
-    return hash;
+    return plaintext;
   }
 
-  public void setHash(String hash) {
+  public void setPlaintext(String plaintext) {
     
-    this.hash = hash;
+    this.plaintext = plaintext;
   }
 
   public String getSign() {
@@ -88,3 +88,4 @@ public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
     this.ts = ts;
   }
 }
+
