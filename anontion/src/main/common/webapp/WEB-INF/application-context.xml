@@ -12,13 +12,13 @@
            								 http://www.springframework.org/schema/mvc
                            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="com.anontion.common, com.anontion.application, com.anontion.account, com.anontion.system" />
+    <context:component-scan base-package="com.anontion.common, com.anontion.application, com.anontion.account, com.anontion.system, com.anontion.asterisk" />
 
     <context:annotation-config/>
 
     <mvc:annotation-driven/>
 
-    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
+    <bean id="dataSourceServer" class="org.apache.tomcat.jdbc.pool.DataSource">
         <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
         <property name="url" value="jdbc:mysql://127.0.0.1:3306/anontion_live" />
         <property name="username" value="anontion" />
@@ -28,8 +28,8 @@
         <property name="validationInterval" value="30000" />
     </bean>
 
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="dataSource">
-     <property name="dataSource" ref="dataSource" />
+    <bean id="entityManagerFactoryService" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="dataSourceServer">
+     <property name="dataSource" ref="dataSourceServer" />
      <property name="packagesToScan" value="com.anontion.application.model, com.anontion.account.model" />
      <property name="jpaVendorAdapter">
          <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
@@ -45,12 +45,51 @@
      <property name="entityManagerFactoryInterface" value="jakarta.persistence.EntityManagerFactory" />
     </bean>
 
-    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    <bean id="transactionManagerService" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactoryService" />
     </bean>
-        
-    <jpa:repositories base-package="com.anontion.application, com.anontion.account, com.anontion.system, com.anontion.common" />
-    
+
+    <jpa:repositories
+            base-package="com.anontion.application, com.anontion.account, com.anontion.system, com.anontion.common"
+            entity-manager-factory-ref="entityManagerFactoryService"
+            transaction-manager-ref="transactionManagerService" />
+
+    <bean id="dataSourceAsterisk" class="org.apache.tomcat.jdbc.pool.DataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/asterisk_live" />
+        <property name="username" value="asterisk" />
+        <property name="password" value="NNNNN" />
+        <property name="validationQuery" value="SELECT 1" />
+        <property name="testOnBorrow" value="true" />
+        <property name="validationInterval" value="30000" />
+    </bean>
+
+    <bean id="entityManagerFactoryAsterisk" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="dataSourceAsterisk">
+        <property name="dataSource" ref="dataSourceAsterisk" />
+        <property name="packagesToScan" value="com.anontion.asterisk.model" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="generateDdl" value="true"/>
+                <property name="showSql" value="true" />
+            </bean>
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</prop>
+            </props>
+        </property>
+        <property name="entityManagerFactoryInterface" value="jakarta.persistence.EntityManagerFactory" />
+    </bean>
+
+    <bean id="transactionManagerAsterisk" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactoryAsterisk" />
+    </bean>
+
+    <jpa:repositories
+            base-package="com.anontion.asterisk"
+            entity-manager-factory-ref="entityManagerFactoryAsterisk"
+            transaction-manager-ref="transactionManagerAsterisk" />
+
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="messageConverters">
             <list>

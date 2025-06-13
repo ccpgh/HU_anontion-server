@@ -97,6 +97,11 @@ sourceSets {
             srcDir 'src/main/common/java'
         }
     }
+    asterisk {
+        java {
+            srcDir 'src/main/asterisk/java'
+        }
+    }
     application {
         java {
             srcDir 'src/main/application/java'
@@ -120,11 +125,18 @@ task compileCommon(type: JavaCompile) {
     classpath = sourceSets.main.compileClasspath
 }
 
+task compileAsterisk(type: JavaCompile) {
+    source sourceSets.asterisk.java
+    destinationDirectory = file("$buildDir/classes/asterisk")
+    classpath = sourceSets.main.compileClasspath
+}
+
 task compileApplication(type: JavaCompile) {
-    dependsOn compileCommon
+    dependsOn compileCommon, compileAsterisk
     source sourceSets.application.java
     destinationDirectory = file("$buildDir/classes/application")
     classpath = sourceSets.main.compileClasspath +
+    files("$buildDir/classes/asterisk") +
     files("$buildDir/classes/common")
 }
 
@@ -133,20 +145,22 @@ task compileAccount(type: JavaCompile) {
     source sourceSets.account.java
     destinationDirectory = file("$buildDir/classes/account")
     classpath = sourceSets.main.compileClasspath +
-    files("$buildDir/classes/common") + 
-    files("$buildDir/classes/application") 
+    files("$buildDir/classes/asterisk") +
+    files("$buildDir/classes/common") +
+    files("$buildDir/classes/application")
 }
 
 task compileSystem(type: JavaCompile) {
-    dependsOn compileCommon
+    dependsOn compileCommon, compileAsterisk
     source sourceSets.system.java
     destinationDirectory = file("$buildDir/classes/system")
     classpath = sourceSets.main.compileClasspath +
+    files("$buildDir/classes/asterisk") +
     files("$buildDir/classes/common")
 }
 
 tasks.withType(War) {
-    dependsOn compileCommon, compileApplication, compileAccount, compileSystem
+    dependsOn compileCommon, compileAsterisk, compileApplication, compileAccount, compileSystem
 }
 
 build.dependsOn tasks.withType(War)
@@ -166,8 +180,24 @@ task commonJar(type: Jar) {
     archiveVersion = '1.0.0'
 }
 
+task asteriskJar(type: Jar) {
+    dependsOn compileAsterisk
+
+    from("$buildDir/classes/asterisk") {
+        include '**/*.class'
+    }
+
+    from("$projectDir/src/main/asterisk/resources") {
+        include '**/*'
+    }
+
+    archiveBaseName = 'anontion-asterisk'
+    archiveVersion = '1.0.0'
+}
+
 task applicationWar(type: War) {
     dependsOn commonJar
+    dependsOn asteriskJar
 
     from("$projectDir/src/main/application/webapp/WEB-INF") {
         include '*.xml'
@@ -206,6 +236,11 @@ task applicationWar(type: War) {
 
     from("$buildDir/libs") {
         include '**/anontion-common-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
+    from("$buildDir/libs") {
+        include '**/anontion-asterisk-1.0.0.jar'
         into 'WEB-INF/lib'
     }
 
@@ -261,12 +296,18 @@ task accountWar(type: War) {
         into 'WEB-INF/lib'
     }
 
+    from("$buildDir/libs") {
+        include '**/anontion-asterisk-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
     archiveBaseName = 'account'
     archiveVersion = '1.0.0'
 }
 
 task systemWar(type: War) {
     dependsOn commonJar
+    dependsOn asteriskJar
 
     from("$projectDir/src/main/system/webapp/WEB-INF") {
         include '*.xml'
@@ -308,11 +349,16 @@ task systemWar(type: War) {
         into 'WEB-INF/lib'
     }
 
+    from("$buildDir/libs") {
+        include '**/anontion-asterisk-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
     archiveBaseName = 'system'
     archiveVersion = '1.0.0'
 }
 
-build.dependsOn commonJar, applicationWar, accountWar, systemWar
+build.dependsOn commonJar, asteriskJar, applicationWar, accountWar, systemWar
 
 tasks.named('war') {
     enabled = false
