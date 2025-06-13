@@ -23,14 +23,14 @@ public class AnontionSecurityTests {
   
   public static boolean TEST_convertionKeyToStringToKeyToStringCompare() {
 
-    ECPublicKeyParameters k1 = AnontionSecurityDSA.pub();
+    ECPublicKeyParameters k1 = AnontionSecurityECDSA.pub();
 
     
-    String s1 = AnontionSecurityDSA.encodePubK1XY(k1);
+    String s1 = AnontionSecurityECDSA.encodePubK1XY(k1);
     
-    ECPublicKeyParameters k2 = AnontionSecurityDSA.decodeECPublicKeyParametersFromBase64XY(s1);
+    ECPublicKeyParameters k2 = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(s1);
     
-    String s2 = AnontionSecurityDSA.encodePubK1XY(k2);
+    String s2 = AnontionSecurityECDSA.encodePubK1XY(k2);
 
     if (s1.compareTo(s2) == 0) {
 
@@ -92,13 +92,13 @@ public class AnontionSecurityTests {
     
     String xyEncodedUncompressedRawBase64String = "BAD/yB0qBYQNJGLQ0VSMdhFlNXD1Qil+RVVwd1EUP/n5V+mClQSDl65Qtchr6QSY3450GU4GN94Xic7PUdi4/Uk=";
     
-    ECPublicKeyParameters k1 = AnontionSecurityDSA.decodeECPublicKeyParametersFromBase64XY(xyEncodedUncompressedRawBase64String);
+    ECPublicKeyParameters k1 = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(xyEncodedUncompressedRawBase64String);
     
-    String s1 = AnontionSecurityDSA.encodePubK1XY(k1);
+    String s1 = AnontionSecurityECDSA.encodePubK1XY(k1);
     
-    ECPublicKeyParameters k2 = AnontionSecurityDSA.decodeECPublicKeyParametersFromBase64XY(s1);
+    ECPublicKeyParameters k2 = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(s1);
     
-    String s2 = AnontionSecurityDSA.encodePubK1XY(k2);
+    String s2 = AnontionSecurityECDSA.encodePubK1XY(k2);
 
     if (s1.compareTo(s2) == 0) {
 
@@ -159,9 +159,9 @@ public class AnontionSecurityTests {
     
     String plaintext = "nvsbv8lnjc3oj0oncp2jekgobrmxwuxoxu0qdf6ams4=:1749089207:b438b97c-5559-4da9-801e-25fd376b538a:bcsym1ahva6n3tcyrtrw//tdc0fh+qsx1fwbdal/gb2mx4qrtbod1bmsxk3ki/flklnvlzd9u0pb5ffz74hnulq=";
 
-    String sign = AnontionSecurityDSA.sign(plaintext);
+    String sign = AnontionSecurityECDSA.sign(plaintext);
     
-    if (AnontionSecurityDSA.check(plaintext, sign, AnontionSecurityDSA.pub())) {
+    if (AnontionSecurityECDSA.check(plaintext, sign, AnontionSecurityECDSA.pub())) {
       
       _logger.info("TEST localSignAndCheck OK");
       
@@ -186,9 +186,9 @@ public class AnontionSecurityTests {
 
     String plaintext = buffer.toString();
     
-    String encrypted = AnontionSecurityRSA.encrypt(buffer.toString());
+    String encrypted = AnontionSecurityECIES_ECDH.encrypt(AnontionSecurityECDSA.pub(), buffer.toString());
 
-    String decrypted = AnontionSecurityRSA.decrypt(encrypted);
+    String decrypted = AnontionSecurityECIES_ECDH.decrypt(AnontionSecurityECDSA.root(), encrypted);
 
     if (plaintext.equals(decrypted)) {
       

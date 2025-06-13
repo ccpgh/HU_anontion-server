@@ -32,7 +32,7 @@ import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionTime;
-import com.anontion.common.security.AnontionSecurityDSA;
+import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.dto.response.ResponseAccountBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
@@ -115,7 +115,7 @@ public class AccountController {
     
     String plaintext = application.getPlaintext();
     
-    if (AnontionSecurityDSA.decodePublicKeyFromBase64XY(pub) == null) {
+    if (AnontionSecurityECDSA.decodePublicKeyFromBase64XY(pub) == null) {
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
           new ResponseBodyErrorDTO("Received client pub key invalid PublicKey."));
@@ -123,7 +123,7 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    ECPublicKeyParameters publicKey = AnontionSecurityDSA.decodeECPublicKeyParametersFromBase64XY(pub);
+    ECPublicKeyParameters publicKey = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(pub);
 
     if (publicKey == null) {
 
@@ -133,7 +133,7 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    if (!AnontionSecurityDSA.check(plaintext, countersign, publicKey)) {
+    if (!AnontionSecurityECDSA.check(plaintext, countersign, publicKey)) {
 
       ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
           new ResponseBodyErrorDTO("Client countersign of proof token invalid."));

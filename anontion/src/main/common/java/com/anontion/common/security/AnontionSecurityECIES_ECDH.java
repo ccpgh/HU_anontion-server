@@ -24,11 +24,11 @@ import org.bouncycastle.util.BigIntegers;
 import com.anontion.common.misc.AnontionConfig;
 import com.anontion.common.misc.AnontionLog;
 
-abstract public class AnontionSecurityRSA {
+abstract public class AnontionSecurityECIES_ECDH {
 
   private static SecureRandom _secureRandom = new SecureRandom();
   
-  public static String encrypt(String s) {
+  public static String encrypt(ECPublicKeyParameters pub, String s) {
     
     try {
 
@@ -55,7 +55,7 @@ abstract public class AnontionSecurityRSA {
 
       agreement.init(ekey);
       
-      BigInteger sharedSecret = agreement.calculateAgreement(AnontionSecurityDSA.pub());
+      BigInteger sharedSecret = agreement.calculateAgreement(pub);
 
       KDF2BytesGenerator kdf = new KDF2BytesGenerator(new SHA256Digest());
       
@@ -113,7 +113,7 @@ abstract public class AnontionSecurityRSA {
     }
   }
   
-  public static String decrypt(String s) {
+  public static String decrypt(ECPrivateKeyParameters key, String s) {
     
     try {
 
@@ -140,7 +140,7 @@ abstract public class AnontionSecurityRSA {
 
       ECDHBasicAgreement agreement = new ECDHBasicAgreement();
       
-      agreement.init(AnontionSecurityDSA.root());
+      agreement.init(key);
       
       BigInteger shared = agreement.calculateAgreement(epub);
       
@@ -180,7 +180,7 @@ abstract public class AnontionSecurityRSA {
     }
   }
  
-  final private static AnontionLog _logger = new AnontionLog(AnontionSecurityRSA.class.getName());
+  final private static AnontionLog _logger = new AnontionLog(AnontionSecurityECIES_ECDH.class.getName());
 }
 
 

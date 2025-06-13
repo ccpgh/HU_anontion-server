@@ -25,7 +25,7 @@ import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
-import com.anontion.common.security.AnontionSecurityDSA;
+import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.security.AnontionPOW;
 import com.anontion.common.dto.response.ResponseApplicationBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
@@ -86,13 +86,13 @@ public class ApplicationController {
 
     AnontionPOW pow = new AnontionPOW();
     
-    String remote = AnontionSecurityDSA.encodePubK1XY(AnontionSecurityDSA.pub());
+    String remote = AnontionSecurityECDSA.encodePubK1XY(AnontionSecurityECDSA.pub());
     
     String[] tokens = { name, ts.toString(), client.toString(), pub};
 
     String plaintext = AnontionStrings.concat(tokens, ":");
 
-    String sign = AnontionSecurityDSA.sign(plaintext);
+    String sign = AnontionSecurityECDSA.sign(plaintext);
 
     AnontionApplication newApplication = new AnontionApplication(name, ts, client, pub, plaintext, sign, pow.getText(), pow.getTarget(), encrypt);
     

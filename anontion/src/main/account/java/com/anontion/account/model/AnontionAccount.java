@@ -13,7 +13,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 
 import com.anontion.common.misc.AnontionJson;
-import com.anontion.common.security.AnontionSecurityDSA;
+import com.anontion.common.security.AnontionSecurityECDSA;
 
 @Entity
 @Table(
@@ -59,7 +59,7 @@ public class AnontionAccount {
     this.ts = ts;
     this.name = name;
     this.application = application;
-    this.key = AnontionSecurityDSA.encodeKeyK1(AnontionSecurityDSA.root());
+    this.key = AnontionSecurityECDSA.encodeKeyK1(AnontionSecurityECDSA.root());
     this.pub = pub;
     this.plaintext = plaintext;
     this.countersign = countersign;

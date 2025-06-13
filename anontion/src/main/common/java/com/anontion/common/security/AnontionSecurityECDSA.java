@@ -30,11 +30,11 @@ import com.anontion.common.misc.AnontionConfig;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionStrings; 
 
-abstract public class AnontionSecurityDSA {
+abstract public class AnontionSecurityECDSA {
 
   private static SecureRandom _secureRandom = new SecureRandom();
 
-  private static ECPrivateKeyParameters _root = AnontionSecurityDSA.load();
+  private static ECPrivateKeyParameters _root = AnontionSecurityECDSA.load();
 
   private static ECPublicKeyParameters _pub = new ECPublicKeyParameters(_root.getParameters().getG().multiply(_root.getD()).normalize(), _root.getParameters());
   
@@ -69,7 +69,7 @@ abstract public class AnontionSecurityDSA {
 
   private static ECPrivateKeyParameters load() {
     
-    InputStream in = AnontionSecurityDSA.class.getClassLoader().getResourceAsStream("server.key");
+    InputStream in = AnontionSecurityECDSA.class.getClassLoader().getResourceAsStream("server.key");
     
     if (in != null) {
 
@@ -189,7 +189,7 @@ abstract public class AnontionSecurityDSA {
       
   public static String sign(String plaintext) { 
 
-    ECPrivateKeyParameters root = AnontionSecurityDSA.root();
+    ECPrivateKeyParameters root = AnontionSecurityECDSA.root();
 
     byte[] bytes = plaintext.getBytes(StandardCharsets.UTF_8);
     
@@ -482,7 +482,7 @@ abstract public class AnontionSecurityDSA {
     return new ECPrivateKeyParameters(d, domain);
   }
    
-  final private static AnontionLog _logger = new AnontionLog(AnontionSecurityDSA.class.getName());
+  final private static AnontionLog _logger = new AnontionLog(AnontionSecurityECDSA.class.getName());
 }
 
 
