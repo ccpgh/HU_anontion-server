@@ -1,12 +1,9 @@
 package com.anontion.asterisk.model;
 
-import java.util.UUID;
-
 import jakarta.persistence.Column;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
 import jakarta.validation.constraints.Pattern;
