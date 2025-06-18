@@ -9,7 +9,9 @@ public class AnontionApplicationId implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String name;
+
   private Long ts;
+  
   private UUID client;
   
   public AnontionApplicationId() {}
@@ -17,7 +19,9 @@ public class AnontionApplicationId implements Serializable {
   public AnontionApplicationId(String name, Long ts, UUID client) {
 
     this.name = name;
+
     this.ts = ts;
+    
     this.client = client;
   }
 

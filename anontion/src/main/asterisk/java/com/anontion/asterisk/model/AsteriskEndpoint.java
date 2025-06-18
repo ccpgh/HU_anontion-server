@@ -35,94 +35,92 @@ public class AsteriskEndpoint {
   private String allow;
 
   @Column(nullable = false, name = "direct_media", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
-  @Pattern(regexp = "0|1|off|on|false|true|no|yes")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
   private String directMedia;
 
-  @Column(nullable = false, name = "connected_line_method", columnDefinition = "enum('invite', 'reinvite', 'update')")
-  @Pattern(regexp = "invite|reinvite|update")
-  private String connectedLineMethod;
+  @Column(nullable = false, name = "trust_id_outbound", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
+  private String trustIdOutbound;
 
-  @Column(nullable = false, name = "direct_media_method", columnDefinition = "enum('invite', 'reinvite', 'update')")
-  @Pattern(regexp = "invite|reinvite|update")
-  private String directMediaMethod;
+  @Column(nullable = false, name = "dtmf_mode", columnDefinition = "enum('rfc4733','inband','info','auto','auto_info')")
+  @Pattern(regexp = "^rfc4733|inband|info|auto|auto_info$")
+  private String dtmfMode;
 
-  @Column(nullable = false, name = "direct_media_glare_mitigation", columnDefinition = "enum('none', 'outgoing', 'incoming')")
-  @Pattern(regexp = "none|outgoing|incoming")
-  private String directMediaGlareMitigation;
+  @Column(nullable = false, name = "force_rport", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
+  private String forceRport;
 
-  @Column(nullable = false, name = "disable_direct_media_on_nat", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
-  @Pattern(regexp = "0|1|off|on|false|true|no|yes")
-  private String disableDirectMediaOnNat;
+  @Column(nullable = false, name = "rtp_symmetric", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
+  private String rtpSymmetric;
 
-  @Column(nullable = false, name = "mailboxes")
-  private String mailboxes;
+  @Column(nullable = false, name = "send_rpid", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
+  private String sendRpid;
 
-  @Column(nullable = false, name = "fax_detect", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
-  @Pattern(regexp = "0|1|off|on|false|true|no|yes")
-  private String faxDetect;
+  @Column(nullable = false, name = "ice_support", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
+  private String iceSupport;
 
-  @Column(nullable = false, name = "t38_udptl", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
-  @Pattern(regexp = "0|1|off|on|false|true|no|yes")
-  private String t38Udptl;
+  @Column(nullable = false, name = "tos_video", length = 10)
+  private String tosVideo;
 
-  @Column(nullable = false, name = "t38_udptl_ec", columnDefinition = "enum('none', 'fec', 'redundancy')")
-  @Pattern(regexp = "none|fec|redundancy")
-  private String t38UdptlEc;
+  @Column(nullable = false, name = "cos_video")
+  private Integer cosVideo;
 
-  @Column(nullable = false, name = "t38_udptl_nat", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
-  @Pattern(regexp = "0|1|off|on|false|true|no|yes")
-  private String t38UdptlNat;
+  @Column(nullable = false, name = "allow_subscribe", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
+  private String allowSubscribe;
 
-  @Column(nullable = false, name = "t38_udptl_ipv6", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
-  @Pattern(regexp = "0|1|off|on|false|true|no|yes")
-  private String t38UdptlIpv6;
+  @Column(nullable = false, name = "callerid", length = 40)
+  private String callerId;
 
   public AsteriskEndpoint() {
 
   }
 
   public AsteriskEndpoint(String id, String transport, String aors, String auth, String context, String disallow,
-      String allow, String directMedia, String connectedLineMethod, String directMediaMethod,
-      String directMediaGlareMitigation, String disableDirectMediaOnNat, String mailboxes,
-      String faxDetect, String t38Udptl, String t38UdptlEc, String t38UdptlNat, String t38UdptlIpv6) {
+      String allow, String directMedia, String trustIdOutbound, String dtmfMode, String forceRport,
+      String rtpSymmetric, String sendRpid, String iceSupport, String tosVideo, Integer cosVideo, 
+      String allowSubscribe, String callerId) {
 
     this.id = id;
 
     this.transport = transport;
-    
+
     this.aors = aors;
-    
+
     this.auth = auth;
-    
+
     this.context = context;
-    
+
     this.disallow = disallow;
-    
+
     this.allow = allow;
-    
+
     this.directMedia = directMedia;
-    
-    this.connectedLineMethod = connectedLineMethod;
-    
-    this.directMediaMethod = directMediaMethod;
-    
-    this.directMediaGlareMitigation = directMediaGlareMitigation;
-    
-    this.disableDirectMediaOnNat = disableDirectMediaOnNat;
-    
-    this.mailboxes = mailboxes;
-    
-    this.faxDetect = faxDetect;
-    
-    this.t38Udptl = t38Udptl;
-    
-    this.t38UdptlEc = t38UdptlEc;
-    
-    this.t38UdptlNat = t38UdptlNat;
-    
-    this.t38UdptlIpv6 = t38UdptlIpv6;
+
+    this.trustIdOutbound = trustIdOutbound;
+
+    this.dtmfMode = dtmfMode;
+
+    this.forceRport = forceRport;
+
+    this.rtpSymmetric = rtpSymmetric;
+
+    this.sendRpid = sendRpid;
+
+    this.iceSupport = iceSupport;
+
+    this.tosVideo = tosVideo;
+
+    this.cosVideo = cosVideo;
+
+    this.allowSubscribe = allowSubscribe;
+
+    this.callerId = callerId;
   }
-  
+
   public String getId() {
 
     return id;
@@ -134,172 +132,173 @@ public class AsteriskEndpoint {
   }
 
   public String getTransport() {
-    
+
     return transport;
   }
 
   public void setTransport(String transport) {
-    
+
     this.transport = transport;
   }
 
   public String getAors() {
-    
+
     return aors;
   }
 
   public void setAors(String aors) {
-    
+
     this.aors = aors;
   }
 
   public String getAuth() {
-    
+
     return auth;
   }
 
   public void setAuth(String auth) {
-    
+
     this.auth = auth;
   }
 
   public String getContext() {
-    
+
     return context;
   }
 
   public void setContext(String context) {
-    
+
     this.context = context;
   }
 
   public String getDisallow() {
-    
+
     return disallow;
   }
 
   public void setDisallow(String disallow) {
-    
+
     this.disallow = disallow;
   }
 
   public String getAllow() {
-    
+
     return allow;
   }
 
   public void setAllow(String allow) {
-    
+
     this.allow = allow;
   }
 
   public String getDirectMedia() {
-   
+
     return directMedia;
   }
 
   public void setDirectMedia(String directMedia) {
-    
+
     this.directMedia = directMedia;
   }
 
-  public String getConnectedLineMethod() {
+  public String getTrustIdOutbound() {
     
-    return connectedLineMethod;
+    return trustIdOutbound;
   }
 
-  public void setConnectedLineMethod(String connectedLineMethod) {
+  public void setTrustIdOutbound(String trustIdOutbound) {
     
-    this.connectedLineMethod = connectedLineMethod;
+    this.trustIdOutbound = trustIdOutbound;
   }
 
-  public String getDirectMediaMethod() {
+  public String getDtmfMode() {
     
-    return directMediaMethod;
+    return dtmfMode;
   }
 
-  public void setDirectMediaMethod(String directMediaMethod) {
+  public void setDtmfMode(String dtmfMode) {
     
-    this.directMediaMethod = directMediaMethod;
+    this.dtmfMode = dtmfMode;
   }
 
-  public String getDirectMediaGlareMitigation() {
+  public String getForceRport() {
     
-    return directMediaGlareMitigation;
+    return forceRport;
   }
 
-  public void setDirectMediaGlareMitigation(String directMediaGlareMitigation) {
+  public void setForceRport(String forceRport) {
     
-    this.directMediaGlareMitigation = directMediaGlareMitigation;
+    this.forceRport = forceRport;
   }
 
-  public String getDisableDirectMediaOnNat() {
+  public String getRtpSymmetric() {
     
-    return disableDirectMediaOnNat;
+    return rtpSymmetric;
   }
 
-  public void setDisableDirectMediaOnNat(String disableDirectMediaOnNat) {
+  public void setRtpSymmetric(String rtpSymmetric) {
     
-    this.disableDirectMediaOnNat = disableDirectMediaOnNat;
+    this.rtpSymmetric = rtpSymmetric;
   }
 
-  public String getMailboxes() {
+  public String getSendRpid() {
     
-    return mailboxes;
+    return sendRpid;
   }
 
-  public void setMailboxes(String mailboxes) {
+  public void setSendRpid(String sendRpid) {
     
-    this.mailboxes = mailboxes;
+    this.sendRpid = sendRpid;
   }
 
-  public String getFaxDetect() {
+  public String getIceSupport() {
     
-    return faxDetect;
+    return iceSupport;
   }
 
-  public void setFaxDetect(String faxDetect) {
+  public void setIceSupport(String iceSupport) {
     
-    this.faxDetect = faxDetect;
+    this.iceSupport = iceSupport;
   }
 
-  public String getT38Udptl() {
+  public String getTosVideo() {
     
-    return t38Udptl;
+    return tosVideo;
   }
 
-  public void setT38Udptl(String t38Udptl) {
+  public void setTosVideo(String tosVideo) {
     
-    this.t38Udptl = t38Udptl;
+    this.tosVideo = tosVideo;
   }
 
-  public String getT38UdptlEc() {
+  public Integer getCosVideo() {
     
-    return t38UdptlEc;
+    return cosVideo;
   }
 
-  public void setT38UdptlEc(String t38UdptlEc) {
+  public void setCosVideo(Integer cosVideo) {
     
-    this.t38UdptlEc = t38UdptlEc;
+    this.cosVideo = cosVideo;
   }
 
-  public String getT38UdptlNat() {
+  public String getAllowSubscribe() {
     
-    return t38UdptlNat;
+    return allowSubscribe;
   }
 
-  public void setT38UdptlNat(String t38UdptlNat) {
+  public void setAllowSubscribe(String allowSubscribe) {
     
-    this.t38UdptlNat = t38UdptlNat;
+    this.allowSubscribe = allowSubscribe;
   }
 
-  public String getT38UdptlIpv6() {
+  public String getCallerId() {
     
-    return t38UdptlIpv6;
+    return callerId;
   }
 
-  public void setT38UdptlIpv6(String t38UdptlIpv6) {
+  public void setCallerId(String callerId) {
     
-    this.t38UdptlIpv6 = t38UdptlIpv6;
+    this.callerId = callerId;
   }
+
 }

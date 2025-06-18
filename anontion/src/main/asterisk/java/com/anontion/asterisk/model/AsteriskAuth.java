@@ -10,14 +10,14 @@ import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "ps_auths")
-public class AsteriskAuths {
+public class AsteriskAuth {
 
   @Id
   @Column(nullable = false, unique = true, name = "id", length = 255)
   private String id;
 
   @Column(nullable = false, name = "auth_type", columnDefinition = "enum('md5','userpass','google_oauth')")
-  @Pattern(regexp = "md5|userpass|google_oauth")
+  @Pattern(regexp = "^md5|userpass|google_oauth$")
   private String authType;
 
   @Column(nullable = false, name = "username", length = 40)
@@ -26,11 +26,11 @@ public class AsteriskAuths {
   @Column(nullable = false, name = "password", length = 80)
   private String password;
 
-  public AsteriskAuths() {
+  public AsteriskAuth() {
 
   }
 
-  public AsteriskAuths(String id, String authType, String username, String password) {
+  public AsteriskAuth(String id, String authType, String username, String password) {
 
     this.id = id;
 

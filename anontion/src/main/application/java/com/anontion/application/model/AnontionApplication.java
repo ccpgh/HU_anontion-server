@@ -16,7 +16,7 @@ public class AnontionApplication {
   private UUID id;
 
   @Id
-  @Column(nullable = false)
+  @Column(nullable = false, length = 255)
   private String name;
 
   @Id
@@ -27,13 +27,13 @@ public class AnontionApplication {
   @Column(nullable = false)
   private UUID client;
 
-  @Column(nullable = false) 
+  @Column(nullable = false, length = 255) 
   private String pub;
 
-  @Column(nullable = false) 
+  @Column(nullable = false, length = 255) 
   private String plaintext;
 
-  @Column(nullable = false) 
+  @Column(nullable = false, length = 255) 
   private String sign;
 
   @Column(nullable = false, columnDefinition = "TEXT")
@@ -52,14 +52,23 @@ public class AnontionApplication {
   public AnontionApplication(String name, Long ts, UUID client, String pub, String plaintext, String sign, String text, Long target, String encrypt) {
 
     this.id = UUID.randomUUID();
+
     this.name = name;
+    
     this.ts = ts;
+    
     this.client = client;
+    
     this.pub = pub;
+    
     this.plaintext = plaintext;
+    
     this.sign = sign;
+    
     this.text = text;
+    
     this.target = target;
+    
     this.encrypt = encrypt;
   }
 

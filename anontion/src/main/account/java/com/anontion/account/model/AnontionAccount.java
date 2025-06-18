@@ -29,7 +29,7 @@ public class AnontionAccount {
   @Column(nullable = false)
   private Long ts;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 255)
   private String name;
 
   @Column(nullable = false)
@@ -41,10 +41,10 @@ public class AnontionAccount {
   @Column(name = "epub", columnDefinition = "VARCHAR(4096)", nullable = false)
   private String pub;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 255)
   private String plaintext;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 255)
   private String countersign;
 
   @Column(nullable = false)

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "ps_aors")
-public class AsteriskAors {
+public class AsteriskAor {
 
   @Id
   @Column(nullable = false, unique = true, name = "id", length = 255)
@@ -20,24 +20,21 @@ public class AsteriskAors {
   private Integer maxContacts;
 
   @Column(nullable = false, name = "remove_existing", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
-  @Pattern(regexp = "0|1|off|on|false|true|no|yes")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
   private String removeExisting;
 
   @Column(nullable = false, name = "qualify_frequency")
   private Integer qualifyFrequency;
 
   @Column(nullable = false, name = "support_path", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
-  @Pattern(regexp = "0|1|off|on|false|true|no|yes")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
   private String supportPath;
 
-  @Column(nullable = false, name = "mailboxes", length = 80)
-  private String mailboxes;
-  
-  public AsteriskAors() {
+  public AsteriskAor() {
 
   }
 
-  public AsteriskAors(String id, Integer maxContacts, String removeExisting, Integer qualifyFrequency, String supportPath, String mailboxes) {
+  public AsteriskAor(String id, Integer maxContacts, String removeExisting, Integer qualifyFrequency, String supportPath) {
 
     this.id = id;
     
@@ -48,8 +45,6 @@ public class AsteriskAors {
     this.qualifyFrequency = qualifyFrequency;
     
     this.supportPath = supportPath;
-    
-    this.mailboxes = mailboxes;
   }
 
   public String getId() {
@@ -100,15 +95,5 @@ public class AsteriskAors {
   public void setSupportPath(String supportPath) {
     
     this.supportPath = supportPath;
-  }
-
-  public String getMailboxes() {
-    
-    return mailboxes;
-  }
-
-  public void setMailboxes(String mailboxes) {
-    
-    this.mailboxes = mailboxes;
   }
 }

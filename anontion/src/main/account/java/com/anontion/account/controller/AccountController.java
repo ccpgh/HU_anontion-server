@@ -25,6 +25,10 @@ import com.anontion.application.model.AnontionApplication;
 import com.anontion.common.dto.request.RequestAccountDTO;
 
 import com.anontion.application.repository.AnontionApplicationRepository;
+import com.anontion.asterisk.model.AsteriskAor;
+import com.anontion.asterisk.model.AsteriskAuth;
+import com.anontion.asterisk.model.AsteriskEndpoint;
+import com.anontion.asterisk.service.AsteriskEndpointService;
 import com.anontion.account.model.AnontionAccount;
 import com.anontion.account.repository.AnontionAccountRepository;
 
@@ -57,6 +61,9 @@ public class AccountController {
   @Autowired
   private ServletContext servletContext;
 
+  @Autowired
+  AsteriskEndpointService asteriskEndpointService;
+  
   @GetMapping("/")
   public ResponseEntity<ResponseDTO> getAccount() {
 
@@ -159,6 +166,8 @@ public class AccountController {
     
     if (accountOptional.isPresent()) {
       
+      _logger.info("DEBUG isPresent");
+      
       account = accountOptional.get();
       
       body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
@@ -167,18 +176,103 @@ public class AccountController {
     } else {
 
       if (approved) {
-        
+
+        _logger.info("DEBUG approved");
+
         AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, plaintext, countersign, true);
 
         _logger.info("New Account: " + newAccount);
 
         account = accountRepository.save(newAccount);
         
+        String id = account.getPub();
+
+        String no = "no";
+
+        String yes = "yes";
+
+        String transport = "transport-id";
+
+        String aor = id;
+
+        String auth = id;
+
+        String context = "external";
+
+        String disallow = "all";
+
+        String allow = "h264,g729,gsm";
+        
+        String directMedia = no;
+
+        String trustIdOutbound = yes;
+
+        String dtmfMode = "rfc4733";
+        
+        String forceRport = yes;
+
+        String rtpSymmetric = yes;
+        
+        String sendRpid = yes;
+        
+        String iceSupport = yes;
+        
+        String tosVideo = "af41";
+        
+        Integer cosVideo = 4;
+        
+        String allowSubscribe = yes;
+        
+        String callerId = account.getName().substring(0, 39).toLowerCase();
+
+        if (callerId.length() > 0) {
+          
+          callerId = callerId.substring(0, 1).toUpperCase() + callerId.substring(1);
+        }
+        
+        AsteriskEndpoint endpoints = new AsteriskEndpoint(id, transport, aor, auth, context, disallow,
+            allow, directMedia, trustIdOutbound, dtmfMode, forceRport, rtpSymmetric, sendRpid, iceSupport,
+            tosVideo, cosVideo, allowSubscribe, callerId);
+                            
+        String authType = "userpass";
+        
+        String password = "password";
+        
+        AsteriskAuth auths = new AsteriskAuth(id, authType, id.substring(0, 1), password);
+        
+        Integer maxContacts = 1;
+        
+        String removeExisting = yes;
+        
+        Integer qualifyFrequency = 30;
+        
+        String supportPath = yes;
+        
+        AsteriskAor aors = new AsteriskAor(id, maxContacts , removeExisting, qualifyFrequency, supportPath);
+        
+        try {
+
+          _logger.info("DEBUG creating");
+
+          asteriskEndpointService.createEndpoint(endpoints, auths, aors);
+        
+        } catch (Exception e) {
+          
+          _logger.equals(e);
+          
+          ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Failed asterisk update."),
+              new ResponseBodyErrorDTO("Failed asterisk update."));
+
+          return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        
         body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
             account.getApplication(), 100.0f, approved);
       
       } else {
       
+        _logger.info("DEBUG NOT approved");
+
         Float progress = ((now - ts) / (float) applicationTimeout) * 100.0f;
         
         body = new ResponseAccountBodyDTO(new UUID(0L, 0L), ts, name, client, progress, approved);
