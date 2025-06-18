@@ -9,7 +9,7 @@ import com.anontion.common.misc.AnontionLog;
 
 public class AnontionSecurityTests {
 
-  private static final String _CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  private static final String _ALPHANUM_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
   private static final SecureRandom _random = new SecureRandom();
 
@@ -181,7 +181,7 @@ public class AnontionSecurityTests {
 
     for (int i = 0; i < length; i++) {
     
-      buffer.append(_CHARACTERS.charAt(_random.nextInt(_CHARACTERS.length())));
+      buffer.append(_ALPHANUM_CHARACTERS.charAt(_random.nextInt(_ALPHANUM_CHARACTERS.length())));
     }
 
     String plaintext = buffer.toString();

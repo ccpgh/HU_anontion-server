@@ -36,6 +36,7 @@ import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionTime;
+import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.dto.response.ResponseAccountBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
@@ -236,9 +237,19 @@ public class AccountController {
                             
         String authType = "userpass";
         
-        String password = "password";
+        String username = AnontionSecurity.tobase93FromBase64(id);
         
-        AsteriskAuth auths = new AsteriskAuth(id, authType, id.substring(0, 1), password);
+        if (username.isEmpty()) {
+          
+          ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Id key invalid."),
+              new ResponseBodyErrorDTO("Id key invalid."));
+
+          return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        
+        String password = AnontionSecurity.generatePassword();
+        
+        AsteriskAuth auths = new AsteriskAuth(id, authType, username, password);
         
         Integer maxContacts = 1;
         
