@@ -213,7 +213,7 @@ public class AccountController {
         
         _count++;
         
-        String NNN = _count.toString();
+        String NNN = _count.toString() + _count.toString() + _count.toString();
 
         id = NNN;
 
