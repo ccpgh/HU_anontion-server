@@ -27,7 +27,7 @@ public class AsteriskEndpointService {
   public AsteriskEndpointService() {
   }
 
-  @Transactional
+  @Transactional("transactionManagerAsterisk") 
   public void createEndpoint(AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
 
     endpointRepository.save(endpoint);    
