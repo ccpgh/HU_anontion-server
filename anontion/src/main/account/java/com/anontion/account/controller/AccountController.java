@@ -53,8 +53,6 @@ public class AccountController {
 
   static final private int _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT = 24 * 60 * 60; // 1 day
   
-  static private Integer _count = 0; // TODO remove
-
   private int applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT;
   
   @Autowired
@@ -211,12 +209,6 @@ public class AccountController {
         
         String id = account.getPub();
         
-        _count++;
-        
-        String NNN = _count.toString() + _count.toString() + _count.toString();
-
-        id = NNN;
-
         String no = "no";
 
         String yes = "yes";
@@ -266,7 +258,7 @@ public class AccountController {
                             
         String authType = "userpass";
                         
-        String username = NNN; //AnontionSecurity.tobase93FromBase64(AnontionSecuritySHA.hash(id));
+        String username = AnontionSecurity.tobase93FromBase64(AnontionSecuritySHA.hash(id));
         
         if (username.isEmpty()) {
           
@@ -276,7 +268,7 @@ public class AccountController {
           return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         
-        String password = NNN; //AnontionSecurity.generatePassword();
+        String password = AnontionSecurity.generatePassword();
         
         _logger.info("DEBUG username " + username);
         
