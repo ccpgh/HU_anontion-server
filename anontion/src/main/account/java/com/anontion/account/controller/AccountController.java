@@ -29,7 +29,7 @@ import com.anontion.asterisk.model.AsteriskAor;
 import com.anontion.asterisk.model.AsteriskAuth;
 import com.anontion.asterisk.model.AsteriskEndpoint;
 import com.anontion.asterisk.repository.AsteriskAuthRepository;
-import com.anontion.asterisk.service.AsteriskEndpointService;
+import com.anontion.common.service.AccountService;
 import com.anontion.account.model.AnontionAccount;
 import com.anontion.account.repository.AnontionAccountRepository;
 
@@ -51,9 +51,9 @@ import jakarta.servlet.ServletContext;
 @RequestMapping("/account")
 public class AccountController {
 
-  static final private int _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT = 24 * 60 * 60; // 1 day
+  final private static int _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT = 24 * 60 * 60; // 1 day
   
-  private int applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT;
+  private int applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT; // default. re-calced below.
   
   @Autowired
   private AnontionAccountRepository accountRepository;
@@ -68,7 +68,7 @@ public class AccountController {
   private ServletContext servletContext;
 
   @Autowired
-  AsteriskEndpointService asteriskEndpointService;
+  AccountService asteriskService;
   
   @GetMapping("/")
   public ResponseEntity<ResponseDTO> getAccount() {
@@ -153,28 +153,20 @@ public class AccountController {
 
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     } 
+        
+    final Long now = AnontionTime.tsN();
     
-    
-    boolean approved = false; 
-    
-    Long now = AnontionTime.tsN();
-    
-    if ((now - ts) > applicationTimeout) {
-
-      approved = true;
-    }
+    boolean approved = valid(ts, now); 
     
     Optional<AnontionAccount> accountOptional = accountRepository.findByTsAndNameAndApplication(ts, name, client);
 
-    AnontionAccount account = null;
-    
     ResponseAccountBodyDTO body = null;
     
     if (accountOptional.isPresent()) {
       
       _logger.info("DEBUG isPresent");
       
-      account = accountOptional.get();
+      AnontionAccount account = accountOptional.get();
 
       Optional<AsteriskAuth> authOptional = authRepository.findById(account.getPub());
 
@@ -205,9 +197,7 @@ public class AccountController {
 
         _logger.info("New Account: " + newAccount);
 
-        account = accountRepository.save(newAccount);
-        
-        String id = account.getPub();
+        String id = newAccount.getPub();
         
         String no = "no";
 
@@ -245,7 +235,7 @@ public class AccountController {
         
         String allowSubscribe = yes;
         
-        String callerId = account.getName().substring(0, 39).toLowerCase();
+        String callerId = newAccount.getName().substring(0, 39).toLowerCase(); // TODO fix me - needs a name that can be used. limit name to 40 chars?
 
         if (callerId.length() > 0) {
           
@@ -284,15 +274,17 @@ public class AccountController {
         
         AsteriskAor aors = new AsteriskAor(id, maxContacts , removeExisting, qualifyFrequency, supportPath);
         
+        AnontionAccount account = null;
+        
         try {
 
-          _logger.info("DEBUG creating");
+          _logger.info("DEBUG saving");
 
-          asteriskEndpointService.createEndpoint(endpoints, auths, aors);
+          account = asteriskService.createAccountAndEndpoint(newAccount, endpoints, auths, aors);
         
         } catch (Exception e) {
           
-          _logger.equals(e);
+          _logger.exception(e);
           
           ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Failed asterisk update."),
               new ResponseBodyErrorDTO("Failed asterisk update."));
@@ -359,6 +351,12 @@ public class AccountController {
     _logger.info("Application timeout is " + applicationTimeout);
   }
 
+  
+  public boolean valid(Long ts, Long now) { // here for now .. 
+    
+    return ((now - ts) > applicationTimeout);
+  }
+  
   final private static AnontionLog _logger = new AnontionLog(AccountController.class.getName());
 }
 

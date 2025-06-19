@@ -78,7 +78,6 @@ public class AnontionSecurity {
     return buffer.reverse().toString();
   }
 
-  @SuppressWarnings("unused")
   final private static AnontionLog _logger = new AnontionLog(AnontionSecurity.class.getName());
 }
 

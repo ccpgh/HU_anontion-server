@@ -1,20 +1,26 @@
-package com.anontion.asterisk.service;
+package com.anontion.common.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 //import jakarta.transaction.Transactional;
 
+import com.anontion.account.model.AnontionAccount;
 import com.anontion.asterisk.model.AsteriskAor;
 import com.anontion.asterisk.model.AsteriskAuth;
 import com.anontion.asterisk.model.AsteriskEndpoint;
+
+import com.anontion.account.repository.AnontionAccountRepository;
 import com.anontion.asterisk.repository.AsteriskAorRepository;
 import com.anontion.asterisk.repository.AsteriskAuthRepository;
 import com.anontion.asterisk.repository.AsteriskEndpointRepository;
 
 @Service
-public class AsteriskEndpointService {
+public class AccountService {
 
+  @Autowired
+  private AnontionAccountRepository accountRepository;
+  
   @Autowired
   private AsteriskEndpointRepository endpointRepository;
 
@@ -24,17 +30,19 @@ public class AsteriskEndpointService {
   @Autowired
   private AsteriskAuthRepository authRepository;
   
-  public AsteriskEndpointService() {
+  public AccountService() {
   }
 
-  @Transactional("transactionManagerAsterisk") 
-  public void createEndpoint(AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
+  @Transactional("transactionManager") 
+  public AnontionAccount createAccountAndEndpoint(AnontionAccount account, AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
 
     endpointRepository.save(endpoint);    
 
     aorRepository.save(aor);
     
     authRepository.save(auth);
+    
+    return accountRepository.save(account);
   }
 }
 
