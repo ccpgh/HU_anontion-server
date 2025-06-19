@@ -1,4 +1,4 @@
-package com.anontion.common.service;
+package com.anontion.services.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +16,7 @@ import com.anontion.asterisk.repository.AsteriskAuthRepository;
 import com.anontion.asterisk.repository.AsteriskEndpointRepository;
 
 @Service
-public class AccountService {
+public class AccountServices implements AccountServicesI {
 
   @Autowired
   private AnontionAccountRepository accountRepository;
@@ -30,7 +30,7 @@ public class AccountService {
   @Autowired
   private AsteriskAuthRepository authRepository;
   
-  public AccountService() {
+  public AccountServices() {
   }
 
   @Transactional("transactionManager") 
@@ -45,4 +45,3 @@ public class AccountService {
     return accountRepository.save(account);
   }
 }
-

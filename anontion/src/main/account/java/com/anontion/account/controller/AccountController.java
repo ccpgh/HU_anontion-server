@@ -29,7 +29,7 @@ import com.anontion.asterisk.model.AsteriskAor;
 import com.anontion.asterisk.model.AsteriskAuth;
 import com.anontion.asterisk.model.AsteriskEndpoint;
 import com.anontion.asterisk.repository.AsteriskAuthRepository;
-import com.anontion.common.service.AccountService;
+import com.anontion.services.service.AccountServices;
 import com.anontion.account.model.AnontionAccount;
 import com.anontion.account.repository.AnontionAccountRepository;
 
@@ -68,7 +68,7 @@ public class AccountController {
   private ServletContext servletContext;
 
   @Autowired
-  AccountService asteriskService;
+  AccountServices accountServices;
   
   @GetMapping("/")
   public ResponseEntity<ResponseDTO> getAccount() {
@@ -280,7 +280,7 @@ public class AccountController {
 
           _logger.info("DEBUG saving");
 
-          account = asteriskService.createAccountAndEndpoint(newAccount, endpoints, auths, aors);
+          account = accountServices.createAccountAndEndpoint(newAccount, endpoints, auths, aors);
         
         } catch (Exception e) {
           

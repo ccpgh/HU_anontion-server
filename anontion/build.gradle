@@ -141,12 +141,19 @@ task compileAsterisk(type: JavaCompile) {
     classpath = sourceSets.main.compileClasspath
 }
 
+task compileServices(type: JavaCompile) {
+    source sourceSets.services.java
+    destinationDirectory = file("$buildDir/classes/services")
+    classpath = sourceSets.main.compileClasspath
+}
+
 task compileApplication(type: JavaCompile) {
     dependsOn compileCommon, compileAsterisk
     source sourceSets.application.java
     destinationDirectory = file("$buildDir/classes/application")
     classpath = sourceSets.main.compileClasspath +
     files("$buildDir/classes/asterisk") +
+    files("$buildDir/classes/services") +
     files("$buildDir/classes/common")
 }
 
@@ -156,6 +163,7 @@ task compileAccount(type: JavaCompile) {
     destinationDirectory = file("$buildDir/classes/account")
     classpath = sourceSets.main.compileClasspath +
     files("$buildDir/classes/asterisk") +
+    files("$buildDir/classes/services") +
     files("$buildDir/classes/common") +
     files("$buildDir/classes/application")
 }
@@ -166,25 +174,16 @@ task compileSystem(type: JavaCompile) {
     destinationDirectory = file("$buildDir/classes/system")
     classpath = sourceSets.main.compileClasspath +
     files("$buildDir/classes/asterisk") +
+    files("$buildDir/classes/services") +
     files("$buildDir/classes/common")
 }
 
-task compileServices(type: JavaCompile) {
-    dependsOn compileCommon, compileAsterisk, compileApplication, compileAccount
-    source sourceSets.services.java
-    destinationDirectory = file("$buildDir/classes/services")
-    classpath = sourceSets.main.compileClasspath +
-    files("$buildDir/classes/asterisk") +
-    files("$buildDir/classes/common") +
-    files("$buildDir/classes/account") +
-    files("$buildDir/classes/application")
-}
 
 tasks.withType(War) {
-    dependsOn compileCommon, compileAsterisk, compileApplication, compileAccount, compileSystem, compileServices
+    dependsOn compileCommon, compileAsterisk, compileServices, compileApplication, compileAccount, compileSystem
 }
 
-build.dependsOn tasks.withType(War)
+//build.dependsOn tasks.withType(War)
 
 task commonJar(type: Jar) {
     dependsOn compileCommon
@@ -234,6 +233,7 @@ task servicesJar(type: Jar) {
 task applicationWar(type: War) {
     dependsOn commonJar
     dependsOn asteriskJar
+    dependsOn servicesJar
 
     from("$projectDir/src/main/application/webapp/WEB-INF") {
         include '*.xml'
@@ -290,6 +290,9 @@ task applicationWar(type: War) {
 }
 
 task accountWar(type: War) {
+    dependsOn commonJar
+    dependsOn servicesJar
+    dependsOn asteriskJar
     dependsOn applicationWar
 
     from("$projectDir/src/main/account/webapp/WEB-INF") {
@@ -354,6 +357,7 @@ task accountWar(type: War) {
 task systemWar(type: War) {
     dependsOn commonJar
     dependsOn asteriskJar
+    dependsOn servicesJar
 
     from("$projectDir/src/main/system/webapp/WEB-INF") {
         include '*.xml'
