@@ -16,18 +16,32 @@ public class ResponseAccountBodyDTO extends ResponseBodyDTO {
 
   private boolean approved;
 
+  private String username;
+
+  private String password;
+
   public ResponseAccountBodyDTO() {
 
   }
 
-  public ResponseAccountBodyDTO(UUID id, Long ts, String name, UUID application, Float progress, boolean approved) {
+  public ResponseAccountBodyDTO(UUID id, Long ts, String name, UUID application, Float progress, 
+      boolean approved, String username, String password) {
     
     this.id = id;
+
     this.ts = ts;
+    
     this.name = name;
+    
     this.application = application;
+    
     this.progress = progress;
+    
     this.approved = approved;
+    
+    this.username = username;
+
+    this.password = password;
   }
 
   public UUID getId() {
@@ -88,6 +102,28 @@ public class ResponseAccountBodyDTO extends ResponseBodyDTO {
   public void setProgress(Float progress) {
     
     this.progress = progress;
+  }
+  
+
+  public String getUsername() {
+    
+    return username;
+  }
+
+  public void setUsername(String username) {
+    
+    this.username = username;
+  }
+
+
+  public String getPassword() {
+    
+    return password;
+  }
+
+  public void setPassword(String password) {
+    
+    this.password = password;
   }
 }
 

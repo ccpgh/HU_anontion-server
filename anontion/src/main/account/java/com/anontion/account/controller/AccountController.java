@@ -28,6 +28,7 @@ import com.anontion.application.repository.AnontionApplicationRepository;
 import com.anontion.asterisk.model.AsteriskAor;
 import com.anontion.asterisk.model.AsteriskAuth;
 import com.anontion.asterisk.model.AsteriskEndpoint;
+import com.anontion.asterisk.repository.AsteriskAuthRepository;
 import com.anontion.asterisk.service.AsteriskEndpointService;
 import com.anontion.account.model.AnontionAccount;
 import com.anontion.account.repository.AnontionAccountRepository;
@@ -60,6 +61,9 @@ public class AccountController {
   @Autowired
   private AnontionApplicationRepository applicationRepository;
 
+  @Autowired
+  private AsteriskAuthRepository authRepository;
+  
   @Autowired
   private ServletContext servletContext;
 
@@ -171,9 +175,25 @@ public class AccountController {
       _logger.info("DEBUG isPresent");
       
       account = accountOptional.get();
-      
-      body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
-             account.getApplication(), 100.0f, true);
+
+      Optional<AsteriskAuth> authOptional = authRepository.findById(account.getPub());
+
+      if (authOptional.isPresent()) {
+        
+        _logger.info("DEBUG isPresent");
+        
+        AsteriskAuth auth = authOptional.get();
+
+        body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
+            account.getApplication(), 100.0f, true, auth.getUsername(), auth.getPassword());
+
+      } else {
+        
+        ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Asterisk account auth missing."),
+            new ResponseBodyErrorDTO("Preexiisting account auth should but does not exist."));
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      }    
       
     } else {
 
@@ -281,7 +301,7 @@ public class AccountController {
         }
         
         body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
-            account.getApplication(), 100.0f, approved);
+            account.getApplication(), 100.0f, approved, username, password);
       
       } else {
       
@@ -289,7 +309,7 @@ public class AccountController {
 
         Float progress = ((now - ts) / (float) applicationTimeout) * 100.0f;
         
-        body = new ResponseAccountBodyDTO(new UUID(0L, 0L), ts, name, client, progress, approved);
+        body = new ResponseAccountBodyDTO(new UUID(0L, 0L), ts, name, client, progress, approved, "", "");
       }
     }
 
