@@ -40,12 +40,12 @@ public class AnontionSecurity {
     
     for (Character c : base64.toCharArray()) {
       
-      if ((c >= 'A' && c <= 'Z') ||
+      if (!((c >= 'A' && c <= 'Z') ||
           (c >= 'a' && c <= 'z') ||
           (c >= '0' && c <= '9') ||
           c == '+' || 
           c == '/' || 
-          c == '=') {
+          c == '=')) {
             
         _logger.severe("Invaliid base64 '" + base64 + "'");
         

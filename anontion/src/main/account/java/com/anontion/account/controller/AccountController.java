@@ -38,6 +38,7 @@ import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
+import com.anontion.common.security.AnontionSecuritySHA;
 import com.anontion.common.dto.response.ResponseAccountBodyDTO;
 import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
@@ -237,7 +238,7 @@ public class AccountController {
                             
         String authType = "userpass";
         
-        String username = AnontionSecurity.tobase93FromBase64(id);
+        String username = AnontionSecurity.tobase93FromBase64(AnontionSecuritySHA.hash(id));
         
         if (username.isEmpty()) {
           
@@ -248,6 +249,8 @@ public class AccountController {
         }
         
         String password = AnontionSecurity.generatePassword();
+        
+        _logger.info("DEBUG username " + username);
         
         AsteriskAuth auths = new AsteriskAuth(id, authType, username, password);
         
