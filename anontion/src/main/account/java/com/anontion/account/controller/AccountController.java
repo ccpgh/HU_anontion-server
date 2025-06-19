@@ -210,6 +210,12 @@ public class AccountController {
         account = accountRepository.save(newAccount);
         
         String id = account.getPub();
+        
+        _count++;
+        
+        String NNN = _count.toString();
+
+        id = NNN;
 
         String no = "no";
 
@@ -253,17 +259,13 @@ public class AccountController {
           
           callerId = callerId.substring(0, 1).toUpperCase() + callerId.substring(1);
         }
-        
+                
         AsteriskEndpoint endpoints = new AsteriskEndpoint(id, transport, aor, auth, context, disallow,
             allow, directMedia, trustIdOutbound, dtmfMode, forceRport, rtpSymmetric, sendRpid, iceSupport,
             tosVideo, cosVideo, allowSubscribe, callerId);
                             
         String authType = "userpass";
-        
-        _count++;
-        
-        String NNN = _count.toString();
-        
+                        
         String username = NNN; //AnontionSecurity.tobase93FromBase64(AnontionSecuritySHA.hash(id));
         
         if (username.isEmpty()) {
