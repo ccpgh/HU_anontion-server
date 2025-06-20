@@ -17,7 +17,7 @@ import com.anontion.common.security.AnontionSecurityECDSA;
 
 @Entity
 @Table(
-  name = "AnontionAccount",
+  name = "anontion_account",
   uniqueConstraints = @UniqueConstraint(columnNames = {"ts", "name", "application"})
 )
 public class AnontionAccount {
