@@ -1,4 +1,4 @@
-package com.anontion.account.model;
+package com.anontion.models.account.model;
 
 import jakarta.persistence.Column;
 

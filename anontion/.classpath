@@ -37,6 +37,18 @@
 			<attribute name="gradle_used_by_scope" value="asterisk"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" output="bin/models" path="src/main/models/java">
+		<attributes>
+			<attribute name="gradle_scope" value="models"/>
+			<attribute name="gradle_used_by_scope" value="models"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="bin/services" path="src/main/services/java">
+		<attributes>
+			<attribute name="gradle_scope" value="services"/>
+			<attribute name="gradle_used_by_scope" value="services"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21/"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer">

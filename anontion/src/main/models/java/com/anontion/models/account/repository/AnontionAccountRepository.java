@@ -1,6 +1,6 @@
-package com.anontion.account.repository;
+package com.anontion.models.account.repository;
 
-import com.anontion.account.model.AnontionAccount;
+import com.anontion.models.account.model.AnontionAccount;
 
 import java.util.Optional;
 

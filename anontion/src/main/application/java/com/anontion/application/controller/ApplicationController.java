@@ -32,9 +32,9 @@ import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
 import jakarta.validation.Valid;
 
-import com.anontion.application.model.AnontionApplication;
-import com.anontion.application.model.AnontionApplicationId;
-import com.anontion.application.repository.AnontionApplicationRepository;
+import com.anontion.models.application.model.AnontionApplication;
+import com.anontion.models.application.model.AnontionApplicationId;
+import com.anontion.models.application.repository.AnontionApplicationRepository;
 
 @RestController
 @RequestMapping("/application")

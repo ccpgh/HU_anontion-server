@@ -1,4 +1,4 @@
-package com.anontion.application.model;
+package com.anontion.models.application.model;
 
 import java.io.Serializable;
 

@@ -20,18 +20,18 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.anontion.application.model.AnontionApplicationId;
-import com.anontion.application.model.AnontionApplication;
+import com.anontion.models.application.model.AnontionApplicationId;
+import com.anontion.models.application.model.AnontionApplication;
 import com.anontion.common.dto.request.RequestAccountDTO;
 
-import com.anontion.application.repository.AnontionApplicationRepository;
+import com.anontion.models.application.repository.AnontionApplicationRepository;
 import com.anontion.asterisk.model.AsteriskAor;
 import com.anontion.asterisk.model.AsteriskAuth;
 import com.anontion.asterisk.model.AsteriskEndpoint;
 import com.anontion.asterisk.repository.AsteriskAuthRepository;
 import com.anontion.asterisk.service.AsteriskEndpointService;
-import com.anontion.account.model.AnontionAccount;
-import com.anontion.account.repository.AnontionAccountRepository;
+import com.anontion.models.account.model.AnontionAccount;
+import com.anontion.models.account.repository.AnontionAccountRepository;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;

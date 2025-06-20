@@ -1,7 +1,7 @@
-package com.anontion.application.repository;
+package com.anontion.models.application.repository;
 
-import com.anontion.application.model.AnontionApplication;
-import com.anontion.application.model.AnontionApplicationId;
+import com.anontion.models.application.model.AnontionApplication;
+import com.anontion.models.application.model.AnontionApplicationId;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
