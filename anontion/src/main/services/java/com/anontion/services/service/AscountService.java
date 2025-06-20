@@ -11,10 +11,15 @@ import com.anontion.asterisk.model.AsteriskEndpoint;
 import com.anontion.asterisk.repository.AsteriskAorRepository;
 import com.anontion.asterisk.repository.AsteriskAuthRepository;
 import com.anontion.asterisk.repository.AsteriskEndpointRepository;
+import com.anontion.models.account.model.AnontionAccount;
+import com.anontion.models.account.repository.AnontionAccountRepository;
 
 @Service
 public class AscountService {
 
+  @Autowired
+  private AnontionAccountRepository accountRepository;
+  
   @Autowired
   private AsteriskEndpointRepository endpointRepository;
 
@@ -27,14 +32,16 @@ public class AscountService {
   public AscountService() {
   }
 
-  @Transactional("transactionManagerAsterisk") 
-  public void saveTxAccountAndEndpoint(AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
-
-    endpointRepository.save(endpoint);    
+  @Transactional("transactionManager")
+  public AnontionAccount createAccountAndEndpoint(AnontionAccount account, AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
 
     aorRepository.save(aor);
     
     authRepository.save(auth);
+    
+    endpointRepository.save(endpoint);  
+    
+    return accountRepository.save(account);    
   }
 }
 

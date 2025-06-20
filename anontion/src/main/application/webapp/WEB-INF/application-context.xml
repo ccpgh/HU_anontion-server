@@ -1,0 +1,210 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa" 
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/data/jpa
+                           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd 
+                           http://www.springframework.org/schema/mvc
+                           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <context:component-scan base-package="com.anontion.common, com.anontion.application, com.anontion.account, com.anontion.system, com.anontion.asterisk, com.anontion.models, com.anontion.services" />
+
+    <context:annotation-config/>
+
+    <mvc:annotation-driven/>
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <!-- bean id="dataSourceServer" class="org.apache.tomcat.jdbc.pool.DataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/anontion_live" />
+        <property name="username" value="anontion" />
+        <property name="password" value="NNNNN" />
+        <property name="validationQuery" value="SELECT 1" />
+        <property name="testOnBorrow" value="true" />
+        <property name="validationInterval" value="30000" />
+    </bean -->
+
+    <bean id="dataSourceServer1" class="com.atomikos.jdbc.AtomikosDataSourceBean" init-method="init" destroy-method="close">
+      <property name="uniqueResourceName" value="dataSourceServer1" />
+      <property name="xaDataSourceClassName" value="com.mysql.cj.jdbc.MysqlXADataSource" />
+      <property name="xaProperties">
+        <props>
+          <prop key="user">anontion</prop>
+          <prop key="password">NNNNN</prop>
+          <prop key="url">jdbc:mysql://127.0.0.1:3306/anontion_live</prop>
+        </props>
+      </property>
+      <property name="maxPoolSize" value="10" />
+    </bean>
+    
+    <bean id="jtaPlatformInit" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" depends-on="atomikosTransactionManager">
+    <property name="targetClass" value="com.anontion.common.config.AtomikosJtaPlatform"/>
+    <property name="targetMethod" value="setTransactionManager"/>
+    <property name="arguments">
+        <list>
+            <ref bean="atomikosTransactionManager"/>
+        </list>
+    </property>
+    </bean>
+    
+    <bean id="jtaUserTxInit" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" depends-on="atomikosUserTransaction">
+    <property name="targetClass" value="com.anontion.common.config.AtomikosJtaPlatform"/>
+    <property name="targetMethod" value="setUserTransaction"/>
+    <property name="arguments">
+        <list>
+            <ref bean="atomikosUserTransaction"/>
+        </list>
+    </property>
+    </bean>
+        
+    <bean id="entityManagerFactoryService" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+      depends-on="dataSourceServer1,jtaPlatformInit,jtaUserTxInit,atomikosTransactionManager,atomikosUserTransaction">
+     <!-- property name="dataSource" ref="dataSourceServer" / -->
+     <property name="jtaDataSource" ref="dataSourceServer1" />
+     <property name="packagesToScan" value="com.anontion.models.application.model, com.anontion.models.account.model" />
+     <property name="jpaVendorAdapter">
+       <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+         <property name="generateDdl" value="true"/>
+         <property name="showSql" value="true" />
+       </bean>
+     </property>
+     <property name="jpaProperties">
+       <props>
+         <prop key="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</prop>
+         <prop key="hibernate.transaction.jta.platform">com.anontion.common.config.AtomikosJtaPlatform</prop>
+         <prop key="jakarta.persistence.transactionType">JTA</prop>
+         <prop key="hibernate.transaction.coordinator_class">jta</prop>
+       </props>
+     </property>
+     <property name="entityManagerFactoryInterface" value="jakarta.persistence.EntityManagerFactory" />
+    </bean>
+
+    <!-- bean id="transactionManagerService" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactoryService" />
+    </bean -->
+
+    <util:properties id="systemProperties"
+                     location="classpath:dummy.properties"
+                     ignore-resource-not-found="true" />
+                  
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+       <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+    </bean>
+
+    <bean id="userTransactionService" class="com.atomikos.icatch.standalone.UserTransactionServiceFactoryBean">
+      <property name="transactionServiceProperties">
+        <props>
+          <prop key="com.atomikos.icatch.log_base_name">log2</prop>
+          <prop key="com.atomikos.icatch.log_base_dir">${catalina.base}/logs/2</prop>
+          <prop key="com.atomikos.icatch.enable_logging">false</prop>
+          <prop key="com.atomikos.icatch.enable_recovery">false</prop>
+        </props>
+      </property>
+    </bean>
+    
+    <!-- bean id="userTransactionService" class="com.atomikos.icatch.standalone.UserTransactionServiceImp" init-method="init" destroy-method="shutdown">
+      <constructor-arg>
+        <props>
+          <prop key="com.atomikos.icatch.log_base_name">log2</prop>
+          <prop key="com.atomikos.icatch.log_base_dir">../logs/app2</prop>
+          <prop key="com.atomikos.icatch.output_dir">../logs/app2</prop>
+        </props>
+      </constructor-arg>
+    </bean -->
+    
+    <bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager" init-method="init" destroy-method="close">
+      <property name="forceShutdown" value="false"/>
+    </bean>
+
+    <bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.UserTransactionImp">
+      <property name="transactionTimeout" value="300"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+      <property name="userTransaction" ref="atomikosUserTransaction" />
+      <property name="transactionManager" ref="atomikosTransactionManager" />
+    </bean>
+    
+    <jpa:repositories
+            base-package="com.anontion.models.application, com.anontion.models.account"
+            entity-manager-factory-ref="entityManagerFactoryService"
+            transaction-manager-ref="transactionManager" /> <!-- transaction-manager-ref="transactionManagerService" -->
+
+    <!-- bean id="dataSourceAsterisk" class="org.apache.tomcat.jdbc.pool.DataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/asterisk_live" />
+        <property name="username" value="asterisk" />
+        <property name="password" value="NNNNN" />
+        <property name="validationQuery" value="SELECT 1" />
+        <property name="testOnBorrow" value="true" />
+        <property name="validationInterval" value="30000" />
+    </bean -->
+
+    <bean id="dataSourceAsterisk" class="com.atomikos.jdbc.AtomikosDataSourceBean" init-method="init" destroy-method="close">
+      <property name="uniqueResourceName" value="dataSourceAsterisk" />
+      <property name="xaDataSourceClassName" value="com.mysql.cj.jdbc.MysqlXADataSource" />
+      <property name="xaProperties">
+        <props>
+          <prop key="user">asterisk</prop>
+          <prop key="password">NNNNN</prop>
+          <prop key="url">jdbc:mysql://127.0.0.1:3306/asterisk_live</prop>
+        </props>
+      </property>
+      <property name="maxPoolSize" value="10" />
+    </bean>
+    
+    <bean id="entityManagerFactoryAsterisk" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+      depends-on="dataSourceAsterisk,jtaPlatformInit,jtaUserTxInit,atomikosTransactionManager,atomikosUserTransaction">
+      <!-- property name="dataSource" ref="dataSourceAsterisk" / -->
+      <property name="jtaDataSource" ref="dataSourceAsterisk" />
+      <property name="packagesToScan" value="com.anontion.asterisk.model" />
+      <property name="jpaVendorAdapter">
+        <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+          <property name="generateDdl" value="true"/>
+          <property name="showSql" value="true" />
+        </bean>
+      </property>
+      <property name="jpaProperties">
+        <props>
+          <prop key="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</prop>
+          <prop key="hibernate.transaction.jta.platform">com.anontion.common.config.AtomikosJtaPlatform</prop>
+          <prop key="jakarta.persistence.transactionType">JTA</prop>
+          <prop key="hibernate.transaction.coordinator_class">jta</prop>
+        </props>
+      </property>
+      <property name="entityManagerFactoryInterface" value="jakarta.persistence.EntityManagerFactory" />
+    </bean>
+
+    <!-- bean id="transactionManagerAsterisk" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactoryAsterisk" />
+    </bean -->
+
+    <jpa:repositories
+            base-package="com.anontion.asterisk"
+            entity-manager-factory-ref="entityManagerFactoryAsterisk"
+            transaction-manager-ref="transactionManager" /> <!-- transaction-manager-ref="transactionManagerAsterisk" -->
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                    <property name="objectMapper">
+                        <bean class="com.fasterxml.jackson.databind.ObjectMapper"/>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+
+</beans>

@@ -154,27 +154,19 @@ public class AccountController {
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     } 
     
-    
-    boolean approved = false; 
-    
     Long now = AnontionTime.tsN();
-    
-    if ((now - ts) > applicationTimeout) {
 
-      approved = true;
-    }
+    boolean approved = valid(ts, now); 
     
     Optional<AnontionAccount> accountOptional = accountRepository.findByTsAndNameAndApplication(ts, name, client);
 
-    AnontionAccount account = null;
-    
     ResponseAccountBodyDTO body = null;
     
     if (accountOptional.isPresent()) {
       
       _logger.info("DEBUG isPresent");
       
-      account = accountOptional.get();
+      AnontionAccount account = accountOptional.get();
 
       Optional<AsteriskAuth> authOptional = authRepository.findById(account.getPub());
 
@@ -205,9 +197,7 @@ public class AccountController {
 
         _logger.info("New Account: " + newAccount);
 
-        account = accountRepository.save(newAccount);
-        
-        String id = account.getPub();
+        String id = newAccount.getPub();
         
         String no = "no";
 
@@ -245,8 +235,8 @@ public class AccountController {
         
         String allowSubscribe = yes;
         
-        String callerId = account.getName().substring(0, 39).toLowerCase();
-
+        String callerId = newAccount.getName().substring(0, 39).toLowerCase(); // TODO fix 40 chars 
+        
         if (callerId.length() > 0) {
           
           callerId = callerId.substring(0, 1).toUpperCase() + callerId.substring(1);
@@ -284,15 +274,17 @@ public class AccountController {
         
         AsteriskAor aors = new AsteriskAor(id, maxContacts , removeExisting, qualifyFrequency, supportPath);
         
+        AnontionAccount account = null;
+
         try {
 
-          _logger.info("DEBUG creating");
+          _logger.info("DEBUG saving");
 
-          accountService.saveTxAccountAndEndpoint(endpoints, auths, aors);
+          account = accountService.createAccountAndEndpoint(newAccount, endpoints, auths, aors);
         
         } catch (Exception e) {
           
-          _logger.equals(e);
+          _logger.exception(e);
           
           ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Failed asterisk update."),
               new ResponseBodyErrorDTO("Failed asterisk update."));
@@ -358,7 +350,12 @@ public class AccountController {
 
     _logger.info("Application timeout is " + applicationTimeout);
   }
-
+ 
+   public boolean valid(Long ts, Long now) { // here for now .. Add commentMore actions
+    
+    return ((now - ts) > applicationTimeout);
+  }
+  
   final private static AnontionLog _logger = new AnontionLog(AccountController.class.getName());
 }
 
