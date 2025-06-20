@@ -1,4 +1,4 @@
-package com.anontion.asterisk.service;
+package com.anontion.services.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,7 @@ import com.anontion.asterisk.repository.AsteriskAuthRepository;
 import com.anontion.asterisk.repository.AsteriskEndpointRepository;
 
 @Service
-public class AsteriskEndpointService {
+public class AscountService {
 
   @Autowired
   private AsteriskEndpointRepository endpointRepository;
@@ -24,11 +24,11 @@ public class AsteriskEndpointService {
   @Autowired
   private AsteriskAuthRepository authRepository;
   
-  public AsteriskEndpointService() {
+  public AscountService() {
   }
 
   @Transactional("transactionManagerAsterisk") 
-  public void createEndpoint(AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
+  public void saveTxAccountAndEndpoint(AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
 
     endpointRepository.save(endpoint);    
 

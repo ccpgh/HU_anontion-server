@@ -150,10 +150,11 @@ task compileModels(type: JavaCompile) {
 }
 
 task compileServices(type: JavaCompile) {
-    dependsOn compileCommon, compileModels
+    dependsOn compileCommon, compileModels, compileAsterisk
     source sourceSets.services.java
     destinationDirectory = file("$buildDir/classes/services")
     classpath = sourceSets.main.compileClasspath +
+    files("$buildDir/classes/asterisk") +
     files("$buildDir/classes/models") +
     files("$buildDir/classes/common")
 }

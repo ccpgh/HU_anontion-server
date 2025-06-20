@@ -25,11 +25,11 @@ import com.anontion.models.application.model.AnontionApplication;
 import com.anontion.common.dto.request.RequestAccountDTO;
 
 import com.anontion.models.application.repository.AnontionApplicationRepository;
+import com.anontion.services.service.AscountService;
 import com.anontion.asterisk.model.AsteriskAor;
 import com.anontion.asterisk.model.AsteriskAuth;
 import com.anontion.asterisk.model.AsteriskEndpoint;
 import com.anontion.asterisk.repository.AsteriskAuthRepository;
-import com.anontion.asterisk.service.AsteriskEndpointService;
 import com.anontion.models.account.model.AnontionAccount;
 import com.anontion.models.account.repository.AnontionAccountRepository;
 
@@ -68,7 +68,7 @@ public class AccountController {
   private ServletContext servletContext;
 
   @Autowired
-  AsteriskEndpointService asteriskEndpointService;
+  AscountService accountService;
   
   @GetMapping("/")
   public ResponseEntity<ResponseDTO> getAccount() {
@@ -288,7 +288,7 @@ public class AccountController {
 
           _logger.info("DEBUG creating");
 
-          asteriskEndpointService.createEndpoint(endpoints, auths, aors);
+          accountService.saveTxAccountAndEndpoint(endpoints, auths, aors);
         
         } catch (Exception e) {
           
