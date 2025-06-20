@@ -7,8 +7,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "anontion_application")
 @IdClass(AnontionApplicationId.class)
 public class AnontionApplication {
 

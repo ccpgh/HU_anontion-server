@@ -27,7 +27,7 @@ public class AscountService {
   public AscountService() {
   }
 
-  @Transactional("transactionManagerAsterisk") 
+  @Transactional("transactionManagerService") 
   public void saveTxAccountAndEndpoint(AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
 
     endpointRepository.save(endpoint);    
