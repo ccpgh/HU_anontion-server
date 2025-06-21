@@ -38,14 +38,14 @@ public class AnontionAccount {
   @Column(name = "ekey", columnDefinition = "VARCHAR(4096)", nullable = false)
   private String key;
 
+  @Column(nullable = false, length = 255)
+  private String countersign;
+
   @Column(name = "epub", columnDefinition = "VARCHAR(4096)", nullable = false)
   private String pub;
 
   @Column(nullable = false, length = 255)
   private String plaintext;
-
-  @Column(nullable = false, length = 255)
-  private String countersign;
 
   @Column(nullable = false)
   private boolean disabled;
@@ -54,7 +54,7 @@ public class AnontionAccount {
     
   }
 
-  public AnontionAccount(Long ts, String name, UUID application, String pub, String plaintext, String countersign, boolean disabled) {
+  public AnontionAccount(Long ts, String name, UUID application, String countersign, String pub, String plaintext, boolean disabled) {
 
     this.ts = ts;
 
@@ -64,11 +64,11 @@ public class AnontionAccount {
     
     this.key = AnontionSecurityECDSA.encodeKeyK1(AnontionSecurityECDSA.root());
     
+    this.countersign = countersign;
+    
     this.pub = pub;
     
     this.plaintext = plaintext;
-    
-    this.countersign = countersign;
     
     this.disabled = disabled;
   }

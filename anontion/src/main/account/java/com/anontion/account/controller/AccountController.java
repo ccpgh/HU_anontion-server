@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.anontion.models.application.model.AnontionApplicationId;
 import com.anontion.models.application.model.AnontionApplication;
+import com.anontion.common.dto.request.RequestAccountBodyDTO;
 import com.anontion.common.dto.request.RequestAccountDTO;
 
 import com.anontion.models.application.repository.AnontionApplicationRepository;
@@ -38,13 +39,13 @@ import com.anontion.models.account.repository.AnontionAccountRepository;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.security.AnontionSecuritySHA;
 import com.anontion.common.dto.response.ResponseAccountBodyDTO;
-import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
 import jakarta.validation.Valid;
 import jakarta.annotation.PostConstruct;
@@ -82,16 +83,8 @@ public class AccountController {
   @Autowired
   AscountService accountService;
   
-  @GetMapping("/")
-  public ResponseEntity<ResponseDTO> getAccount() {
-
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
-
-    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-  }
-
   @PostMapping(path = "/")
-  public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestAccountDTO requestAccountDTO,
+  public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestAccountDTO request,
       BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
@@ -99,170 +92,176 @@ public class AccountController {
       String message = bindingResult.getAllErrors().stream().map(ObjectError::getDefaultMessage)
           .collect(Collectors.joining(" "));
 
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Invalid parameters!"),
-          new ResponseBodyErrorDTO(message));
-
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      return Responses.getBAD_REQUEST(
+          "Invalid parameters!", 
+          message);      
     }
 
-    UUID    client      = requestAccountDTO.getBody().getId();
-    String  countersign = requestAccountDTO.getBody().getCountersign();
-    String  high        = requestAccountDTO.getBody().getHigh();
-    String  low         = requestAccountDTO.getBody().getLow();
-    String  name        = requestAccountDTO.getBody().getName();
-    Long    target      = requestAccountDTO.getBody().getTarget();
-    String  text        = requestAccountDTO.getBody().getText();
-    Long    ts          = requestAccountDTO.getBody().getTs();
-
-    AnontionApplicationId applicationId = new AnontionApplicationId(name, ts, client);
-
-    Optional<AnontionApplication> applicationOptional = applicationRepository.findById(applicationId);
-
-    if (!applicationOptional.isPresent()) {
-
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "No application."),
-          new ResponseBodyErrorDTO("Application could not be found." + "name = '" + name + "', ts = '" + ts + "', client UUID " + client + "'"));
-
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    AnontionApplication application = applicationOptional.get();
+    RequestAccountBodyDTO dto = request.getBody();
     
-    if (!application.getText().equals(text) || !application.getTarget().equals(target) || application.getDisabled()) {
+    String  low         = dto.getLow();
+    String  high        = dto.getHigh();
+
+    AnontionApplicationId id = new AnontionApplicationId(
+        dto.getName(), 
+        dto.getTs(), 
+        dto.getId());
+
+    Optional<AnontionApplication> applicationO = applicationRepository.findById(id);
+
+    if (!applicationO.isPresent()) {
+
+      return Responses.getBAD_REQUEST(
+          "No application.", 
+          "Application missing " + id.description());
+    }
+
+    AnontionApplication application = applicationO.get();
+    
+    if (!application.getText().equals(dto.getText()) || 
+        !application.getTarget().equals(dto.getTarget()) || 
+        application.getDisabled()) {
       
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "No active application."),
-          new ResponseBodyErrorDTO("Application POW mismatch."));
-
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      return Responses.getBAD_REQUEST(
+          "No active application.", 
+          "Application POW mismatch.");
     }
 
-    String pub = application.getPub();
-    
-    String plaintext = application.getPlaintext();
-    
-    if (AnontionSecurityECDSA.decodePublicKeyFromBase64XY(pub) == null) {
+    if (AnontionSecurityECDSA.decodePublicKeyFromBase64XY(application.getPub()) == null) {
 
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
-          new ResponseBodyErrorDTO("Received client pub key invalid PublicKey."));
-
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      return Responses.getBAD_REQUEST(
+          "Bad pub.", 
+          "Received client pub key invalid PublicKey.");
     }
 
-    ECPublicKeyParameters publicKey = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(pub);
+    ECPublicKeyParameters publicKey = 
+        AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(application.getPub());
 
     if (publicKey == null) {
 
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
-          new ResponseBodyErrorDTO("Received client pub key invalid ECPublicKeyParameters."));
-
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      return Responses.getBAD_REQUEST(
+          "Bad pub.", 
+          "Received client pub key invalid ECPublicKeyParameters.");
     }
 
-    if (!AnontionSecurityECDSA.check(plaintext, countersign, publicKey)) {
+    if (!AnontionSecurityECDSA.check(application.getPlaintext(), dto.getCountersign(), publicKey)) {
 
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Bad pub."),
-          new ResponseBodyErrorDTO("Client countersign of proof token invalid."));
-
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      return Responses.getBAD_REQUEST(
+          "Bad pub.", 
+          "Client countersign of proof token invalid.");
     } 
     
-
     Long now = AnontionTime.tsN();
 
-    boolean approved = valid(ts, now); 
-       
-    Optional<AnontionAccount> accountOptional = accountRepository.findByTsAndNameAndApplication(ts, name, client);
+    Optional<AnontionAccount> accountO = accountRepository.findByTsAndNameAndApplication(
+        dto.getTs(), 
+        dto.getName(), 
+        dto.getId());
 
     ResponseAccountBodyDTO body = null;
     
-    if (accountOptional.isPresent()) {
+    if (accountO.isPresent()) {
       
-      _logger.info("DEBUG isPresent");
-      
-      AnontionAccount account = accountOptional.get();
+      AnontionAccount account = accountO.get();
 
-      Optional<AsteriskAuth> authOptional = authRepository.findById(account.getPub());
+      Optional<AsteriskAuth> authO = authRepository.findById(account.getPub());
 
-      if (authOptional.isPresent()) {
+      if (authO.isPresent()) {
         
-        _logger.info("DEBUG isPresent");
-        
-        AsteriskAuth auth = authOptional.get();
+        AsteriskAuth auth = authO.get();
 
-        body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
-            account.getApplication(), 100.0f, true, auth.getUsername(), auth.getPassword());
+        body = new ResponseAccountBodyDTO(
+            account.getId(), 
+            account.getTs(), 
+            account.getName(),
+            account.getApplication(), 
+            auth.getUsername(), 
+            auth.getPassword(),
+            100.0f, 
+            true);
 
       } else {
-        
-        ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Asterisk account auth missing."),
-            new ResponseBodyErrorDTO("Preexiisting account auth should but does not exist."));
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return Responses.getBAD_REQUEST(
+            "Asterisk account auth missing.", 
+            "Preexiisting account auth should but does not exist.");
       }    
       
     } else {
 
-      if (approved) {
+      if (approved(dto.getTs(), now)) {
 
-        _logger.info("DEBUG approved");
-
-        AnontionAccount newAccount = new AnontionAccount(ts, 
-            name, 
-            client, 
-            pub, 
-            plaintext, 
-            countersign, 
+        AnontionAccount account = new AnontionAccount(
+            dto.getTs(), 
+            dto.getName(), 
+            dto.getId(), 
+            dto.getCountersign(), 
+            application.getPub(), 
+            application.getPlaintext(), 
             false);
                
-        AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(newAccount.getPub(), 
-            newAccount.getName());
+        AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
+            account.getPub(), 
+            account.getName());
                                     
-        AsteriskAuth auths = authBean.createAsteriskAuth(newAccount.getPub(), 
-            AnontionSecurity.tobase93FromBase64(AnontionSecuritySHA.hash(newAccount.getPub())), 
+        AsteriskAuth auths = authBean.createAsteriskAuth(
+            account.getPub(), 
+            AnontionSecurity.tobase93FromBase64(AnontionSecuritySHA.hash(account.getPub())), 
             AnontionSecurity.generatePassword());
 
         if (auths.getUsername().isEmpty()) {
           
-          ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Id key invalid."),
-              new ResponseBodyErrorDTO("Id key invalid."));
-
-          return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+          return Responses.getBAD_REQUEST(
+              "Id key invalid.");
         }
         
-        AsteriskAor aors = aorBean.createAsteriskAor(pub);
-        
-        AnontionAccount account = null;
+        AsteriskAor aors = aorBean.createAsteriskAor(
+            application.getPub());
         
         try {
 
-          _logger.info("DEBUG saving Account(+Asterisk)");
-          
-          account = accountService.saveTxAccountAndEndpoint(newAccount, endpoints, auths, aors);
+          account = accountService.saveTxAccountAndEndpoint(
+              account, 
+              endpoints, 
+              auths, 
+              aors);
         
         } catch (Exception e) {
           
           _logger.exception(e);
           
-          ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Failed asterisk update."),
-              new ResponseBodyErrorDTO("Failed asterisk update."));
-
-          return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+          return Responses.getBAD_REQUEST(
+              "Failed asterisk update.");
         }
         
-        body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
-            account.getApplication(), 100.0f, approved, auths.getUsername(), auths.getPassword());
+        body = new ResponseAccountBodyDTO(
+            account.getId(), 
+            account.getTs(), 
+            account.getName(),
+            account.getApplication(), 
+            auths.getUsername(), 
+            auths.getPassword(), 
+            100.0f, 
+            true);
       
       } else {
       
-        _logger.info("DEBUG NOT approved");
-
-        Float progress = ((now - ts) / (float) applicationTimeout) * 100.0f;
+        Float progress = ((now - dto.getTs()) / (float) applicationTimeout) * 100.0f;
         
-        body = new ResponseAccountBodyDTO(new UUID(0L, 0L), ts, name, client, progress, approved, "", "");
+        body = new ResponseAccountBodyDTO(
+            new UUID(0L, 0L), 
+            dto.getTs(), 
+            dto.getName(), 
+            dto.getId(), 
+            "", 
+            "", 
+            progress, 
+            false);
       }
     }
 
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(true, 0, "Ok."), body);
+    ResponseDTO response = new ResponseDTO(
+        new ResponseHeaderDTO(true, 0, "Ok."), body);
 
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
@@ -270,17 +269,19 @@ public class AccountController {
   @PutMapping(path = "/")
   public ResponseEntity<ResponseDTO> putAccount() {
 
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
-
-    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    return Responses.getNYI();    
   }
 
   @DeleteMapping(path = "/")
   public ResponseEntity<ResponseDTO> deleteAccount() {
 
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
+    return Responses.getNYI();    
+  }
+  
+  @GetMapping("/")
+  public ResponseEntity<ResponseDTO> getAccount() {
 
-    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    return Responses.getNYI();    
   }
   
   @PostConstruct
@@ -308,7 +309,7 @@ public class AccountController {
     _logger.info("Application timeout is " + applicationTimeout);
   }
 
-  public boolean valid(Long ts, Long now) { 
+  public boolean approved(Long ts, Long now) { // TODO expand
     
     return ((now - ts) > applicationTimeout);
   }

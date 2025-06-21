@@ -22,12 +22,12 @@ import com.anontion.common.dto.request.RequestApplicationDTO;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.security.AnontionPOW;
 import com.anontion.common.dto.response.ResponseApplicationBodyDTO;
-import com.anontion.common.dto.response.ResponseBodyErrorDTO;
 
 import jakarta.validation.Valid;
 
@@ -39,14 +39,12 @@ import com.anontion.models.application.repository.AnontionApplicationRepository;
 @RequestMapping("/application")
 public class ApplicationController {
 
-  final private static ResponseDTO _NYI = new ResponseDTO(
-      new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
-  
   @Autowired
   private AnontionApplicationRepository applicationRepository;
 
   @PostMapping(path = "/")
-  public ResponseEntity<ResponseDTO> postApplication(@Valid @RequestBody RequestApplicationDTO request, BindingResult bindingResult) {
+  public ResponseEntity<ResponseDTO> postApplication(@Valid @RequestBody RequestApplicationDTO request, 
+      BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
 
@@ -54,12 +52,7 @@ public class ApplicationController {
           .map(ObjectError::getDefaultMessage)
           .collect(Collectors.joining(" "));
 
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 
-          1, 
-          "Invalid parameters!"), 
-          new ResponseBodyErrorDTO(message));
-
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);    
+      return Responses.getBAD_REQUEST("Bad arguments", message);
     }
 
     UUID   client  = request.getBody().getId();
@@ -74,18 +67,11 @@ public class ApplicationController {
         ts, 
         client);
 
-    boolean exists = 
-        applicationRepository.existsById(id);
+    boolean exists = applicationRepository.existsById(id);
 
     if (exists) {
 
-      ResponseDTO response = new ResponseDTO(
-          new ResponseHeaderDTO(false, 
-              1, 
-              "Application already exists!"), 
-          new ResponseBodyErrorDTO(id.description()));
-
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      return Responses.getBAD_REQUEST("Application already exists!");
     }
 
     AnontionPOW pow = new AnontionPOW();
@@ -135,22 +121,19 @@ public class ApplicationController {
   @GetMapping(path = "/")
   public ResponseEntity<ResponseDTO> getApplication() {
 
-    return new ResponseEntity<>(_NYI, 
-        HttpStatus.UNAUTHORIZED);    
+    return Responses.getNYI();    
   }
 
   @PutMapping(path = "/")
   public ResponseEntity<ResponseDTO> putApplication() {
 
-    return new ResponseEntity<>(_NYI, 
-        HttpStatus.UNAUTHORIZED);    
+    return Responses.getNYI();    
   }
 
   @DeleteMapping(path = "/")
   public ResponseEntity<ResponseDTO> deleteApplication() {
 
-    return new ResponseEntity<>(_NYI, 
-        HttpStatus.UNAUTHORIZED);    
+    return Responses.getNYI();    
   }
 }
 
