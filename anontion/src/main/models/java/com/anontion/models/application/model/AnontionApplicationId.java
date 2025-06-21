@@ -78,4 +78,9 @@ public class AnontionApplicationId implements Serializable {
 
     return 31 * (name.hashCode() + ts.hashCode() + client.hashCode());
   }
+  
+  public String description() {
+    
+    return String.format("Name '%s' ts '%d' Client '%s'", name, ts, client);
+  }
 }

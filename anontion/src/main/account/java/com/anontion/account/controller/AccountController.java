@@ -26,6 +26,9 @@ import com.anontion.common.dto.request.RequestAccountDTO;
 
 import com.anontion.models.application.repository.AnontionApplicationRepository;
 import com.anontion.services.service.AscountService;
+import com.anontion.asterisk.bean.AsteriskAorBean;
+import com.anontion.asterisk.bean.AsteriskAuthBean;
+import com.anontion.asterisk.bean.AsteriskEndpointBean;
 import com.anontion.asterisk.model.AsteriskAor;
 import com.anontion.asterisk.model.AsteriskAuth;
 import com.anontion.asterisk.model.AsteriskEndpoint;
@@ -67,6 +70,15 @@ public class AccountController {
   @Autowired
   private ServletContext servletContext;
 
+  @Autowired
+  private AsteriskEndpointBean endpointBean;
+
+  @Autowired
+  private AsteriskAorBean aorBean;
+
+  @Autowired
+  private AsteriskAuthBean authBean;
+  
   @Autowired
   AscountService accountService;
   
@@ -116,9 +128,9 @@ public class AccountController {
 
     AnontionApplication application = applicationOptional.get();
     
-    if (!application.getText().equals(text) || !application.getTarget().equals(target)) {
+    if (!application.getText().equals(text) || !application.getTarget().equals(target) || application.getDisabled()) {
       
-      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "No application."),
+      ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "No active application."),
           new ResponseBodyErrorDTO("Application POW mismatch."));
 
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -194,64 +206,22 @@ public class AccountController {
 
         _logger.info("DEBUG approved");
 
-        AnontionAccount newAccount = new AnontionAccount(ts, name, client, pub, plaintext, countersign, true);
+        AnontionAccount newAccount = new AnontionAccount(ts, 
+            name, 
+            client, 
+            pub, 
+            plaintext, 
+            countersign, 
+            false);
+               
+        AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(newAccount.getPub(), 
+            newAccount.getName());
+                                    
+        AsteriskAuth auths = authBean.createAsteriskAuth(newAccount.getPub(), 
+            AnontionSecurity.tobase93FromBase64(AnontionSecuritySHA.hash(newAccount.getPub())), 
+            AnontionSecurity.generatePassword());
 
-        _logger.info("New Account: " + newAccount);
-
-        String id = newAccount.getPub();
-        
-        String no = "no";
-
-        String yes = "yes";
-
-        String transport = "transport-id";
-
-        String aor = id;
-
-        String auth = id;
-
-        String context = "external";
-
-        String disallow = "all";
-
-        String allow = "h264,g729,gsm";
-        
-        String directMedia = no;
-
-        String trustIdOutbound = yes;
-
-        String dtmfMode = "rfc4733";
-        
-        String forceRport = yes;
-
-        String rtpSymmetric = yes;
-        
-        String sendRpid = yes;
-        
-        String iceSupport = yes;
-        
-        String tosVideo = "af41";
-        
-        Integer cosVideo = 4;
-        
-        String allowSubscribe = yes;
-        
-        String callerId = newAccount.getName().substring(0, 39);
-
-        if (callerId.length() > 0) {
-          
-          callerId = callerId.substring(0, 1).toUpperCase() + callerId.substring(1);
-        }
-                
-        AsteriskEndpoint endpoints = new AsteriskEndpoint(id, transport, aor, auth, context, disallow,
-            allow, directMedia, trustIdOutbound, dtmfMode, forceRport, rtpSymmetric, sendRpid, iceSupport,
-            tosVideo, cosVideo, allowSubscribe, callerId);
-                            
-        String authType = "userpass";
-                        
-        String username = AnontionSecurity.tobase93FromBase64(AnontionSecuritySHA.hash(id));
-        
-        if (username.isEmpty()) {
+        if (auths.getUsername().isEmpty()) {
           
           ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(false, 1, "Id key invalid."),
               new ResponseBodyErrorDTO("Id key invalid."));
@@ -259,21 +229,7 @@ public class AccountController {
           return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         
-        String password = AnontionSecurity.generatePassword();
-        
-        _logger.info("DEBUG username " + username);
-        
-        AsteriskAuth auths = new AsteriskAuth(id, authType, username, password);
-        
-        Integer maxContacts = 1;
-        
-        String removeExisting = yes;
-        
-        Integer qualifyFrequency = 30;
-        
-        String supportPath = yes;
-        
-        AsteriskAor aors = new AsteriskAor(id, maxContacts , removeExisting, qualifyFrequency, supportPath);
+        AsteriskAor aors = aorBean.createAsteriskAor(pub);
         
         AnontionAccount account = null;
         
@@ -294,7 +250,7 @@ public class AccountController {
         }
         
         body = new ResponseAccountBodyDTO(account.getId(), account.getTs(), account.getName(),
-            account.getApplication(), 100.0f, approved, username, password);
+            account.getApplication(), 100.0f, approved, auths.getUsername(), auths.getPassword());
       
       } else {
       

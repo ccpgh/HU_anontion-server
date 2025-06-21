@@ -48,22 +48,29 @@ public class AnontionAccount {
   private String countersign;
 
   @Column(nullable = false)
-  private boolean active;
-  
+  private boolean disabled;
+
   public AnontionAccount() {
     
   }
 
-  public AnontionAccount(Long ts, String name, UUID application, String pub, String plaintext, String countersign, boolean active) {
+  public AnontionAccount(Long ts, String name, UUID application, String pub, String plaintext, String countersign, boolean disabled) {
 
     this.ts = ts;
+
     this.name = name;
+    
     this.application = application;
+    
     this.key = AnontionSecurityECDSA.encodeKeyK1(AnontionSecurityECDSA.root());
+    
     this.pub = pub;
+    
     this.plaintext = plaintext;
+    
     this.countersign = countersign;
-    this.active = active;
+    
+    this.disabled = disabled;
   }
 
   public UUID getId() {
@@ -145,20 +152,19 @@ public class AnontionAccount {
    
     this.plaintext = plaintext;
   }
-
-  public boolean getActive() {
-  
-    return active;
-  }
-
-  public void setActive(boolean active) {
-  
-    this.active = active;
-  }
   
   public String toString() {
     
     return AnontionJson.o2Json(this);
   }
   
+  public boolean getDisabled() {
+
+    return disabled;
+  }
+
+  public void setDisabled(boolean disabled) {
+
+    this.disabled = disabled;
+  }
 }

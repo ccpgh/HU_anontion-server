@@ -47,11 +47,14 @@ public class AnontionApplication {
   @Column(nullable = false) 
   private Long target;
 
+  @Column(nullable = false) 
+  private boolean disabled;
+
   public AnontionApplication() {
     
   }
 
-  public AnontionApplication(String name, Long ts, UUID client, String pub, String plaintext, String sign, String text, Long target, String encrypt) {
+  public AnontionApplication(String name, Long ts, UUID client, String pub, String plaintext, String sign, String text, Long target, String encrypt, boolean disabled) {
 
     this.id = UUID.randomUUID();
 
@@ -72,6 +75,8 @@ public class AnontionApplication {
     this.target = target;
     
     this.encrypt = encrypt;
+    
+    this.disabled = disabled;
   }
 
   public UUID getId() {
@@ -176,4 +181,13 @@ public class AnontionApplication {
     this.encrypt = encrypt;
   }
 
+  public boolean getDisabled() {
+
+    return disabled;
+  }
+
+  public void setDisabled(boolean disabled) {
+
+    this.disabled = disabled;
+  }
 }

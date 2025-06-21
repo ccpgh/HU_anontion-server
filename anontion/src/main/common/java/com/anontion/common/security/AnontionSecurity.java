@@ -4,8 +4,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-import com.anontion.common.misc.AnontionLog;
-
 public class AnontionSecurity {
 
   private static final char[] _BASE93_CHARS = new char[93];
@@ -47,8 +45,6 @@ public class AnontionSecurity {
           c == '/' || 
           c == '=')) {
             
-        _logger.severe("Invaliid base64 '" + base64 + "'");
-        
         return "";
       }
     }
@@ -77,8 +73,5 @@ public class AnontionSecurity {
 
     return buffer.reverse().toString();
   }
-
-  @SuppressWarnings("unused")
-  final private static AnontionLog _logger = new AnontionLog(AnontionSecurity.class.getName());
 }
 
