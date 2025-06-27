@@ -5,10 +5,12 @@ import org.springframework.http.ResponseEntity;
 
 public class Responses {
 
-  final private static ResponseDTO _NYI = new ResponseDTO(
-      new ResponseHeaderDTO(false, 1, "NYI"), new ResponseBodyErrorDTO());
+  final private static ResponseDTO _NYI = new ResponseGenericDTO(
+      new ResponseHeaderDTO(false, 1, "Not Implemented"), new ResponseBodyErrorDTO());
   
-
+  final private static ResponseEntity<ResponseDTO> _responseNYI = 
+      new ResponseEntity<>(_NYI, HttpStatus.UNAUTHORIZED); 
+  
   public static ResponseEntity<ResponseDTO> getBAD_REQUEST(String message) {
     
     return Responses.getBAD_REQUEST(message, message);
@@ -16,7 +18,7 @@ public class Responses {
   
   public static ResponseEntity<ResponseDTO> getBAD_REQUEST(String head, String body) {
 
-    ResponseDTO response = new ResponseDTO(new ResponseHeaderDTO(
+    ResponseDTO response = new ResponseGenericDTO(new ResponseHeaderDTO(
         false, 
         1, 
         head), 
@@ -27,8 +29,7 @@ public class Responses {
   
   public static ResponseEntity<ResponseDTO> getNYI() {
   
-    return new ResponseEntity<>(_NYI, 
-        HttpStatus.UNAUTHORIZED);   
+    return _responseNYI;
   }
 
 }

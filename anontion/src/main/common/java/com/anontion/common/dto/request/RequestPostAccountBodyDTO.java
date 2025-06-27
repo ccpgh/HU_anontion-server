@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 @Component
-public class RequestAccountBodyDTO {
+public class RequestPostAccountBodyDTO {
   
   @NotNull(message = "Id cannot be null.")
   private UUID id;
@@ -35,7 +35,7 @@ public class RequestAccountBodyDTO {
   @Min(0)
   private Long target;
 
-  public RequestAccountBodyDTO() {
+  public RequestPostAccountBodyDTO() {
     
   }
   

@@ -1,12 +1,7 @@
 package com.anontion.application.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -18,8 +13,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.anontion.common.dto.request.RequestApplicationDTO;
+import com.anontion.common.dto.request.RequestPostApplicationDTO;
 
+import com.anontion.common.dto.response.ResponsePostDTO;
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.dto.response.Responses;
@@ -27,7 +23,7 @@ import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.security.AnontionPOW;
-import com.anontion.common.dto.response.ResponseApplicationBodyDTO;
+import com.anontion.common.dto.response.ResponsePostApplicationBodyDTO;
 
 import jakarta.validation.Valid;
 
@@ -36,14 +32,13 @@ import com.anontion.models.application.model.AnontionApplicationId;
 import com.anontion.models.application.repository.AnontionApplicationRepository;
 
 @RestController
-@RequestMapping("/application")
-public class ApplicationController {
+public class ApplicationPostController {
 
   @Autowired
   private AnontionApplicationRepository applicationRepository;
 
-  @PostMapping(path = "/")
-  public ResponseEntity<ResponseDTO> postApplication(@Valid @RequestBody RequestApplicationDTO request, 
+  @PostMapping(path = "/application/")
+  public ResponseEntity<ResponseDTO> postApplication(@Valid @RequestBody RequestPostApplicationDTO request, 
       BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
@@ -100,15 +95,15 @@ public class ApplicationController {
 
     applicationRepository.save(application);
 
-    ResponseApplicationBodyDTO body = 
-        new ResponseApplicationBodyDTO(application.getText(), 
+    ResponsePostApplicationBodyDTO body = 
+        new ResponsePostApplicationBodyDTO(application.getText(), 
             application.getTarget(), 
             remote, 
             plaintext, 
             sign, 
             ts);
 
-    ResponseDTO response = new ResponseDTO(
+    ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 
             0, 
             "Ok"), 
@@ -116,24 +111,6 @@ public class ApplicationController {
 
     return new ResponseEntity<>(response, 
         HttpStatus.OK);    
-  }
-
-  @GetMapping(path = "/")
-  public ResponseEntity<ResponseDTO> getApplication() {
-
-    return Responses.getNYI();    
-  }
-
-  @PutMapping(path = "/")
-  public ResponseEntity<ResponseDTO> putApplication() {
-
-    return Responses.getNYI();    
-  }
-
-  @DeleteMapping(path = "/")
-  public ResponseEntity<ResponseDTO> deleteApplication() {
-
-    return Responses.getNYI();    
   }
 }
 

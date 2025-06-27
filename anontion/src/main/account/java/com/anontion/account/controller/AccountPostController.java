@@ -1,12 +1,7 @@
 package com.anontion.account.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -22,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.anontion.models.application.model.AnontionApplicationId;
 import com.anontion.models.application.model.AnontionApplication;
-import com.anontion.common.dto.request.RequestAccountBodyDTO;
-import com.anontion.common.dto.request.RequestAccountDTO;
+import com.anontion.common.dto.request.RequestPostAccountBodyDTO;
+import com.anontion.common.dto.request.RequestPostAccountDTO;
 
 import com.anontion.models.application.repository.AnontionApplicationRepository;
 import com.anontion.services.service.AscountService;
@@ -38,6 +33,7 @@ import com.anontion.models.account.model.AnontionAccount;
 import com.anontion.models.account.repository.AnontionAccountRepository;
 
 import com.anontion.common.dto.response.ResponseDTO;
+import com.anontion.common.dto.response.ResponsePostDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionLog;
@@ -45,15 +41,14 @@ import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.security.AnontionSecuritySHA;
-import com.anontion.common.dto.response.ResponseAccountBodyDTO;
+import com.anontion.common.dto.response.ResponsePostAccountBodyDTO;
 
 import jakarta.validation.Valid;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletContext;
 
 @RestController
-@RequestMapping("/account")
-public class AccountController {
+public class AccountPostController {
 
   static final private int _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT = 24 * 60 * 60; // 1 day
   
@@ -83,8 +78,8 @@ public class AccountController {
   @Autowired
   AscountService accountService;
   
-  @PostMapping(path = "/")
-  public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestAccountDTO request,
+  @PostMapping(path = "/account/")
+  public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestPostAccountDTO request,
       BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
@@ -97,7 +92,7 @@ public class AccountController {
           message);      
     }
 
-    RequestAccountBodyDTO dto = request.getBody();
+    RequestPostAccountBodyDTO dto = request.getBody();
     
     String  low         = dto.getLow();
     String  high        = dto.getHigh();
@@ -158,7 +153,7 @@ public class AccountController {
         dto.getName(), 
         dto.getId());
 
-    ResponseAccountBodyDTO body = null;
+    ResponsePostAccountBodyDTO body = null;
     
     if (accountO.isPresent()) {
       
@@ -170,7 +165,7 @@ public class AccountController {
         
         AsteriskAuth auth = authO.get();
 
-        body = new ResponseAccountBodyDTO(
+        body = new ResponsePostAccountBodyDTO(
             account.getId(), 
             account.getTs(), 
             account.getName(),
@@ -234,7 +229,7 @@ public class AccountController {
               "Failed asterisk update.");
         }
         
-        body = new ResponseAccountBodyDTO(
+        body = new ResponsePostAccountBodyDTO(
             account.getId(), 
             account.getTs(), 
             account.getName(),
@@ -248,7 +243,7 @@ public class AccountController {
       
         Float progress = ((now - dto.getTs()) / (float) applicationTimeout) * 100.0f;
         
-        body = new ResponseAccountBodyDTO(
+        body = new ResponsePostAccountBodyDTO(
             new UUID(0L, 0L), 
             dto.getTs(), 
             dto.getName(), 
@@ -260,30 +255,12 @@ public class AccountController {
       }
     }
 
-    ResponseDTO response = new ResponseDTO(
+    ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 0, "Ok."), body);
 
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PutMapping(path = "/")
-  public ResponseEntity<ResponseDTO> putAccount() {
-
-    return Responses.getNYI();    
-  }
-
-  @DeleteMapping(path = "/")
-  public ResponseEntity<ResponseDTO> deleteAccount() {
-
-    return Responses.getNYI();    
-  }
-  
-  @GetMapping("/")
-  public ResponseEntity<ResponseDTO> getAccount() {
-
-    return Responses.getNYI();    
-  }
-  
   @PostConstruct
   public void init() {
     
@@ -314,7 +291,7 @@ public class AccountController {
     return ((now - ts) > applicationTimeout);
   }
   
-  final private static AnontionLog _logger = new AnontionLog(AccountController.class.getName());
+  final private static AnontionLog _logger = new AnontionLog(AccountPostController.class.getName());
 }
 
 

@@ -1,6 +1,6 @@
 package com.anontion.common.dto.response;
 
-public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
+public class ResponsePostApplicationBodyDTO extends ResponseBodyDTO {
 
   private String text;
 
@@ -14,11 +14,11 @@ public class ResponseApplicationBodyDTO extends ResponseBodyDTO {
 
   private Long ts;
   
-  public ResponseApplicationBodyDTO() {
+  public ResponsePostApplicationBodyDTO() {
 
   }
 
-  public ResponseApplicationBodyDTO(String text, Long target, String remote, String plaintext, String sign, Long ts) {
+  public ResponsePostApplicationBodyDTO(String text, Long target, String remote, String plaintext, String sign, Long ts) {
 
     this.text = text;
     this.target = target;

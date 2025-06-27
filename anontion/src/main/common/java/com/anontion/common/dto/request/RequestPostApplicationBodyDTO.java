@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 
 @Component
-public class RequestApplicationBodyDTO {
+public class RequestPostApplicationBodyDTO {
   
   @NotNull(message = "Id cannot be null.")
   private UUID id;
@@ -22,7 +22,7 @@ public class RequestApplicationBodyDTO {
   @NotBlank(message = "Encrypt cannot be blank.")
   private String encrypt;
 
-  public RequestApplicationBodyDTO() {
+  public RequestPostApplicationBodyDTO() {
     
   }
   

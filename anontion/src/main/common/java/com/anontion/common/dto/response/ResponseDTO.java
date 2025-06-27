@@ -1,13 +1,15 @@
 package com.anontion.common.dto.response;
   
-public class ResponseDTO {
+abstract public class ResponseDTO {
 
   private ResponseHeaderDTO header;
+  
   private ResponseBodyDTO body;
 
-  public ResponseDTO(ResponseHeaderDTO header, ResponseBodyDTO body) {
+  protected ResponseDTO(ResponseHeaderDTO header, ResponseBodyDTO body) {
 
     this.header = header;
+    
     this.body   = body;
   }
 

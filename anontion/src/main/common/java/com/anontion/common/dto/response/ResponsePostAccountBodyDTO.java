@@ -2,7 +2,7 @@ package com.anontion.common.dto.response;
 
 import java.util.UUID;
 
-public class ResponseAccountBodyDTO extends ResponseBodyDTO {
+public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
 
   private UUID id;
 
@@ -20,11 +20,11 @@ public class ResponseAccountBodyDTO extends ResponseBodyDTO {
 
   private boolean approved;
 
-  public ResponseAccountBodyDTO() {
+  public ResponsePostAccountBodyDTO() {
 
   }
 
-  public ResponseAccountBodyDTO(UUID id, Long ts, String name, UUID application, String username, String password, Float progress, 
+  public ResponsePostAccountBodyDTO(UUID id, Long ts, String name, UUID application, String username, String password, Float progress, 
       boolean approved) {
     
     this.id = id;
