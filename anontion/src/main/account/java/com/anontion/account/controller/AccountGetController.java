@@ -12,7 +12,7 @@ import com.anontion.common.misc.AnontionLog;
 @RestController
 public class AccountGetController {
   
-  @GetMapping("/account/*")
+  @GetMapping("/account/")
   public ResponseEntity<ResponseDTO> getAccount() {
 
     _logger.severe("NYI");

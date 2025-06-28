@@ -76,7 +76,7 @@ public class AccountPostController {
   private AsteriskAuthBean authBean;
   
   @Autowired
-  AscountService accountService;
+  private AscountService accountService;
   
   @PostMapping(path = "/account/")
   public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestPostAccountDTO request,
@@ -215,11 +215,16 @@ public class AccountPostController {
         
         try {
 
-          account = accountService.saveTxAccountAndEndpoint(
+          if (!accountService.saveTxAccountAndEndpoint(
+              application,
               account, 
               endpoints, 
               auths, 
-              aors);
+              aors)) {
+            
+            return Responses.getBAD_REQUEST(
+                "Failed asterisk update.");
+          }
         
         } catch (Exception e) {
           

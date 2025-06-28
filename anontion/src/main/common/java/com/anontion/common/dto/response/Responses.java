@@ -11,6 +11,8 @@ public class Responses {
   final private static ResponseEntity<ResponseDTO> _responseNYI = 
       new ResponseEntity<>(_NYI, HttpStatus.UNAUTHORIZED); 
   
+  //
+  
   public static ResponseEntity<ResponseDTO> getBAD_REQUEST(String message) {
     
     return Responses.getBAD_REQUEST(message, message);
@@ -26,6 +28,21 @@ public class Responses {
 
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
+  
+  //
+  
+  public static ResponseEntity<ResponseDTO> getOK() {
+
+    ResponseBodyOkDTO body = new ResponseBodyOkDTO("Ok.");
+
+    ResponseHeaderDTO head = new ResponseHeaderDTO(true, 0, "Ok");
+    
+    ResponseDTO response = new ResponseOkDTO(head, body);
+
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+  
+  //
   
   public static ResponseEntity<ResponseDTO> getNYI() {
   

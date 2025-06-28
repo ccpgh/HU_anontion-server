@@ -11,7 +11,7 @@ import com.anontion.common.dto.response.Responses;
 @RestController
 public class ApplicationPutController {
 
-  @PutMapping(path = "/application/*")
+  @PutMapping(path = "/application/{id}")
   public ResponseEntity<ResponseDTO> putApplication() {
 
     return Responses.getNYI();    

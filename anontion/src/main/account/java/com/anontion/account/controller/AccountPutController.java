@@ -12,8 +12,8 @@ import com.anontion.common.misc.AnontionLog;
 @RestController
 public class AccountPutController {
   
-  @PutMapping("/account/*")
-  public ResponseEntity<ResponseDTO> getAccount() {
+  @PutMapping("/account/{id}")
+  public ResponseEntity<ResponseDTO> putAccount() {
 
     _logger.severe("NYI");
 

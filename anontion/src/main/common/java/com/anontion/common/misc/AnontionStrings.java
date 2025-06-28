@@ -1,5 +1,7 @@
 package com.anontion.common.misc;
 
+import java.util.ArrayList;
+
 public class AnontionStrings {
 
   public static String concat(String[] tokens, String delimiter) {
@@ -23,5 +25,17 @@ public class AnontionStrings {
     } 
     
     return buffer.toString();
+  }
+  
+  public static String[] split(String s, String delimiter) {
+
+    ArrayList<String> buffer = new ArrayList<String>();
+    
+    for (String token : s.split(delimiter)) {
+
+      buffer.add(token.trim());
+    }
+   
+    return buffer.toArray(new String[0]);
   }
 }

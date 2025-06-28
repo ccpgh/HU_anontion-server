@@ -71,8 +71,6 @@ public class ApplicationPostController {
 
     AnontionPOW pow = new AnontionPOW();
 
-    String remote = AnontionSecurityECDSA.encodePubK1XY(AnontionSecurityECDSA.pub());
-
     String plaintext = AnontionStrings.concat(new String[] { 
         name, 
         ts.toString(), 
@@ -98,7 +96,7 @@ public class ApplicationPostController {
     ResponsePostApplicationBodyDTO body = 
         new ResponsePostApplicationBodyDTO(application.getText(), 
             application.getTarget(), 
-            remote, 
+            AnontionSecurityECDSA.encodePubK1XY(AnontionSecurityECDSA.pub()), 
             plaintext, 
             sign, 
             ts);
