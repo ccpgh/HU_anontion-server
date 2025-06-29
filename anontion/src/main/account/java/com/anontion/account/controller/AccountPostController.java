@@ -40,7 +40,7 @@ import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
-import com.anontion.common.security.AnontionSecuritySHA;
+import com.anontion.common.security.AnontionSecuritySCRYPT;
 import com.anontion.common.dto.response.ResponsePostAccountBodyDTO;
 
 import jakarta.validation.Valid;
@@ -201,7 +201,7 @@ public class AccountPostController {
                                     
         AsteriskAuth auths = authBean.createAsteriskAuth(
             account.getPub(), 
-            AnontionSecurity.tobase93FromBase64(AnontionSecuritySHA.hash(account.getPub())), 
+            AnontionSecurity.tobase76FromBase64(AnontionSecuritySCRYPT.hash(account.getPub())),
             AnontionSecurity.generatePassword());
 
         if (auths.getUsername().isEmpty()) {
@@ -271,7 +271,6 @@ public class AccountPostController {
     
     String context = servletContext.getInitParameter("application-timeout");
 
-    
     if (context != null) {
       
       try {
