@@ -40,7 +40,7 @@ public class AscountService {
   }
 
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxAccountAndEndpoint(AnontionApplication application, AnontionAccount account,  AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
+  public boolean saveTxAccountAndEndpoint(AnontionApplication application, AnontionAccount account, AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
 
     try {
       
@@ -70,13 +70,34 @@ public class AscountService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean deleteTxApplicationAndAccount(AnontionApplication application, AnontionAccount account) {
+  public boolean deleteTxApplicationAndAccountAndEndpoint(AnontionApplication application, AnontionAccount account, AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
     
     try {
       
-      accountRepository.delete(account);
-    
-      applicationRepository.delete(application);
+      if (account != null) {
+
+        accountRepository.delete(account);
+      }
+      
+      if (application != null) {
+
+        applicationRepository.delete(application);
+      }
+
+      if (auth != null) {
+
+        authRepository.delete(auth);
+      }
+
+      if (aor != null) {
+
+        aorRepository.delete(aor);
+      }
+
+      if (endpoint != null) {
+
+        endpointRepository.delete(endpoint);
+      }
 
       return true;
       
@@ -88,7 +109,7 @@ public class AscountService {
       
       return false;      
     }
-  }  
+  }
   
   final private static AnontionLog _logger = new AnontionLog(AscountService.class.getName());
 }

@@ -223,7 +223,7 @@ public class AccountPostController {
               aors)) {
             
             return Responses.getBAD_REQUEST(
-                "Failed asterisk update.");
+                "Failed application, account and/or asterisk update.");
           }
         
         } catch (Exception e) {
@@ -231,7 +231,7 @@ public class AccountPostController {
           _logger.exception(e);
           
           return Responses.getBAD_REQUEST(
-              "Failed asterisk update.");
+              "Failed application, account and/or asterisk update.");
         }
         
         body = new ResponsePostAccountBodyDTO(

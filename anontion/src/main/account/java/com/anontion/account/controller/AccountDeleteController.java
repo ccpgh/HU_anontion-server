@@ -13,6 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anontion.application.controller.ApplicationDeleteController;
+import com.anontion.asterisk.model.AsteriskAor;
+import com.anontion.asterisk.model.AsteriskAuth;
+import com.anontion.asterisk.model.AsteriskEndpoint;
+import com.anontion.asterisk.repository.AsteriskAorRepository;
+import com.anontion.asterisk.repository.AsteriskAuthRepository;
+import com.anontion.asterisk.repository.AsteriskEndpointRepository;
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionLog;
@@ -33,6 +39,15 @@ public class AccountDeleteController {
   @Autowired
   private AnontionApplicationRepository applicationRepository;
 
+  @Autowired
+  private AsteriskEndpointRepository endpointRepository;
+
+  @Autowired
+  private AsteriskAorRepository aorRepository;
+
+  @Autowired
+  private AsteriskAuthRepository authRepository;
+  
   @Autowired
   private AscountService accountService;
  
@@ -94,70 +109,74 @@ public class AccountDeleteController {
         ts, 
         uuid);
     
-    AnontionApplication application = null;
-    
     Optional<AnontionApplication> applicationO = 
         applicationRepository.findById(index);
 
-    if (applicationO.isPresent()) {
-
-      application = applicationO.get();
-    }
-
-    AnontionAccount account = null;
-    
     Optional<AnontionAccount> accountO = 
         accountRepository.findByTsAndNameAndApplication(ts, name, uuid);
 
-    if (accountO.isPresent()) {
+    String pub = AccountDeleteController.getPub(applicationO, accountO);
 
-      account = accountO.get();
-    }
+    AsteriskEndpoint endpoint = null;
+    
+    AsteriskAor aors = null;
 
-    if (account != null && application != null) {
+    AsteriskAuth auths = null;
+
+    if (pub != null && !pub.isBlank()) {
+    
+      Optional<AsteriskEndpoint> endpoint0 = 
+          endpointRepository.findById(pub);
       
-      if (!accountService.deleteTxApplicationAndAccount(application, account)) {
+      if (endpoint0.isPresent()) {
         
-        return Responses.getBAD_REQUEST(
-            "Account+Application delete error");
+        endpoint = endpoint0.get();
       }
+ 
+      Optional<AsteriskAuth> auth0 = 
+          authRepository.findById(pub);
       
-    } else if (account == null && application == null) {
-      
-    } else {
-
-      if (account != null) {
-
-        try {
-
-          accountRepository.delete(account);
-
-        } catch (Exception e) {
-
-          _logger.exception(e);
-
-          return Responses.getBAD_REQUEST(
-              "Account delete error - " + e.getClass().getName());
-        }
+      if (auth0.isPresent()) {
+        
+        auths = auth0.get();
       }
 
-      if (application != null) {
-
-        try {
-
-          applicationRepository.delete(application);
-
-        } catch (Exception e) {
-
-          _logger.exception(e);
-
-          return Responses.getBAD_REQUEST(
-              "Application delete error - " + e.getClass().getName());
-        }
+      Optional<AsteriskAor> aors0 = 
+          aorRepository.findById(pub);
+      
+      if (aors0.isPresent()) {
+        
+        aors = aors0.get();
       }
     }
     
+    if (!accountService.deleteTxApplicationAndAccountAndEndpoint(
+        applicationO.orElse(null), 
+        accountO.orElse(null),
+        endpoint,
+        auths,
+        aors)) {
+      
+      return Responses.getBAD_REQUEST(
+          "Failed application, account and/or asterisk update.");
+    }
+    
     return Responses.getOK();    
+  }
+  
+  private static String getPub(Optional<AnontionApplication> applicationO, Optional<AnontionAccount> accountO) {
+    
+    if (applicationO.isPresent()) {
+      
+      return applicationO.get().getPub();
+    }
+
+    if (accountO.isPresent()) {
+      
+      return accountO.get().getPub();
+    }
+
+    return null;
   }
   
   final private static AnontionLog _logger = new AnontionLog(ApplicationDeleteController.class.getName());
