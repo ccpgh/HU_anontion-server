@@ -70,8 +70,6 @@ public class AccountDeleteController {
           "Invalid parameter - name was empty.");
     }
 
-    _logger.info("DEBUG extracted name is '" + name + "'");
-
     Long ts = null;
     
     try {
@@ -108,26 +106,8 @@ public class AccountDeleteController {
     Optional<AnontionApplication> applicationO = 
         applicationRepository.findById(index);
 
-    if (applicationO.isPresent()) {
-      
-      _logger.info("DEBUG Hibernate application found '" + ts + "', '" + name + "', '" + uuid + "'");
-      
-    } else {
-      
-      _logger.info("DEBUG Hibernate application NOT found '" + ts + "', '" + name + "', '" + uuid + "'");
-    }
-
     Optional<AnontionAccount> accountO = 
         accountRepository.findByTsAndNameAndApplication(ts, name, uuid);
-
-    if (accountO.isPresent()) {
-      
-      _logger.info("DEBUG Hibernate account found '" + ts + "', '" + name + "', '" + uuid + "'");
-      
-    } else {
-      
-      _logger.info("DEBUG Hibernate account NOT found '" + ts + "', '" + name + "', '" + uuid + "'");
-    }
 
     Optional<AsteriskEndpoint> endpoint0 = 
         endpointRepository.findById(name);

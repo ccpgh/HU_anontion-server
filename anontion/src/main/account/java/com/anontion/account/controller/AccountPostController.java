@@ -101,8 +101,6 @@ public class AccountPostController {
         dto.getTs(), 
         dto.getId());
 
-    _logger.info("DEBUG gotting application with name is '" + dto.getName() + "'");
-
     Optional<AnontionApplication> applicationO = applicationRepository.findById(id);
 
     if (!applicationO.isPresent()) {
@@ -196,8 +194,6 @@ public class AccountPostController {
             application.getUid(), 
             false);
                
-        _logger.info("DEBUG saving account with name is '" + dto.getName() + "'");
-
         AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
             account.getPub(), 
             account.getName());
