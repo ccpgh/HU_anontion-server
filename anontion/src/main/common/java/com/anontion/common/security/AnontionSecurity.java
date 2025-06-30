@@ -1,18 +1,15 @@
 package com.anontion.common.security;
-
+ 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Base64;
-
-import com.anontion.common.misc.AnontionLog;
 
 public class AnontionSecurity {
 
   private static final char[] _BASE93_CHARS = new char[93];
 
-  private static final char[] _BASE76_CHARS = new char[76];
+  private static final char[] _BASE74_CHARS = new char[74];
 
-  private static final String _BASE76_EXCLUDE_CHARS = ":@/;?=&,\"<>#%[]'`";
+  private static final String _BASE74_EXCLUDE_CHARS = ":@/;?=&,\"<>#%[]'`_\\";
 
   static {
   
@@ -27,16 +24,16 @@ public class AnontionSecurity {
     
       if ((i - (33 + offset)) > 75) {
       
-        throw new RuntimeException("BASE76_CHARS would be too big");
+        throw new RuntimeException("BASE74_CHARS would be too big");
       }
       
-      if (_BASE76_EXCLUDE_CHARS.indexOf((char) i) != -1) {
+      if (_BASE74_EXCLUDE_CHARS.indexOf((char) i) != -1) {
         
         offset++;
         
       } else {
         
-        _BASE76_CHARS[i - (33 + offset)] = (char) i;
+        _BASE74_CHARS[i - (33 + offset)] = (char) i;
       }
     }
   }
@@ -50,77 +47,41 @@ public class AnontionSecurity {
     int length = _random.nextInt(8, 12);
     
     while (length > 0) {
+
+      char c = (char) _random.nextInt(33, 126);
       
-      buffer.append((char) _random.nextInt(33, 126));
+      if (_BASE74_EXCLUDE_CHARS.indexOf((char) c) != -1) {
+
+        continue;
+      }
+      
+      buffer.append(c);
 
       length--;
     }
     
     return buffer.toString();
   }
-
-  public static String tobase93FromBase64(String base64) {
-    
-    if (!isBase64(base64)) {
-
-      _logger.severe("not base64 '" + base64 + "'");
-
-      return "";
-    }
-    
-    StringBuilder buffer = new StringBuilder();
-    
-    byte[] bytes = Base64.getDecoder().decode(base64);
-
-    BigInteger number = new BigInteger(1, bytes);
-
-    BigInteger base93 = BigInteger.valueOf(_BASE93_CHARS.length);
-
-    if (number.equals(BigInteger.ZERO)) {
-
-      return String.valueOf(_BASE93_CHARS[0]);
-    }
-
-    while (number.compareTo(BigInteger.ZERO) > 0) {
-      
-      BigInteger[] r = number.divideAndRemainder(base93);
-      
-      buffer.append(_BASE93_CHARS[r[1].intValue()]);
-      
-      number = r[0];
-    }
-
-    return buffer.reverse().toString();
-  }
   
-  public static String tobase76FromBase64(String base64) {
-   
-    if (!isBase64(base64)) {
+  public static String tobase74FromBytes(byte[] bytes) {
 
-      _logger.severe("not base64 '" + base64 + "'");
-
-      return "";
-    }
-    
     StringBuilder buffer = new StringBuilder();
     
-    byte[] bytes = Base64.getDecoder().decode(base64);
-
     BigInteger number = new BigInteger(1, bytes);
 
-    BigInteger base76 = BigInteger.valueOf(_BASE76_CHARS.length);
+    BigInteger base74 = BigInteger.valueOf(_BASE74_CHARS.length);
 
     if (number.equals(BigInteger.ZERO)) {
 
-      return String.valueOf(_BASE76_CHARS[0]);
+      return String.valueOf(_BASE74_CHARS[0]);
     }
 
     while (number.compareTo(BigInteger.ZERO) > 0) {
-      
-      BigInteger[] r = number.divideAndRemainder(base76);
-      
-      buffer.append(_BASE76_CHARS[r[1].intValue()]);
-      
+
+      BigInteger[] r = number.divideAndRemainder(base74);
+
+      buffer.append(_BASE74_CHARS[r[1].intValue()]);
+
       number = r[0];
     }
 
@@ -158,7 +119,5 @@ public class AnontionSecurity {
     
     return salt;
   }
-  
-  final private static AnontionLog _logger = new AnontionLog(AnontionSecurity.class.getName());
 }
 

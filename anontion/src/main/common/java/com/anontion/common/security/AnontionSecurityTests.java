@@ -1,5 +1,5 @@
 package com.anontion.common.security;
-
+ 
 import java.security.SecureRandom;
 
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
@@ -157,11 +157,11 @@ public class AnontionSecurityTests {
 
   public static boolean TEST_localSignAndCheck() {
     
-    String plaintext = "nvsbv8lnjc3oj0oncp2jekgobrmxwuxoxu0qdf6ams4=:1749089207:b438b97c-5559-4da9-801e-25fd376b538a:bcsym1ahva6n3tcyrtrw//tdc0fh+qsx1fwbdal/gb2mx4qrtbod1bmsxk3ki/flklnvlzd9u0pb5ffz74hnulq=";
+    String cleartext = "nvsbv8lnjc3oj0oncp2jekgobrmxwuxoxu0qdf6ams4=:1749089207:b438b97c-5559-4da9-801e-25fd376b538a:bcsym1ahva6n3tcyrtrw//tdc0fh+qsx1fwbdal/gb2mx4qrtbod1bmsxk3ki/flklnvlzd9u0pb5ffz74hnulq=";
 
-    String sign = AnontionSecurityECDSA.sign(plaintext);
+    String sign = AnontionSecurityECDSA.sign(cleartext);
     
-    if (AnontionSecurityECDSA.check(plaintext, sign, AnontionSecurityECDSA.pub())) {
+    if (AnontionSecurityECDSA.check(cleartext, sign, AnontionSecurityECDSA.pub())) {
       
       _logger.info("TEST localSignAndCheck OK");
       
@@ -184,13 +184,13 @@ public class AnontionSecurityTests {
       buffer.append(_ALPHANUM_CHARACTERS.charAt(_random.nextInt(_ALPHANUM_CHARACTERS.length())));
     }
 
-    String plaintext = buffer.toString();
+    String cleartext = buffer.toString();
     
     String encrypted = AnontionSecurityECIES_ECDH.encrypt(AnontionSecurityECDSA.pub(), buffer.toString());
 
     String decrypted = AnontionSecurityECIES_ECDH.decrypt(AnontionSecurityECDSA.root(), encrypted);
 
-    if (plaintext.equals(decrypted)) {
+    if (cleartext.equals(decrypted)) {
       
       _logger.info("TEST encryptDecrypt OK");
 

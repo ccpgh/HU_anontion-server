@@ -6,9 +6,11 @@ public class ResponsePostApplicationBodyDTO extends ResponseBodyDTO {
 
   private Long target;
 
+  private String ename;
+
   private String remote;
 
-  private String plaintext;
+  private String uid;
   
   private String sign;
 
@@ -18,13 +20,20 @@ public class ResponsePostApplicationBodyDTO extends ResponseBodyDTO {
 
   }
 
-  public ResponsePostApplicationBodyDTO(String text, Long target, String remote, String plaintext, String sign, Long ts) {
+  public ResponsePostApplicationBodyDTO(String text, Long target, String ename, String remote, String uid, String sign, Long ts) {
 
     this.text = text;
+
     this.target = target;
+
+    this.ename = ename;
+
     this.remote = remote;
-    this.plaintext = plaintext;
+    
+    this.uid = uid;
+    
     this.sign = sign;
+    
     this.ts = ts;
   }
 
@@ -48,6 +57,16 @@ public class ResponsePostApplicationBodyDTO extends ResponseBodyDTO {
     this.target = target;
   }
 
+  public String getEname() {
+    
+    return ename;
+  }
+
+  public void setEname(String ename) {
+    
+    this.ename = ename;
+  }
+
   public String getRemote() {
     
     return remote;
@@ -58,14 +77,14 @@ public class ResponsePostApplicationBodyDTO extends ResponseBodyDTO {
     this.remote = remote;
   }
   
-  public String getPlaintext() {
+  public String getUid() {
     
-    return plaintext;
+    return uid;
   }
 
-  public void setPlaintext(String plaintext) {
+  public void setUid(String uid) {
     
-    this.plaintext = plaintext;
+    this.uid = uid;
   }
 
   public String getSign() {

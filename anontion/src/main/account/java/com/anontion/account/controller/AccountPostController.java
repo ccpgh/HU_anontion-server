@@ -40,7 +40,6 @@ import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
-import com.anontion.common.security.AnontionSecuritySCRYPT;
 import com.anontion.common.dto.response.ResponsePostAccountBodyDTO;
 
 import jakarta.validation.Valid;
@@ -102,6 +101,8 @@ public class AccountPostController {
         dto.getTs(), 
         dto.getId());
 
+    _logger.info("DEBUG gotting application with name is '" + dto.getName() + "'");
+
     Optional<AnontionApplication> applicationO = applicationRepository.findById(id);
 
     if (!applicationO.isPresent()) {
@@ -139,7 +140,7 @@ public class AccountPostController {
           "Received client pub key invalid ECPublicKeyParameters.");
     }
 
-    if (!AnontionSecurityECDSA.check(application.getPlaintext(), dto.getCountersign(), publicKey)) {
+    if (!AnontionSecurityECDSA.check(application.getUid(), dto.getCountersign(), publicKey)) {
 
       return Responses.getBAD_REQUEST(
           "Bad pub.", 
@@ -192,16 +193,18 @@ public class AccountPostController {
             dto.getId(), 
             dto.getCountersign(), 
             application.getPub(), 
-            application.getPlaintext(), 
+            application.getUid(), 
             false);
                
+        _logger.info("DEBUG saving account with name is '" + dto.getName() + "'");
+
         AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
             account.getPub(), 
             account.getName());
                                     
         AsteriskAuth auths = authBean.createAsteriskAuth(
-            account.getPub(), 
-            AnontionSecurity.tobase76FromBase64(AnontionSecuritySCRYPT.hash(account.getPub())),
+            account.getPub(),
+            account.getName(),
             AnontionSecurity.generatePassword());
 
         if (auths.getUsername().isEmpty()) {

@@ -3,8 +3,6 @@ package com.anontion.account.controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,13 +52,9 @@ public class AccountDeleteController {
   @DeleteMapping("/account/{id}")
   public ResponseEntity<ResponseDTO> deleteApplication(@PathVariable("id") String id) {
 
-    String adjusted = id.replace('@', '/');
+    String[] tokens = AnontionStrings.split(id, ":");
     
-    String decoded = URLDecoder.decode(adjusted, StandardCharsets.UTF_8);
-    
-    String[] tokens = AnontionStrings.split(decoded, ":");
-    
-    if (tokens.length < 4) {
+    if (tokens.length < 3) {
       
       return Responses.getBAD_REQUEST(
           "Invalid parameters - expected 4+ parameter elements");
@@ -75,7 +69,9 @@ public class AccountDeleteController {
       return Responses.getBAD_REQUEST(
           "Invalid parameter - name was empty.");
     }
-    
+
+    _logger.info("DEBUG extracted name is '" + name + "'");
+
     Long ts = null;
     
     try {
@@ -112,27 +108,38 @@ public class AccountDeleteController {
     Optional<AnontionApplication> applicationO = 
         applicationRepository.findById(index);
 
+    if (applicationO.isPresent()) {
+      
+      _logger.info("DEBUG Hibernate application found '" + ts + "', '" + name + "', '" + uuid + "'");
+      
+    } else {
+      
+      _logger.info("DEBUG Hibernate application NOT found '" + ts + "', '" + name + "', '" + uuid + "'");
+    }
+
     Optional<AnontionAccount> accountO = 
         accountRepository.findByTsAndNameAndApplication(ts, name, uuid);
 
+    if (accountO.isPresent()) {
+      
+      _logger.info("DEBUG Hibernate account found '" + ts + "', '" + name + "', '" + uuid + "'");
+      
+    } else {
+      
+      _logger.info("DEBUG Hibernate account NOT found '" + ts + "', '" + name + "', '" + uuid + "'");
+    }
+
+    Optional<AsteriskEndpoint> endpoint0 = 
+        endpointRepository.findById(name);
+    
     String pub = AccountDeleteController.getPub(applicationO, accountO);
 
-    AsteriskEndpoint endpoint = null;
-    
     AsteriskAor aors = null;
 
     AsteriskAuth auths = null;
 
     if (pub != null && !pub.isBlank()) {
-    
-      Optional<AsteriskEndpoint> endpoint0 = 
-          endpointRepository.findById(pub);
-      
-      if (endpoint0.isPresent()) {
-        
-        endpoint = endpoint0.get();
-      }
- 
+
       Optional<AsteriskAuth> auth0 = 
           authRepository.findById(pub);
       
@@ -153,7 +160,7 @@ public class AccountDeleteController {
     if (!accountService.deleteTxApplicationAndAccountAndEndpoint(
         applicationO.orElse(null), 
         accountO.orElse(null),
-        endpoint,
+        endpoint0.orElse(null),
         auths,
         aors)) {
       

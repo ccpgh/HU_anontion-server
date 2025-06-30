@@ -44,10 +44,7 @@ public class AscountService {
 
     try {
       
-      if (application != null) {
-       
-        applicationRepository.delete(application);
-      }
+      applicationRepository.delete(application);
       
       endpointRepository.save(endpoint);    
 

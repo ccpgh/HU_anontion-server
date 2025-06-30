@@ -22,6 +22,7 @@ import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurityECDSA;
+import com.anontion.common.security.AnontionSecuritySCRYPT;
 import com.anontion.common.security.AnontionPOW;
 import com.anontion.common.dto.response.ResponsePostApplicationBodyDTO;
 
@@ -55,10 +56,24 @@ public class ApplicationPostController {
     String name    = request.getBody().getName();
     String encrypt = request.getBody().getEncrypt();
 
+    if (name.isBlank()) {
+      
+      return Responses.getBAD_REQUEST(
+          "Bad account name!");
+    }
+
+    String hname = AnontionSecuritySCRYPT.hashBase76(name);
+    
+    if (hname.isBlank()) {
+      
+      return Responses.getBAD_REQUEST(
+          "Bad account name!");
+    }
+     
     Long ts = AnontionTime.tsN();
 
     AnontionApplicationId id = new AnontionApplicationId(
-        name, 
+        hname, 
         ts, 
         client);
 
@@ -66,25 +81,25 @@ public class ApplicationPostController {
 
     if (exists) {
 
-      return Responses.getBAD_REQUEST("Application already exists!");
+      return Responses.getBAD_REQUEST(
+          "Application already exists!");
     }
 
     AnontionPOW pow = new AnontionPOW();
 
-    String plaintext = AnontionStrings.concat(new String[] { 
-        name, 
+    String uid = AnontionStrings.concat(new String[] { 
+        hname, 
         ts.toString(), 
-        client.toString(), 
-        pub }, ":");
+        client.toString() }, ":");
 
-    String sign = AnontionSecurityECDSA.sign(plaintext);
+    String sign = AnontionSecurityECDSA.sign(uid);
 
     AnontionApplication application = 
-        new AnontionApplication(name, 
+        new AnontionApplication(hname, 
             ts, 
             client, 
             pub, 
-            plaintext, 
+            uid, 
             sign,
             pow.getText(), 
             pow.getTarget(), 
@@ -96,8 +111,9 @@ public class ApplicationPostController {
     ResponsePostApplicationBodyDTO body = 
         new ResponsePostApplicationBodyDTO(application.getText(), 
             application.getTarget(), 
+            hname,
             AnontionSecurityECDSA.encodePubK1XY(AnontionSecurityECDSA.pub()), 
-            plaintext, 
+            uid, 
             sign, 
             ts);
 

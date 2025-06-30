@@ -45,14 +45,18 @@ public class AsteriskEndpointBean {
     
     String allowSubscribe = "yes";
     
-    String callerId = name.substring(0, 39);
+    String callerId = null;
 
-    if (callerId.length() > 1) {
-      
-      callerId = callerId.substring(0, 1).toUpperCase() + callerId.substring(1);
+    if (name.length() > 1) {
+
+      callerId = name.substring(0, Math.min(39, name.length()));
+    
+    } else {
+    
+      callerId = name;
     }
     
-    return new AsteriskEndpoint(id, transport, aor, auth, context, disallow,
+    return new AsteriskEndpoint(name, transport, aor, auth, context, disallow,
         allow, directMedia, trustIdOutbound, dtmfMode, forceRport, rtpSymmetric, sendRpid, iceSupport,
         tosVideo, cosVideo, allowSubscribe, callerId);
   }

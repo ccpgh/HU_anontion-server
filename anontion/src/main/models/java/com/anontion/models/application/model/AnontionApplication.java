@@ -33,7 +33,7 @@ public class AnontionApplication {
   private String pub;
 
   @Column(nullable = false, length = 255) 
-  private String plaintext;
+  private String uid;
 
   @Column(nullable = false, length = 255) 
   private String sign;
@@ -54,7 +54,7 @@ public class AnontionApplication {
     
   }
 
-  public AnontionApplication(String name, Long ts, UUID client, String pub, String plaintext, String sign, String text, Long target, String encrypt, boolean disabled) {
+  public AnontionApplication(String name, Long ts, UUID client, String pub, String uid, String sign, String text, Long target, String encrypt, boolean disabled) {
 
     this.id = UUID.randomUUID();
 
@@ -66,7 +66,7 @@ public class AnontionApplication {
     
     this.pub = pub;
     
-    this.plaintext = plaintext;
+    this.uid = uid;
     
     this.sign = sign;
     
@@ -129,17 +129,15 @@ public class AnontionApplication {
     this.pub = pub;
   }
   
-  
-  public String getPlaintext() {
+  public String getUid() {
 
-    return plaintext;
+    return uid;
   }
 
-  public void setHash(String plaintext) {
+  public void setUid(String uid) {
 
-    this.plaintext = plaintext;
+    this.uid = uid;
   }
-  
   
   public String getSign() {
 

@@ -187,11 +187,11 @@ abstract public class AnontionSecurityECDSA {
     return new ECPublicKeyParameters(point, domainParams);
   }
       
-  public static String sign(String plaintext) { 
+  public static String sign(String text) { 
 
     ECPrivateKeyParameters root = AnontionSecurityECDSA.root();
 
-    byte[] bytes = plaintext.getBytes(StandardCharsets.UTF_8);
+    byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
     
     SHA256Digest digest = new SHA256Digest();
     

@@ -1,7 +1,6 @@
 package com.anontion.common.security;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 import org.bouncycastle.crypto.generators.SCrypt;
 
@@ -9,12 +8,19 @@ import com.anontion.common.misc.AnontionLog;
 
 abstract public class AnontionSecuritySCRYPT {
 
-  public static String hash(String s) {
+  public static String hashBase76(String s) {
 
-    return hash(s, null);
+    byte[] data = hash(s, null);
+    
+    if (data == null) {
+      
+      return "";
+    }
+    
+    return AnontionSecurity.tobase74FromBytes(data);
   }
   
-  public static String hash(String s, byte[] salt) {
+  private static byte[] hash(String s, byte[] salt) {
     
     byte[] sbytes = salt;
 
@@ -28,7 +34,7 @@ abstract public class AnontionSecuritySCRYPT {
       
         _logger.exception(e);
         
-        return "";  
+        return null;  
       }
     }
 
@@ -36,15 +42,13 @@ abstract public class AnontionSecuritySCRYPT {
     
     try {
     
-      byte[] hash = SCrypt.generate(passwordBytes, sbytes, 16384, 8, 1, 31);
-
-      return Base64.getEncoder().encodeToString(hash);
+      return SCrypt.generate(passwordBytes, sbytes, 16384, 8, 1, 31);
 
     } catch (Exception e) {
 
       _logger.exception(e);
 
-      return "";
+      return null;
     }
   }
 

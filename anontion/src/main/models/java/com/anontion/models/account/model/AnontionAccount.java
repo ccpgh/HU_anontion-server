@@ -45,7 +45,7 @@ public class AnontionAccount {
   private String pub;
 
   @Column(nullable = false, length = 255)
-  private String plaintext;
+  private String uid;
 
   @Column(nullable = false)
   private boolean disabled;
@@ -54,7 +54,7 @@ public class AnontionAccount {
     
   }
 
-  public AnontionAccount(Long ts, String name, UUID application, String countersign, String pub, String plaintext, boolean disabled) {
+  public AnontionAccount(Long ts, String name, UUID application, String countersign, String pub, String uid, boolean disabled) {
 
     this.ts = ts;
 
@@ -68,7 +68,7 @@ public class AnontionAccount {
     
     this.pub = pub;
     
-    this.plaintext = plaintext;
+    this.uid = uid;
     
     this.disabled = disabled;
   }
@@ -143,14 +143,14 @@ public class AnontionAccount {
     this.countersign = countersign;
   }
   
-  public String getPlaintext() {
+  public String getUid() {
     
-    return plaintext;
+    return uid;
   }
 
-  public void setPlaintext(String plaintext) {
+  public void setUid(String uid) {
    
-    this.plaintext = plaintext;
+    this.uid = uid;
   }
   
   public String toString() {
