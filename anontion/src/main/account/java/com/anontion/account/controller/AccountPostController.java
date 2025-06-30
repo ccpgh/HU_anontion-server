@@ -210,7 +210,8 @@ public class AccountPostController {
         }
         
         AsteriskAor aors = aorBean.createAsteriskAor(
-            application.getPub());
+            application.getPub(),
+            account.getName());
         
         try {
 

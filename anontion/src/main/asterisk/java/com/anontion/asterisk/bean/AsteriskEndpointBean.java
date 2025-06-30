@@ -15,7 +15,7 @@ public class AsteriskEndpointBean {
     
     String transport = "transport-id";
 
-    String aor = id;
+    String aor = name;
 
     String auth = id;
 
