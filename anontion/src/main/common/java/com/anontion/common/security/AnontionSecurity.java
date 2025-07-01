@@ -7,9 +7,9 @@ public class AnontionSecurity {
 
   private static final char[] _BASE93_CHARS = new char[93];
 
-  private static final char[] _BASE65_CHARS = new char[65];
+  private static final char[] _BASE64_CHARS = new char[64];
 
-  private static final String _BASE65_EXCLUDE_CHARS = ":@/;?=&,\"<>#%[]'`_{}.^|!*()\\";
+  private static final String _BASE64_EXCLUDE_CHARS = ":@/;?=&,\"<>#%[]'`_{}.^|!*()$\\";
 
   static {
   
@@ -22,18 +22,18 @@ public class AnontionSecurity {
     
     for (int i = 33; i < 126; i++) {
     
-      if ((i - (33 + offset)) > 65) {
+      if ((i - (33 + offset)) > 64) {
       
-        throw new RuntimeException("BASE65_CHARS would be too big");
+        throw new RuntimeException("BASE64_CHARS would be too big");
       }
       
-      if (_BASE65_EXCLUDE_CHARS.indexOf((char) i) != -1) {
+      if (_BASE64_EXCLUDE_CHARS.indexOf((char) i) != -1) {
         
         offset++;
         
       } else {
         
-        _BASE65_CHARS[i - (33 + offset)] = (char) i;
+        _BASE64_CHARS[i - (33 + offset)] = (char) i;
       }
     }
   }
@@ -50,7 +50,7 @@ public class AnontionSecurity {
 
       char c = (char) _random.nextInt(33, 126);
       
-      if (_BASE65_EXCLUDE_CHARS.indexOf((char) c) != -1) {
+      if (_BASE64_EXCLUDE_CHARS.indexOf((char) c) != -1) {
 
         continue;
       }
@@ -63,24 +63,24 @@ public class AnontionSecurity {
     return buffer.toString();
   }
   
-  public static String tobase65FromBytes(byte[] bytes) {
+  public static String tobase64FromBytes(byte[] bytes) {
 
     StringBuilder buffer = new StringBuilder();
     
     BigInteger number = new BigInteger(1, bytes);
 
-    BigInteger base65 = BigInteger.valueOf(_BASE65_CHARS.length);
+    BigInteger base64 = BigInteger.valueOf(_BASE64_CHARS.length);
 
     if (number.equals(BigInteger.ZERO)) {
 
-      return String.valueOf(_BASE65_CHARS[0]);
+      return String.valueOf(_BASE64_CHARS[0]);
     }
 
     while (number.compareTo(BigInteger.ZERO) > 0) {
 
-      BigInteger[] r = number.divideAndRemainder(base65);
+      BigInteger[] r = number.divideAndRemainder(base64);
 
-      buffer.append(_BASE65_CHARS[r[1].intValue()]);
+      buffer.append(_BASE64_CHARS[r[1].intValue()]);
 
       number = r[0];
     }

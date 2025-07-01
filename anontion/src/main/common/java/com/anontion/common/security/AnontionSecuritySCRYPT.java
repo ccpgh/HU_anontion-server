@@ -8,7 +8,7 @@ import com.anontion.common.misc.AnontionLog;
 
 abstract public class AnontionSecuritySCRYPT {
 
-  public static String hashBase65(String s) {
+  public static String hashBase64(String s) {
 
     byte[] data = hash(s, null);
     
@@ -17,7 +17,7 @@ abstract public class AnontionSecuritySCRYPT {
       return "";
     }
     
-    return AnontionSecurity.tobase65FromBytes(data);
+    return AnontionSecurity.tobase64FromBytes(data);
   }
   
   private static byte[] hash(String s, byte[] salt) {
