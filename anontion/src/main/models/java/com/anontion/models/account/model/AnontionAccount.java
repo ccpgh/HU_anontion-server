@@ -13,7 +13,6 @@ import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 
 import com.anontion.common.misc.AnontionJson;
-import com.anontion.common.security.AnontionSecurityECDSA;
 
 @Entity
 @Table(
@@ -35,13 +34,10 @@ public class AnontionAccount {
   @Column(nullable = false)
   private UUID application;
 
-  @Column(name = "ekey", columnDefinition = "VARCHAR(4096)", nullable = false)
-  private String key;
-
   @Column(nullable = false, length = 255)
   private String countersign;
 
-  @Column(name = "epub", columnDefinition = "VARCHAR(4096)", nullable = false)
+  @Column(columnDefinition = "VARCHAR(4096)", nullable = false)
   private String pub;
 
   @Column(nullable = false, length = 255)
@@ -61,9 +57,7 @@ public class AnontionAccount {
     this.name = name;
     
     this.application = application;
-    
-    this.key = AnontionSecurityECDSA.encodeKeyK1(AnontionSecurityECDSA.root());
-    
+        
     this.countersign = countersign;
     
     this.pub = pub;
@@ -111,16 +105,6 @@ public class AnontionAccount {
   public void setApplication(UUID application) {
     
     this.application = application;
-  }
-
-  public String getKey() {
-    
-    return key;
-  }
-
-  public void setKey(String key) {
-   
-    this.key = key;
   }
 
   public String getPub() {
