@@ -7,9 +7,9 @@ public class AnontionSecurity {
 
   private static final char[] _BASE93_CHARS = new char[93];
 
-  private static final char[] _BASE74_CHARS = new char[74];
+  private static final char[] _BASE71_CHARS = new char[71];
 
-  private static final String _BASE74_EXCLUDE_CHARS = ":@/;?=&,\"<>#%[]'`_\\";
+  private static final String _BASE71_EXCLUDE_CHARS = ":@/;?=&,\"<>#%[]'`_{}.\\";
 
   static {
   
@@ -24,16 +24,16 @@ public class AnontionSecurity {
     
       if ((i - (33 + offset)) > 75) {
       
-        throw new RuntimeException("BASE74_CHARS would be too big");
+        throw new RuntimeException("BASE71_CHARS would be too big");
       }
       
-      if (_BASE74_EXCLUDE_CHARS.indexOf((char) i) != -1) {
+      if (_BASE71_EXCLUDE_CHARS.indexOf((char) i) != -1) {
         
         offset++;
         
       } else {
         
-        _BASE74_CHARS[i - (33 + offset)] = (char) i;
+        _BASE71_CHARS[i - (33 + offset)] = (char) i;
       }
     }
   }
@@ -50,7 +50,7 @@ public class AnontionSecurity {
 
       char c = (char) _random.nextInt(33, 126);
       
-      if (_BASE74_EXCLUDE_CHARS.indexOf((char) c) != -1) {
+      if (_BASE71_EXCLUDE_CHARS.indexOf((char) c) != -1) {
 
         continue;
       }
@@ -63,24 +63,24 @@ public class AnontionSecurity {
     return buffer.toString();
   }
   
-  public static String tobase74FromBytes(byte[] bytes) {
+  public static String tobase71FromBytes(byte[] bytes) {
 
     StringBuilder buffer = new StringBuilder();
     
     BigInteger number = new BigInteger(1, bytes);
 
-    BigInteger base74 = BigInteger.valueOf(_BASE74_CHARS.length);
+    BigInteger base71 = BigInteger.valueOf(_BASE71_CHARS.length);
 
     if (number.equals(BigInteger.ZERO)) {
 
-      return String.valueOf(_BASE74_CHARS[0]);
+      return String.valueOf(_BASE71_CHARS[0]);
     }
 
     while (number.compareTo(BigInteger.ZERO) > 0) {
 
-      BigInteger[] r = number.divideAndRemainder(base74);
+      BigInteger[] r = number.divideAndRemainder(base71);
 
-      buffer.append(_BASE74_CHARS[r[1].intValue()]);
+      buffer.append(_BASE71_CHARS[r[1].intValue()]);
 
       number = r[0];
     }

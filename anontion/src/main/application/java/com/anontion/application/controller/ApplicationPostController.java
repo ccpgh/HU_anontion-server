@@ -62,7 +62,7 @@ public class ApplicationPostController {
           "Bad account name!");
     }
 
-    String hname = AnontionSecuritySCRYPT.hashBase76(name);
+    String hname = AnontionSecuritySCRYPT.hashBase71(name);
     
     if (hname.isBlank()) {
       

@@ -8,7 +8,7 @@ import com.anontion.common.misc.AnontionLog;
 
 abstract public class AnontionSecuritySCRYPT {
 
-  public static String hashBase76(String s) {
+  public static String hashBase71(String s) {
 
     byte[] data = hash(s, null);
     
@@ -17,7 +17,7 @@ abstract public class AnontionSecuritySCRYPT {
       return "";
     }
     
-    return AnontionSecurity.tobase74FromBytes(data);
+    return AnontionSecurity.tobase71FromBytes(data);
   }
   
   private static byte[] hash(String s, byte[] salt) {
@@ -42,7 +42,7 @@ abstract public class AnontionSecuritySCRYPT {
     
     try {
     
-      return SCrypt.generate(passwordBytes, sbytes, 16384, 8, 1, 31);
+      return SCrypt.generate(passwordBytes, sbytes, 16384, 8, 1, 30); // TODO 30?
 
     } catch (Exception e) {
 
