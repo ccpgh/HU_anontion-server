@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPublicKeySpec;
 import java.util.Base64;
@@ -37,7 +36,11 @@ abstract public class AnontionSecurityECDSA {
   private static ECPrivateKeyParameters _root = AnontionSecurityECDSA.load();
 
   private static ECPublicKeyParameters _pub = new ECPublicKeyParameters(_root.getParameters().getG().multiply(_root.getD()).normalize(), _root.getParameters());
-  
+
+  private static String _rootS = AnontionSecurityECDSA.encodeKeyK1(_root);
+
+  private static String _pubS = AnontionSecurityECDSA.encodePubK1XY(_pub);
+
   public static ECPrivateKeyParameters root() {
   
     return _root;
@@ -46,6 +49,16 @@ abstract public class AnontionSecurityECDSA {
   public static ECPublicKeyParameters pub() {
   
     return _pub;
+  }
+
+  public static String rootS() {
+    
+    return _rootS;
+  }
+
+  public static String pubS() {
+  
+    return _pubS;
   }
 
   public static String generateRandomString() {
@@ -59,12 +72,9 @@ abstract public class AnontionSecurityECDSA {
 
   public static String encodeKeyK1(ECPrivateKeyParameters key) {
 
-    return key.getD().toString();
-  }
+    byte[] dBytes = key.getD().toByteArray();
 
-  public static String encodePubK1Q(ECPublicKeyParameters pub) {
-
-    return pub.getQ().toString();
+    return Base64.getEncoder().encodeToString(dBytes);
   }
 
   private static ECPrivateKeyParameters load() {
@@ -310,54 +320,6 @@ abstract public class AnontionSecurityECDSA {
 
     return result;
   }
-  
-  public static String encodePubK1XY_(PublicKey pub) {
-
-    ECPublicKey ecPublicKey = (ECPublicKey) pub;
-
-    java.security.spec.ECPoint publicKeyPoint = ecPublicKey.getW();
-
-    BigInteger x = publicKeyPoint.getAffineX();
-
-    BigInteger y = publicKeyPoint.getAffineY();
-
-    byte[] xBytes = x.toByteArray();
-
-    byte[] yBytes = y.toByteArray();
-
-    byte[] x32Bytes = new byte[32];
-
-    byte[] y32Bytes = new byte[32];
-
-    int xOffset = 0;
-
-    int yOffset = 0;
-
-    if (xBytes.length == 33 && xBytes[0] == 0x00) {
-
-      xOffset = 1;
-    }
-
-    if (yBytes.length == 33 && yBytes[0] == 0x00) {
-
-      yOffset = 1;
-    }
-
-    System.arraycopy(xBytes, xOffset, x32Bytes, 32 - (xBytes.length - xOffset), (xBytes.length - xOffset));
-
-    System.arraycopy(yBytes, yOffset, y32Bytes, 32 - (yBytes.length - yOffset), (yBytes.length - yOffset));
-
-    byte[] publicKeyBytes = new byte[65];
-
-    publicKeyBytes[0] = 0x04;
-
-    System.arraycopy(x32Bytes, 0, publicKeyBytes, 1, 32);
-
-    System.arraycopy(y32Bytes, 0, publicKeyBytes, 33, 32);
-
-    return Base64.getEncoder().encodeToString(publicKeyBytes);
-  }
-  
 
   public static PublicKey decodePublicKeyFromBase64XY(String base64Key) { 
 
@@ -428,36 +390,6 @@ abstract public class AnontionSecurityECDSA {
     String[] tokens = { name, ts.toString(), client.toString(), pub};
     
     return AnontionSecuritySHA.hash(AnontionStrings.concat(tokens, ":"));
-  }
-
-  public static String encodeKeyD_(ECPrivateKeyParameters key) { // TODO - check works
-    
-    BigInteger d = key.getD();
-
-    byte[] bytes = d.toByteArray();
-
-    if (bytes.length == 33 && bytes[0] == 0x00) {
-
-        byte[] trimmed = new byte[32];
-
-        System.arraycopy(bytes, 1, trimmed, 0, 32);
-        
-        bytes = trimmed;
-    
-    } else if (bytes.length < 32) {
-
-      byte[] padded = new byte[32];
-      
-      System.arraycopy(bytes, 0, padded, 32 - bytes.length, bytes.length);
-      
-      bytes = padded;
-    
-    } else if (bytes.length > 32) {
-    
-      throw new IllegalArgumentException("Private key too large");
-    }
-
-    return Base64.getEncoder().encodeToString(bytes);
   }
 
   public static ECPrivateKeyParameters decodeECPrivateKeyParametersFromBase64D(String base64Key) {

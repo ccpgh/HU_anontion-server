@@ -67,7 +67,7 @@ abstract public class AnontionSecurityECIES_ECDH {
       
       kdf.generateBytes(bytes, 0, bytes.length);
 
-      byte[] iv = new byte[16];
+      byte[] iv = new byte[12];
 
       _secureRandom.nextBytes(iv);
       
@@ -101,11 +101,7 @@ abstract public class AnontionSecurityECIES_ECDH {
       
       System.arraycopy(text, 0, result, epubBytes.length + iv.length, text.length);
 
-      String encoded = Base64.getEncoder().encodeToString(result);
-      
-      _logger.info("Encoded string " + encoded);
-
-      return encoded;
+      return Base64.getEncoder().encodeToString(result);
 
     } catch (Exception e) {
       
@@ -127,12 +123,17 @@ abstract public class AnontionSecurityECIES_ECDH {
       ECDomainParameters params = new ECDomainParameters(e.getCurve(), e.getG(), e.getN(), e.getH());
          
       byte[] data = Base64.getDecoder().decode(s);
+      
+      if (data.length < 78) {
+
+        throw new RuntimeException("Decrypt data was too short");
+      }
 
       byte[] ephPubBytes = Arrays.copyOfRange(data, 0, 65);
       
-      byte[] iv = Arrays.copyOfRange(data, 65, 81);
+      byte[] iv = Arrays.copyOfRange(data, 65, 77);
       
-      byte[] ciphertext = Arrays.copyOfRange(data, 81, data.length);
+      byte[] ciphertext = Arrays.copyOfRange(data, 77, data.length);
 
       ECPoint ephQ = params.getCurve().decodePoint(ephPubBytes).normalize();
       
@@ -170,13 +171,13 @@ abstract public class AnontionSecurityECIES_ECDH {
 
       String decoded = new String(output, 0, len, "UTF-8");
       
-      _logger.info("Decoded string " + decoded);
-
       return decoded;
       
     } catch (Exception e) {
       
-      throw new RuntimeException("Decryption failed", e);
+      _logger.exception(e);
+      
+      throw new RuntimeException("Decrypt failed", e);
     }
   }
  

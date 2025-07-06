@@ -54,7 +54,6 @@ public class ApplicationPostController {
     UUID   client  = request.getBody().getId();
     String pub     = request.getBody().getPub();   
     String name    = request.getBody().getName();
-    String encrypt = request.getBody().getEncrypt();
 
     if (name.isBlank()) {
       
@@ -103,7 +102,6 @@ public class ApplicationPostController {
             sign,
             pow.getText(), 
             pow.getTarget(), 
-            encrypt, 
             false);
 
     applicationRepository.save(application);
@@ -111,8 +109,8 @@ public class ApplicationPostController {
     ResponsePostApplicationBodyDTO body = 
         new ResponsePostApplicationBodyDTO(application.getText(), 
             application.getTarget(), 
-            hname,
-            AnontionSecurityECDSA.encodePubK1XY(AnontionSecurityECDSA.pub()), 
+            hname, 
+            AnontionSecurityECDSA.pubS(),
             uid, 
             sign, 
             ts);

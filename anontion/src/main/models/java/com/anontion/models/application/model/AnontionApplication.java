@@ -39,9 +39,6 @@ public class AnontionApplication {
   private String sign;
 
   @Column(nullable = false, columnDefinition = "TEXT")
-  private String encrypt;
-
-  @Column(nullable = false, columnDefinition = "TEXT")
   private String text;
 
   @Column(nullable = false) 
@@ -54,7 +51,7 @@ public class AnontionApplication {
     
   }
 
-  public AnontionApplication(String name, Long ts, UUID client, String pub, String uid, String sign, String text, Long target, String encrypt, boolean disabled) {
+  public AnontionApplication(String name, Long ts, UUID client, String pub, String uid, String sign, String text, Long target, boolean disabled) {
 
     this.id = UUID.randomUUID();
 
@@ -73,8 +70,6 @@ public class AnontionApplication {
     this.text = text;
     
     this.target = target;
-    
-    this.encrypt = encrypt;
     
     this.disabled = disabled;
   }
@@ -167,16 +162,6 @@ public class AnontionApplication {
   public void setTarget(Long target) {
 
     this.target = target;
-  }
-
-  public String getEncrypt() {
-
-    return encrypt;
-  }
-
-  public void setEncrypt(String encrypt) {
-
-    this.encrypt = encrypt;
   }
 
   public boolean getDisabled() {

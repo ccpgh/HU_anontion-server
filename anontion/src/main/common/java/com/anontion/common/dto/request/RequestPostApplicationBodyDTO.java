@@ -19,9 +19,6 @@ public class RequestPostApplicationBodyDTO {
   @NotBlank(message = "Pub cannot be blank.")
   private String pub;
 
-  @NotBlank(message = "Encrypt cannot be blank.")
-  private String encrypt;
-
   public RequestPostApplicationBodyDTO() {
     
   }
@@ -55,15 +52,4 @@ public class RequestPostApplicationBodyDTO {
  
     this.pub = pub;
   }
-  
-  public String getEncrypt() {
-    
-    return encrypt;
-  }
-
-  public void setEncrypt(String encrypt) {
- 
-    this.encrypt = encrypt;
-  }
-
 }
