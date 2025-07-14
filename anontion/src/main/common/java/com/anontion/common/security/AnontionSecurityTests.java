@@ -159,9 +159,9 @@ public class AnontionSecurityTests {
     
     String cleartext = "nvsbv8lnjc3oj0oncp2jekgobrmxwuxoxu0qdf6ams4=:1749089207:b438b97c-5559-4da9-801e-25fd376b538a:bcsym1ahva6n3tcyrtrw//tdc0fh+qsx1fwbdal/gb2mx4qrtbod1bmsxk3ki/flklnvlzd9u0pb5ffz74hnulq=";
 
-    String sign = AnontionSecurityECDSA.sign(cleartext);
+    String signature = AnontionSecurityECDSA.sign(cleartext);
     
-    if (AnontionSecurityECDSA.check(cleartext, sign, AnontionSecurityECDSA.pub())) {
+    if (AnontionSecurityECDSA.checkSignature(cleartext, signature, AnontionSecurityECDSA.pub())) {
       
       _logger.info("TEST localSignAndCheck OK");
       

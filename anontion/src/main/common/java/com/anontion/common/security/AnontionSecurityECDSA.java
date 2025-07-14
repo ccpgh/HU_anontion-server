@@ -234,7 +234,7 @@ abstract public class AnontionSecurityECDSA {
     return Base64.getEncoder().encodeToString(buffer);
   }
   
-  public static boolean check(String text, String countersign, ECPublicKeyParameters key) {
+  public static boolean checkSignature(String text, String signature, ECPublicKeyParameters key) {
     
     try {
 
@@ -248,7 +248,7 @@ abstract public class AnontionSecurityECDSA {
       
       digest.doFinal(hash, 0);
     
-      byte[] sigBytes = Base64.getDecoder().decode(countersign);
+      byte[] sigBytes = Base64.getDecoder().decode(signature);
 
       BigInteger r = null;
       

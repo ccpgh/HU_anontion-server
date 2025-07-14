@@ -51,32 +51,30 @@ public class ApplicationPostController {
       return Responses.getBAD_REQUEST("Bad arguments", message);
     }
 
-    UUID   client  = request.getBody().getId();
-    String pub     = request.getBody().getPub();   
-    String name    = request.getBody().getName();
+    UUID   clientId   = request.getBody().getClientId();
+    String clientPub  = request.getBody().getClientPub();   
+    String clientName = request.getBody().getClientName();
 
-    if (name.isBlank()) {
+    if (clientName.isBlank()) {
       
       return Responses.getBAD_REQUEST(
-          "Bad account name!");
+          "Bad client name!");
     }
 
-    String hname = AnontionSecuritySCRYPT.hashBase64(name);
+    String enceyptedName = AnontionSecuritySCRYPT.hashBase64(clientName);
     
-    if (hname.isBlank()) {
+    if (enceyptedName.isBlank()) {
       
       return Responses.getBAD_REQUEST(
           "Bad account name!");
     }
      
-    Long ts = AnontionTime.tsN();
+    Long nowTs = AnontionTime.tsN();
 
-    AnontionApplicationId id = new AnontionApplicationId(
-        hname, 
-        ts, 
-        client);
-
-    boolean exists = applicationRepository.existsById(id);
+    boolean exists = applicationRepository.existsById(new AnontionApplicationId(
+        enceyptedName, 
+        nowTs, 
+        clientId));
 
     if (exists) {
 
@@ -86,20 +84,18 @@ public class ApplicationPostController {
 
     AnontionPOW pow = new AnontionPOW();
 
-    String uid = AnontionStrings.concat(new String[] { 
-        hname, 
-        ts.toString(), 
-        client.toString() }, ":");
-
-    String sign = AnontionSecurityECDSA.sign(uid);
+    String clientUID = AnontionStrings.concat(new String[] { 
+        enceyptedName, 
+        nowTs.toString(), 
+        clientId.toString() }, ":");
 
     AnontionApplication application = 
-        new AnontionApplication(hname, 
-            ts, 
-            client, 
-            pub, 
-            uid, 
-            sign,
+        new AnontionApplication(enceyptedName, 
+            nowTs, 
+            clientId,
+            clientPub, 
+            clientUID, 
+            AnontionSecurityECDSA.sign(clientUID),
             pow.getText(), 
             pow.getTarget(), 
             false);
@@ -107,13 +103,13 @@ public class ApplicationPostController {
     applicationRepository.save(application);
 
     ResponsePostApplicationBodyDTO body = 
-        new ResponsePostApplicationBodyDTO(application.getText(), 
-            application.getTarget(), 
-            hname, 
+        new ResponsePostApplicationBodyDTO(application.getPowText(), 
+            application.getPowTarget(), 
+            enceyptedName, 
             AnontionSecurityECDSA.pubS(),
-            uid, 
-            sign, 
-            ts);
+            clientUID, 
+            application.getServerSignature(), 
+            nowTs);
 
     ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 

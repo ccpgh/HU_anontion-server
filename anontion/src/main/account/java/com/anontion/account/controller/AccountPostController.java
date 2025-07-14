@@ -93,35 +93,35 @@ public class AccountPostController {
 
     RequestPostAccountBodyDTO dto = request.getBody();
     
-    String  low         = dto.getLow();
-    String  high        = dto.getHigh();
+    String powLow  = dto.getPowLow();
+    String powHigh = dto.getPowHigh();
 
-    AnontionApplicationId id = new AnontionApplicationId(
-        dto.getName(), 
-        dto.getTs(), 
-        dto.getId());
+    AnontionApplicationId primaryKey = new AnontionApplicationId(
+        dto.getClientName(),
+        dto.getClientTs(),
+        dto.getClientId());
 
-    Optional<AnontionApplication> applicationO = applicationRepository.findById(id);
+    Optional<AnontionApplication> applicationO = applicationRepository.findById(primaryKey);
 
     if (!applicationO.isPresent()) {
 
       return Responses.getBAD_REQUEST(
           "No application.", 
-          "Application missing " + id.description());
+          "Application missing " + primaryKey.description());
     }
 
     AnontionApplication application = applicationO.get();
     
-    if (!application.getText().equals(dto.getText()) || 
-        !application.getTarget().equals(dto.getTarget()) || 
-        application.getDisabled()) {
+    if (!application.getPowText().equals(dto.getPowText()) || 
+        !application.getPowTarget().equals(dto.getPowTarget()) || 
+        application.getIsDisabled()) {
       
       return Responses.getBAD_REQUEST(
           "No active application.", 
           "Application POW mismatch.");
     }
 
-    if (AnontionSecurityECDSA.decodePublicKeyFromBase64XY(application.getPub()) == null) {
+    if (AnontionSecurityECDSA.decodePublicKeyFromBase64XY(application.getClientPub()) == null) {
 
       return Responses.getBAD_REQUEST(
           "Bad pub.", 
@@ -129,7 +129,7 @@ public class AccountPostController {
     }
 
     ECPublicKeyParameters publicKey = 
-        AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(application.getPub());
+        AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(application.getClientPub());
 
     if (publicKey == null) {
 
@@ -138,19 +138,19 @@ public class AccountPostController {
           "Received client pub key invalid ECPublicKeyParameters.");
     }
 
-    if (!AnontionSecurityECDSA.check(application.getUid(), dto.getCountersign(), publicKey)) {
+    if (!AnontionSecurityECDSA.checkSignature(application.getClientUID(), dto.getClientSignature(), publicKey)) {
 
       return Responses.getBAD_REQUEST(
-          "Bad pub.", 
-          "Client countersign of proof token invalid.");
+          "Bad signature.", 
+          "Client signature of proof token invalid.");
     } 
     
-    Long now = AnontionTime.tsN();
+    Long nowTs = AnontionTime.tsN();
 
-    Optional<AnontionAccount> accountO = accountRepository.findByTsAndNameAndApplication(
-        dto.getTs(), 
-        dto.getName(), 
-        dto.getId());
+    Optional<AnontionAccount> accountO = accountRepository.findByClientTsAndClientNameAndClientId(
+        dto.getClientTs(),
+        dto.getClientName(),
+        dto.getClientId());
 
     ResponsePostAccountBodyDTO body = null;
     
@@ -158,17 +158,17 @@ public class AccountPostController {
       
       AnontionAccount account = accountO.get();
 
-      Optional<AsteriskAuth> authO = authRepository.findById(account.getPub());
+      Optional<AsteriskAuth> authO = authRepository.findById(account.getClientPub());
 
       if (authO.isPresent()) {
         
         AsteriskAuth auth = authO.get();
 
         body = new ResponsePostAccountBodyDTO(
-            account.getId(), 
-            account.getTs(), 
-            account.getName(),
-            account.getApplication(), 
+            account.getAccountId(), 
+            account.getClientTs(), 
+            account.getClientName(),
+            account.getClientId(), 
             auth.getUsername(), 
             auth.getPassword(),
             100.0f, 
@@ -183,24 +183,24 @@ public class AccountPostController {
       
     } else {
 
-      if (approved(dto.getTs(), now)) {
+      if (approved(dto.getClientTs(), nowTs)) {
 
         AnontionAccount account = new AnontionAccount(
-            dto.getTs(), 
-            dto.getName(), 
-            dto.getId(), 
-            dto.getCountersign(), 
-            application.getPub(), 
-            application.getUid(), 
+            dto.getClientTs(),
+            dto.getClientName(),
+            dto.getClientId(),
+            dto.getClientSignature(), 
+            application.getClientPub(), 
+            application.getClientUID(), 
             false);
                
         AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
-            account.getPub(), 
-            account.getName());
+            account.getClientPub(), 
+            account.getClientName());
                                     
         AsteriskAuth auths = authBean.createAsteriskAuth(
-            account.getPub(),
-            account.getName(),
+            account.getClientPub(),
+            account.getClientName(),
             AnontionSecurity.generatePassword());
 
         if (auths.getUsername().isEmpty()) {
@@ -210,8 +210,8 @@ public class AccountPostController {
         }
         
         AsteriskAor aors = aorBean.createAsteriskAor(
-            application.getPub(),
-            account.getName());
+            application.getClientPub(),
+            account.getClientName());
         
         try {
 
@@ -235,10 +235,10 @@ public class AccountPostController {
         }
         
         body = new ResponsePostAccountBodyDTO(
-            account.getId(), 
-            account.getTs(), 
-            account.getName(),
-            account.getApplication(), 
+            account.getAccountId(), 
+            account.getClientTs(), 
+            account.getClientName(),
+            account.getClientId(), 
             auths.getUsername(), 
             auths.getPassword(), 
             100.0f, 
@@ -246,13 +246,13 @@ public class AccountPostController {
       
       } else {
       
-        Float progress = ((now - dto.getTs()) / (float) applicationTimeout) * 100.0f;
+        Float progress = ((nowTs - dto.getClientTs()) / (float) applicationTimeout) * 100.0f;
         
         body = new ResponsePostAccountBodyDTO(
             new UUID(0L, 0L), 
-            dto.getTs(), 
-            dto.getName(), 
-            dto.getId(), 
+            dto.getClientTs(),
+            dto.getClientName(),
+            dto.getClientId(),
             "", 
             "", 
             progress, 

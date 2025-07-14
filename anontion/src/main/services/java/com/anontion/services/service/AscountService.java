@@ -70,7 +70,7 @@ public class AscountService {
   public boolean deleteTxApplicationAndAccountAndEndpoint(AnontionApplication application, AnontionAccount account, AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
     
     try {
-      
+
       if (account != null) {
 
         accountRepository.delete(account);

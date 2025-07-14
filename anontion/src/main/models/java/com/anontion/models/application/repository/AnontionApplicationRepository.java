@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AnontionApplicationRepository extends JpaRepository<AnontionApplication, AnontionApplicationId> {
 
-    boolean existsById(AnontionApplicationId anontionApplicationId);
+    boolean existsById(AnontionApplicationId applicationId);
     
 }

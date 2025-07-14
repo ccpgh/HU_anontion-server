@@ -10,113 +10,113 @@ import jakarta.validation.constraints.NotBlank;
 
 @Component
 public class RequestPostAccountBodyDTO {
+
+  @NotNull(message = "Client Id cannot be null.")
+  private UUID clientId;
+
+  @NotNull(message = "Client Timestamp cannot be null.")
+  private Long clientTs;
   
-  @NotNull(message = "Id cannot be null.")
-  private UUID id;
+  @NotBlank(message = "Client Name cannot be blank.")
+  private String clientName;
 
-  @NotNull(message = "Timestamp cannot be null.")
-  private Long ts;
-  
-  @NotBlank(message = "Name cannot be blank.")
-  private String name;
+  @NotBlank(message = "Pow Low cannot be blank.")
+  private String powLow;
 
-  @NotBlank(message = "Low cannot be blank.")
-  private String low;
+  @NotBlank(message = "Pow High cannot be blank.")
+  private String powHigh;
 
-  @NotBlank(message = "High cannot be blank.")
-  private String high;
-
-  @NotBlank(message = "Target cannot be blank.")
-  private String text;
-
-  @NotBlank(message = "Countersign cannot be blank.")
-  private String countersign;
+  @NotBlank(message = "Pow Text cannot be blank.")
+  private String powText;
 
   @Min(0)
-  private Long target;
+  private Long powTarget;
+
+  @NotBlank(message = "Client Signature cannot be blank.")
+  private String clientSignature;
 
   public RequestPostAccountBodyDTO() {
     
   }
   
-  public UUID getId() {
+  public UUID getClientId() {
     
-    return id;
+    return clientId;
   }
 
-  public void setId(UUID id) {
+  public void setClientId(UUID clientId) {
     
-    this.id = id;
+    this.clientId = clientId;
   }
 
-  public Long getTs() {
+  public Long getClientTs() {
     
-    return ts;
+    return clientTs;
   }
 
-  public void setTs(Long ts) {
+  public void setClientTs(Long clientTs) {
     
-    this.ts = ts;
+    this.clientTs = clientTs;
   }
 
-  public String getName() {
+  public String getClientName() {
     
-    return name;
+    return clientName;
   }
 
-  public void setName(String name) {
+  public void setClientName(String clientName) {
  
-    this.name = name;
+    this.clientName = clientName;
   }
   
-  public String getLow() {
+  public String getPowLow() {
     
-    return low;
+    return powLow;
   }
 
-  public void setLow(String low) {
+  public void setPowLow(String powLow) {
  
-    this.low = low;
+    this.powLow = powLow;
   }
 
-  public String getHigh() {
+  public String getPowHigh() {
     
-    return high;
+    return powHigh;
   }
 
-  public void setHigh(String high) {
+  public void setPowHigh(String powHigh) {
  
-    this.high = high;
+    this.powHigh = powHigh;
   }
 
-  public String getText() {
+  public String getPowText() {
     
-    return text;
+    return powText;
   }
 
-  public void setText(String text) {
+  public void setPowText(String powText) {
  
-    this.text = text;
+    this.powText = powText;
   }
 
-  public Long getTarget() {
+  public Long getPowTarget() {
     
-    return target;
+    return powTarget;
   }
 
-  public void setTarget(Long target) {
+  public void setPowTarget(Long powTarget) {
  
-    this.target = target;
+    this.powTarget = powTarget;
   }
   
-  public String getCountersign() {
+  public String getClientSignature() {
     
-    return countersign;
+    return clientSignature;
   }
 
-  public void setCounter(String countersign) {
+  public void setClientSignature(String clientSignature) {
  
-    this.countersign = countersign;
+    this.clientSignature = clientSignature;
   }
 }
 

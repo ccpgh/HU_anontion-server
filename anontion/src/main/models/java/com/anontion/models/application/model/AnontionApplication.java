@@ -14,163 +14,163 @@ import jakarta.persistence.Table;
 @IdClass(AnontionApplicationId.class)
 public class AnontionApplication {
 
-  @Column(nullable = false, unique = true)
-  private UUID id;
+  @Column(name = "application_id", nullable = false, unique = true)
+  private UUID applicationId;
 
   @Id
-  @Column(nullable = false, length = 255)
-  private String name;
+  @Column(name = "client_name", nullable = false, length = 255)
+  private String clientName;
 
   @Id
-  @Column(nullable = false)
-  private Long ts;
+  @Column(name = "client_ts", nullable = false)
+  private Long clientTs;
 
   @Id
-  @Column(nullable = false)
-  private UUID client;
+  @Column(name = "client_id", nullable = false)
+  private UUID clientId;
 
-  @Column(nullable = false, length = 255) 
-  private String pub;
+  @Column(name = "client_pub", nullable = false, length = 255) 
+  private String clientPub;
 
-  @Column(nullable = false, length = 255) 
-  private String uid;
+  @Column(name = "client_uid", nullable = false, length = 255) 
+  private String clientUID;
 
-  @Column(nullable = false, length = 255) 
-  private String sign;
+  @Column(name = "server_signature", nullable = false, length = 255) 
+  private String serverSignature;
 
-  @Column(nullable = false, columnDefinition = "TEXT")
-  private String text;
+  @Column(name = "pow_text", nullable = false, columnDefinition = "TEXT")
+  private String powText;
 
-  @Column(nullable = false) 
-  private Long target;
+  @Column(name = "pos_target", nullable = false) 
+  private Long powTarget;
 
-  @Column(nullable = false) 
-  private boolean disabled;
+  @Column(name = "is_disabled", nullable = false) 
+  private boolean isDisabled;
 
   public AnontionApplication() {
     
   }
 
-  public AnontionApplication(String name, Long ts, UUID client, String pub, String uid, String sign, String text, Long target, boolean disabled) {
+  public AnontionApplication(String clientName, Long clientTs, UUID clientId, String clientPub, String clientUID, String serverSignature, String powText, Long powTarget, boolean isDisabled) {
 
-    this.id = UUID.randomUUID();
+    this.applicationId = UUID.randomUUID();
 
-    this.name = name;
+    this.clientName = clientName;
     
-    this.ts = ts;
+    this.clientTs = clientTs;
     
-    this.client = client;
+    this.clientId = clientId;
     
-    this.pub = pub;
+    this.clientPub = clientPub;
     
-    this.uid = uid;
+    this.clientUID = clientUID;
     
-    this.sign = sign;
+    this.serverSignature = serverSignature;
     
-    this.text = text;
+    this.powText = powText;
     
-    this.target = target;
+    this.powTarget = powTarget;
     
-    this.disabled = disabled;
+    this.isDisabled = isDisabled;
   }
 
-  public UUID getId() {
+  public UUID getApplicationId() {
     
-    return id;
+    return applicationId;
   }
 
-  public void setId(UUID id) {
+  public void setApplicationId(UUID applicationId) {
 
-    this.id = id;
+    this.applicationId = applicationId;
   }
 
-  public String getName() {
+  public String getClientName() {
     
-    return name;
+    return clientName;
   }
 
-  public void setName(String name) {
+  public void setClientName(String clientName) {
     
-    this.name = name;
+    this.clientName = clientName;
   }
 
-  public Long getTs() {
+  public Long getClientTs() {
     
-    return ts;
+    return clientTs;
   }
 
-  public void setTs(Long ts) {
+  public void setClientTs(Long clientTs) {
     
-    this.ts = ts;
+    this.clientTs = clientTs;
   }
 
-  public UUID getClient() {
+  public UUID getClientId() {
     
-    return client;
+    return clientId;
   }
 
-  public void setClient(UUID client) {
+  public void setClientId(UUID clientId) {
     
-    this.client = client;
+    this.clientId = clientId;
   }
 
-  public String getPub() {
+  public String getClientPub() {
 
-    return pub;
+    return clientPub;
   }
 
-  public void setPub(String pub) {
+  public void setClientPub(String clientPub) {
 
-    this.pub = pub;
+    this.clientPub = clientPub;
   }
   
-  public String getUid() {
+  public String getClientUID() {
 
-    return uid;
+    return clientUID;
   }
 
-  public void setUid(String uid) {
+  public void setClientUid(String clientUID) {
 
-    this.uid = uid;
+    this.clientUID = clientUID;
   }
   
-  public String getSign() {
+  public String getServerSignature() {
 
-    return sign;
+    return serverSignature;
   }
 
-  public void setSign(String sign) {
+  public void setServerSignature(String serverSignature) {
 
-    this.sign = sign;
+    this.serverSignature = serverSignature;
   }
     
-  public String getText() {
+  public String getPowText() {
 
-    return text;
+    return powText;
   }
 
-  public void setText(String text) {
+  public void setPowText(String powText) {
 
-    this.text = text;
+    this.powText = powText;
   }
   
-  public Long getTarget() {
+  public Long getPowTarget() {
 
-    return target;
+    return powTarget;
   }
 
-  public void setTarget(Long target) {
+  public void setPowTarget(Long powTarget) {
 
-    this.target = target;
+    this.powTarget = powTarget;
   }
 
-  public boolean getDisabled() {
+  public boolean getIsDisabled() {
 
-    return disabled;
+    return isDisabled;
   }
 
-  public void setDisabled(boolean disabled) {
+  public void setIsDisabled(boolean isDisabled) {
 
-    this.disabled = disabled;
+    this.isDisabled = isDisabled;
   }
 }

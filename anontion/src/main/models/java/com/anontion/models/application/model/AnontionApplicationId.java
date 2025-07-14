@@ -8,51 +8,51 @@ public class AnontionApplicationId implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private String name;
+  private String clientName;
 
-  private Long ts;
+  private Long clientTs;
   
-  private UUID client;
+  private UUID clientId;
   
   public AnontionApplicationId() {}
 
-  public AnontionApplicationId(String name, Long ts, UUID client) {
+  public AnontionApplicationId(String clientName, Long clientTs, UUID clientId) {
 
-    this.name = name;
+    this.clientName = clientName;
 
-    this.ts = ts;
+    this.clientTs = clientTs;
     
-    this.client = client;
+    this.clientId = clientId;
   }
 
-  public String getName() {
+  public String getClientName() {
 
-    return name;
+    return clientName;
   }
 
-  public void setName(String name) {
+  public void setClientName(String clientName) {
 
-    this.name = name;
+    this.clientName = clientName;
   }
 
-  public Long getTs() {
+  public Long getClientTs() {
 
-    return ts;
+    return clientTs;
   }
 
-  public void setTs(Long ts) {
+  public void setClientTs(Long clientTs) {
 
-    this.ts = ts;
+    this.clientTs = clientTs;
   }
 
-  public UUID getClient() {
+  public UUID getClientId() {
 
-    return client;
+    return clientId;
   }
 
-  public void setClient(UUID client) {
+  public void setClientId(UUID clientId) {
 
-    this.client = client;
+    this.clientId = clientId;
   }
 
   @Override
@@ -70,17 +70,26 @@ public class AnontionApplicationId implements Serializable {
 
     AnontionApplicationId that = (AnontionApplicationId) o;
 
-    return name.equals(that.name) && ts.equals(that.ts) && client.equals(that.client);
+    return 
+        clientName.equals(that.clientName) && 
+        clientTs.equals(that.clientTs) && 
+        clientId.equals(that.clientId);
   }
 
   @Override
   public int hashCode() {
 
-    return 31 * (name.hashCode() + ts.hashCode() + client.hashCode());
+    return 31 * 
+        (clientName.hashCode() + 
+        clientTs.hashCode() + 
+        clientId.hashCode());
   }
   
   public String description() {
     
-    return String.format("Name '%s' ts '%d' Client '%s'", name, ts, client);
+    return String.format("Name '%s' ts '%d' Client '%s'", 
+        clientName, 
+        clientTs, 
+        clientId);
   }
 }

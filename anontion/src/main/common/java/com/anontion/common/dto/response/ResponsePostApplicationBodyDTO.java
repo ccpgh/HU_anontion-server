@@ -2,109 +2,110 @@ package com.anontion.common.dto.response;
 
 public class ResponsePostApplicationBodyDTO extends ResponseBodyDTO {
 
-  private String text;
+  private String powText;
 
-  private Long target;
+  private Long powTarget;
 
-  private String ename;
+  private String encryptedName;
 
-  private String remote;
+  private String serverPub;
 
-  private String uid;
+  private String clientUID;
   
-  private String sign;
+  private String serverSignature;
 
-  private Long ts;
+  private Long clientTs;
   
   public ResponsePostApplicationBodyDTO() {
 
   }
 
-  public ResponsePostApplicationBodyDTO(String text, Long target, String ename, String remote, String uid, String sign, Long ts) {
+  public ResponsePostApplicationBodyDTO(String powText, Long powTarget, String encryptedName, 
+      String serverPub, String clientUID, String serverSignature, Long clientTs) {
 
-    this.text = text;
-
-    this.target = target;
-
-    this.ename = ename;
-
-    this.remote = remote;
+    this.clientUID = clientUID;
     
-    this.uid = uid;
+    this.clientTs = clientTs;
+
+    this.encryptedName = encryptedName;
+
+    this.powText = powText;
+
+    this.powTarget = powTarget;
+
+    this.serverPub = serverPub;
     
-    this.sign = sign;
-    
-    this.ts = ts;
+    this.serverSignature = serverSignature;
   }
 
-  public String getText() {
+  public String getPowText() {
     
-    return text;
+    return powText;
   }
 
-  public void setText(String text) {
+  public void setPowText(String powText) {
     
-    this.text = text;
+    this.powText = powText;
   }
 
-  public Long getTarget() {
+  public Long getPowTarget() {
     
-    return target;
+    return powTarget;
   }
 
-  public void setTarget(Long target) {
+  public void setPowTarget(Long powTarget) {
     
-    this.target = target;
+    this.powTarget = powTarget;
   }
 
-  public String getEname() {
+  public String getEncryptedName() {
     
-    return ename;
+    return encryptedName;
   }
 
-  public void setEname(String ename) {
+  public void setEncryptedName(String encryptedName) {
     
-    this.ename = ename;
+    this.encryptedName = encryptedName;
   }
 
-  public String getRemote() {
+  public String getServerPub() {
     
-    return remote;
+    return serverPub;
   }
 
-  public void setRemote(String remote) {
+  public void setServerPub(String serverPub) {
     
-    this.remote = remote;
-  }
-  
-  public String getUid() {
-    
-    return uid;
-  }
-
-  public void setUid(String uid) {
-    
-    this.uid = uid;
-  }
-
-  public String getSign() {
-    
-    return sign;
-  }
-
-  public void setSign(String sign) {
-    
-    this.sign = sign;
+    this.serverPub = serverPub;
   }
   
-  public Long getTs() {
+  public String getClientUID() {
     
-    return ts;
+    return clientUID;
   }
 
-  public void setTs(Long ts) {
+  public void setClientUID(String clientUID) {
     
-    this.ts = ts;
+    this.clientUID = clientUID;
+  }
+
+  public String getServerSignature() {
+    
+    return serverSignature;
+  }
+
+  public void setServerSignature(String serverSignature) {
+    
+    this.serverSignature = serverSignature;
+  }
+  
+  public Long getClientTs() {
+    
+    return clientTs;
+  }
+
+  public void setClientTs(Long clientTs) {
+    
+    this.clientTs = clientTs;
   }
 }
 

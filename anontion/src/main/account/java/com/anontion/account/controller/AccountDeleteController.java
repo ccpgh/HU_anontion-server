@@ -107,7 +107,7 @@ public class AccountDeleteController {
         applicationRepository.findById(index);
 
     Optional<AnontionAccount> accountO = 
-        accountRepository.findByTsAndNameAndApplication(ts, name, uuid);
+        accountRepository.findByClientTsAndClientNameAndClientId(ts, name, uuid);
 
     Optional<AsteriskEndpoint> endpoint0 = 
         endpointRepository.findById(name);
@@ -115,6 +115,14 @@ public class AccountDeleteController {
     String pub = AccountDeleteController.getPub(applicationO, accountO);
 
     AsteriskAor aors = null;
+
+    Optional<AsteriskAor> aors0 = 
+        aorRepository.findById(name);
+    
+    if (aors0.isPresent()) {
+      
+      aors = aors0.get();
+    }
 
     AsteriskAuth auths = null;
 
@@ -126,14 +134,6 @@ public class AccountDeleteController {
       if (auth0.isPresent()) {
         
         auths = auth0.get();
-      }
-
-      Optional<AsteriskAor> aors0 = 
-          aorRepository.findById(pub);
-      
-      if (aors0.isPresent()) {
-        
-        aors = aors0.get();
       }
     }
     
@@ -155,12 +155,12 @@ public class AccountDeleteController {
     
     if (applicationO.isPresent()) {
       
-      return applicationO.get().getPub();
+      return applicationO.get().getClientPub();
     }
 
     if (accountO.isPresent()) {
       
-      return accountO.get().getPub();
+      return accountO.get().getClientPub();
     }
 
     return null;

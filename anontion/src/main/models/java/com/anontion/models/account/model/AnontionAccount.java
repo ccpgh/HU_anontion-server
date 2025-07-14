@@ -17,124 +17,125 @@ import com.anontion.common.misc.AnontionJson;
 @Entity
 @Table(
   name = "anontion_account",
-  uniqueConstraints = @UniqueConstraint(columnNames = {"ts", "name", "application"})
+  uniqueConstraints = @UniqueConstraint(columnNames = {"client_ts", "client_name", "client_id"})
 )
 public class AnontionAccount {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private UUID id;
+  @Column(name = "account_id")
+  private UUID accountId;
 
-  @Column(nullable = false)
-  private Long ts;
+  @Column(name = "client_ts", nullable = false)
+  private Long clientTs;
 
-  @Column(nullable = false, length = 255)
-  private String name;
+  @Column(name = "client_name", nullable = false, length = 255)
+  private String clientName;
 
-  @Column(nullable = false)
-  private UUID application;
+  @Column(name = "client_id", nullable = false)
+  private UUID clientId;
 
-  @Column(nullable = false, length = 255)
-  private String countersign;
+  @Column(name = "server_signature", nullable = false, length = 255)
+  private String serverSignature;
 
-  @Column(columnDefinition = "VARCHAR(4096)", nullable = false)
-  private String pub;
+  @Column(name = "client_pub", columnDefinition = "VARCHAR(4096)", nullable = false)
+  private String clientPub;
 
-  @Column(nullable = false, length = 255)
-  private String uid;
+  @Column(name = "client_uid", nullable = false, length = 255)
+  private String clientUID;
 
-  @Column(nullable = false)
-  private boolean disabled;
+  @Column(name = "is_disabled", nullable = false)
+  private boolean isDisabled;
 
   public AnontionAccount() {
     
   }
 
-  public AnontionAccount(Long ts, String name, UUID application, String countersign, String pub, String uid, boolean disabled) {
+  public AnontionAccount(Long clientTs, String clientName, UUID clientId, String serverSignature, String clientPub, String clientUID, boolean isDisabled) {
 
-    this.ts = ts;
+    this.clientTs = clientTs;
 
-    this.name = name;
+    this.clientName = clientName;
     
-    this.application = application;
+    this.clientId = clientId;
         
-    this.countersign = countersign;
+    this.serverSignature = serverSignature;
     
-    this.pub = pub;
+    this.clientPub = clientPub;
     
-    this.uid = uid;
+    this.clientUID = clientUID;
     
-    this.disabled = disabled;
+    this.isDisabled = isDisabled;
   }
 
-  public UUID getId() {
+  public UUID getAccountId() {
     
-    return id;
+    return accountId;
   }
 
-  public void setId(UUID id) {
+  public void setAccountId(UUID accountId) {
     
-    this.id = id;
+    this.accountId = accountId;
   }
 
-  public Long getTs() {
+  public Long getClientTs() {
     
-    return ts;
+    return clientTs;
   }
 
-  public void setTs(Long ts) {
+  public void setClientTs(Long clientTs) {
     
-    this.ts = ts;
+    this.clientTs = clientTs;
   }
 
-  public String getName() {
+  public String getClientName() {
     
-    return name;
+    return clientName;
   }
 
-  public void setName(String name) {
+  public void setClientName(String clientName) {
     
-    this.name = name;
+    this.clientName = clientName;
   }
 
-  public UUID getApplication() {
+  public UUID getClientId() {
     
-    return application;
+    return clientId;
   }
 
-  public void setApplication(UUID application) {
+  public void setClientId(UUID clientId) {
     
-    this.application = application;
+    this.clientId = clientId;
   }
 
-  public String getPub() {
+  public String getClientPub() {
     
-    return pub;
+    return clientPub;
   }
 
-  public void setPub(String pub) {
+  public void setClientPub(String clientPub) {
    
-    this.pub = pub;
+    this.clientPub = clientPub;
   }
 
-  public String getCountersign() {
+  public String getServerSignature() {
     
-    return countersign;
+    return serverSignature;
   }
 
-  public void setCountersign(String countersign) {
+  public void setServerSignature(String serverSignature) {
    
-    this.countersign = countersign;
+    this.serverSignature = serverSignature;
   }
   
-  public String getUid() {
+  public String getClientUid() {
     
-    return uid;
+    return clientUID;
   }
 
-  public void setUid(String uid) {
+  public void setClientUid(String clientUID) {
    
-    this.uid = uid;
+    this.clientUID = clientUID;
   }
   
   public String toString() {
@@ -142,13 +143,13 @@ public class AnontionAccount {
     return AnontionJson.o2Json(this);
   }
   
-  public boolean getDisabled() {
+  public boolean getIsDisabled() {
 
-    return disabled;
+    return isDisabled;
   }
 
-  public void setDisabled(boolean disabled) {
+  public void setDisabled(boolean isDisabled) {
 
-    this.disabled = disabled;
+    this.isDisabled = isDisabled;
   }
 }

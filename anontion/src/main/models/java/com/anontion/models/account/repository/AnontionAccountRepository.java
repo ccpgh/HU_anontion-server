@@ -12,7 +12,9 @@ import java.util.UUID;
 @Repository
 public interface AnontionAccountRepository extends JpaRepository<AnontionAccount, Long> {
 
-  Optional<AnontionAccount> findById(UUID id);
+  //Optional<AnontionAccount> findById(UUID accountId);
   
-  Optional<AnontionAccount> findByTsAndNameAndApplication(Long ts, String name, UUID application);
+  //Optional<AnontionAccount> findByAccountId(UUID accountId);
+
+  Optional<AnontionAccount> findByClientTsAndClientNameAndClientId(Long clientTs, String clientName, UUID clientId);
 }

@@ -10,46 +10,46 @@ import jakarta.validation.constraints.NotBlank;
 @Component
 public class RequestPostApplicationBodyDTO {
   
-  @NotNull(message = "Id cannot be null.")
-  private UUID id;
+  @NotNull(message = "Client Id cannot be null.")
+  private UUID clientId;
 
-  @NotBlank(message = "Name cannot be blank.")
-  private String name;
+  @NotBlank(message = "Client Name cannot be blank.")
+  private String clientName;
 
-  @NotBlank(message = "Pub cannot be blank.")
-  private String pub;
+  @NotBlank(message = "Client Pub cannot be blank.")
+  private String clientPub;
 
   public RequestPostApplicationBodyDTO() {
     
   }
   
-  public UUID getId() {
+  public UUID getClientId() {
     
-    return id;
+    return clientId;
   }
 
-  public void setId(UUID id) {
+  public void setClientId(UUID clientId) {
     
-    this.id = id;
+    this.clientId = clientId;
   }
 
-  public String getName() {
+  public String getClientName() {
     
-    return name;
+    return clientName;
   }
 
-  public void setName(String name) {
+  public void setClientName(String clientName) {
  
-    this.name = name;
+    this.clientName = clientName;
   }
   
-  public String getPub() {
+  public String getClientPub() {
     
-    return pub;
+    return clientPub;
   }
 
-  public void setPub(String pub) {
+  public void setClientPub(String clientPub) {
  
-    this.pub = pub;
+    this.clientPub = clientPub;
   }
 }

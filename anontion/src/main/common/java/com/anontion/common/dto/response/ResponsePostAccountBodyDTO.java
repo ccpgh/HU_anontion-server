@@ -4,126 +4,126 @@ import java.util.UUID;
 
 public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
 
-  private UUID id;
+  private UUID accountId;
 
-  private Long ts;
+  private Long clientTs;
 
-  private String name;
+  private String clientName;
 
-  private UUID application;
+  private UUID clientId;
   
-  private String username;
+  private String sipUsername;
 
-  private String password;
+  private String sipPassword;
 
-  private Float progress;
+  private Float progressPercentage;
 
-  private boolean approved;
+  private boolean isApproved;
 
   public ResponsePostAccountBodyDTO() {
 
   }
 
-  public ResponsePostAccountBodyDTO(UUID id, Long ts, String name, UUID application, String username, String password, Float progress, 
-      boolean approved) {
+  public ResponsePostAccountBodyDTO(UUID accountId, Long clientTs, String clientName, 
+      UUID clientId, String sipUsername, String sipPassword, Float progressPercentage, boolean isApproved) {
     
-    this.id = id;
+    this.accountId = accountId;
 
-    this.ts = ts;
+    this.clientTs = clientTs;
     
-    this.name = name;
+    this.clientName = clientName;
     
-    this.application = application;
+    this.clientId = clientId;
     
-    this.username = username;
+    this.sipUsername = sipUsername;
 
-    this.password = password;
+    this.sipPassword = sipPassword;
 
-    this.progress = progress;
+    this.progressPercentage = progressPercentage;
     
-    this.approved = approved;
+    this.isApproved = isApproved;
   }
 
-  public UUID getId() {
+  public UUID getAccountId() {
 
-    return id;
+    return accountId;
   }
 
-  public void setId(UUID id) {
+  public void setAccountId(UUID accountId) {
     
-    this.id = id;
+    this.accountId = accountId;
   }
 
-  public Long getTs() {
+  public Long getClientTs() {
     
-    return ts;
+    return clientTs;
   }
 
-  public void setTs(Long ts) {
+  public void setClientTs(Long clientTs) {
     
-    this.ts = ts;
+    this.clientTs = clientTs;
   }
 
-  public String getName() {
+  public String getClientName() {
     
-    return name;
+    return clientName;
   }
 
-  public void setName(String name) {
+  public void setClientName(String clientName) {
     
-    this.name = name;
+    this.clientName = clientName;
   }
 
-  public UUID getApplication() {
+  public UUID getClientId() {
     
-    return application;
+    return clientId;
   }
 
-  public void setApplication(UUID application) {
+  public void setClientId(UUID clientId) {
     
-    this.application = application;
-  }
-  
-  public boolean getApproved() {
-    
-    return approved;
-  }
-
-  public void setApproved(boolean approved) {
-    
-    this.approved = approved;
+    this.clientId = clientId;
   }
   
-  public Float getProgress() {
+  public boolean getIsApproved() {
     
-    return progress;
+    return isApproved;
   }
 
-  public void setProgress(Float progress) {
+  public void setIsApproved(boolean isApproved) {
     
-    this.progress = progress;
+    this.isApproved = isApproved;
+  }
+  
+  public Float getProgressPercentage() {
+    
+    return progressPercentage;
+  }
+
+  public void setProgressPercentage(Float progressPercentage) {
+    
+    this.progressPercentage = progressPercentage;
   }
   
 
-  public String getUsername() {
+  public String getSipUsername() {
     
-    return username;
+    return sipUsername;
   }
 
-  public void setUsername(String username) {
+  public void setSipUsername(String sipUsername) {
     
-    this.username = username;
+    this.sipUsername = sipUsername;
   }
 
 
-  public String getPassword() {
+  public String getSipPassword() {
     
-    return password;
+    return sipPassword;
   }
 
-  public void setPassword(String password) {
+  public void setSipPassword(String sipPassword) {
     
-    this.password = password;
+    this.sipPassword = sipPassword;
   }
 }
 

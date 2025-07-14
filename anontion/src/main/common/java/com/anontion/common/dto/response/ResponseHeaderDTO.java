@@ -3,15 +3,21 @@ package com.anontion.common.dto.response;
 public class ResponseHeaderDTO {
 
   private String originator;
+  
   private Boolean success;
+  
   private Integer code;
+  
   private String message;
   
   public ResponseHeaderDTO(Boolean success, Integer code, String message) {
 
     this.originator = "server";
+  
     this.success = success;
+    
     this.code   = code;
+    
     this.message = message;
   }
 
