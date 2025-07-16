@@ -13,6 +13,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 
 import com.anontion.common.misc.AnontionJson;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(
@@ -21,6 +22,8 @@ import com.anontion.common.misc.AnontionJson;
 )
 public class AnontionAccount {
 
+  public static final Float CONSTANT_COMPLETED_POW_PERCENTAGE = 100.0f;
+  
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "account_id")
@@ -44,14 +47,33 @@ public class AnontionAccount {
   @Column(name = "client_uid", nullable = false, length = 255)
   private String clientUID;
 
+  @Column(name = "default_expiration", nullable = false)
+  private Integer defaultExpiration;
+
+  @Column(name = "minimum_expiration", nullable = false)
+  private Integer minimumExpiration;
+
+  @Column(name = "maximum_expiration", nullable = false)
+  private Integer maximumExpiration;
+
   @Column(name = "is_disabled", nullable = false)
   private boolean isDisabled;
 
+  //
+  
+  public final static Integer DEFAULT_defaultExpiration = 300;
+
+  public final static Integer DEFAULT_minimumExpiration = 60;
+
+  public final static Integer DEFAULT_maximumExpiration = 3600;
+      
   public AnontionAccount() {
     
   }
 
-  public AnontionAccount(Long clientTs, String clientName, UUID clientId, String serverSignature, String clientPub, String clientUID, boolean isDisabled) {
+  public AnontionAccount(Long clientTs, String clientName, UUID clientId, String serverSignature, 
+      String clientPub, String clientUID, Integer defaultExpiration, Integer minimumExpiration, 
+      Integer maximumExpiration, boolean isDisabled) {
 
     this.clientTs = clientTs;
 
@@ -65,6 +87,12 @@ public class AnontionAccount {
     
     this.clientUID = clientUID;
     
+    this.defaultExpiration = defaultExpiration;
+    
+    this.minimumExpiration = minimumExpiration;
+    
+    this.maximumExpiration = maximumExpiration;
+
     this.isDisabled = isDisabled;
   }
 
@@ -143,13 +171,51 @@ public class AnontionAccount {
     return AnontionJson.o2Json(this);
   }
   
-  public boolean getIsDisabled() {
+  @JsonProperty("isADisabled")
+  public boolean isDisabled() {
 
     return isDisabled;
   }
 
+  @JsonProperty("isADisabled")
   public void setDisabled(boolean isDisabled) {
 
     this.isDisabled = isDisabled;
   }
+  
+  public Integer getDefaultExpiration() {
+
+    return defaultExpiration;
+  }
+
+  public void setDefaultExpiration(Integer defaultExpiration) {
+
+    this.defaultExpiration = defaultExpiration;
+  }
+  
+  public Integer getMinimumExpiration() {
+
+    return minimumExpiration;
+  }
+
+  public void setMinimumExpiration(Integer minimumExpiration) {
+
+    this.minimumExpiration = minimumExpiration;
+  }
+  
+  public Integer getMaximumExpiration() {
+
+    return maximumExpiration;
+  }
+
+  public void setMaximumExpiration(Integer maximumExpiration) {
+
+    this.maximumExpiration = maximumExpiration;
+  }
+  
+  public Integer getSipExpiration() {
+    
+    return Math.max(getDefaultExpiration()/3, getMinimumExpiration());
+  }
 }
+

@@ -2,6 +2,8 @@ package com.anontion.common.dto.response;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
 
   private UUID accountId;
@@ -16,6 +18,8 @@ public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
 
   private String sipPassword;
 
+  private Integer sipRegisterExpiry;
+
   private Float progressPercentage;
 
   private boolean isApproved;
@@ -25,7 +29,8 @@ public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
   }
 
   public ResponsePostAccountBodyDTO(UUID accountId, Long clientTs, String clientName, 
-      UUID clientId, String sipUsername, String sipPassword, Float progressPercentage, boolean isApproved) {
+      UUID clientId, String sipUsername, String sipPassword, Float progressPercentage, 
+      Integer sipRegisterExpiry, boolean isApproved) {
     
     this.accountId = accountId;
 
@@ -41,6 +46,8 @@ public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
 
     this.progressPercentage = progressPercentage;
     
+    this.sipRegisterExpiry = sipRegisterExpiry;
+
     this.isApproved = isApproved;
   }
 
@@ -84,12 +91,14 @@ public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
     this.clientId = clientId;
   }
   
-  public boolean getIsApproved() {
+  @JsonProperty("isApproved")
+  public boolean isApproved() {
     
     return isApproved;
   }
 
-  public void setIsApproved(boolean isApproved) {
+  @JsonProperty("isApproved")
+  public void setApproved(boolean isApproved) {
     
     this.isApproved = isApproved;
   }
@@ -125,5 +134,16 @@ public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
     
     this.sipPassword = sipPassword;
   }
+  
+  public Integer getSipRegisterExpiry() {
+    
+    return sipRegisterExpiry;
+  }
+
+  public void setSipRegisterExpiry(Integer sipRegisterExpiry) {
+    
+    this.sipRegisterExpiry = sipRegisterExpiry;
+  }
+  
 }
 

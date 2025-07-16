@@ -2,6 +2,8 @@ package com.anontion.models.application.model;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 
 import jakarta.persistence.Entity;
@@ -164,12 +166,14 @@ public class AnontionApplication {
     this.powTarget = powTarget;
   }
 
-  public boolean getIsDisabled() {
+  @JsonProperty("isADisabled")
+  public boolean isDisabled() {
 
     return isDisabled;
   }
 
-  public void setIsDisabled(boolean isDisabled) {
+  @JsonProperty("isADisabled")
+  public void setDisabled(boolean isDisabled) {
 
     this.isDisabled = isDisabled;
   }

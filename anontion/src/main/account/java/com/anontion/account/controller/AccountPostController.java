@@ -114,7 +114,7 @@ public class AccountPostController {
     
     if (!application.getPowText().equals(dto.getPowText()) || 
         !application.getPowTarget().equals(dto.getPowTarget()) || 
-        application.getIsDisabled()) {
+        application.isDisabled()) {
       
       return Responses.getBAD_REQUEST(
           "No active application.", 
@@ -171,7 +171,8 @@ public class AccountPostController {
             account.getClientId(), 
             auth.getUsername(), 
             auth.getPassword(),
-            100.0f, 
+            AnontionAccount.CONSTANT_COMPLETED_POW_PERCENTAGE, 
+            account.getSipExpiration(),
             true);
 
       } else {
@@ -192,6 +193,9 @@ public class AccountPostController {
             dto.getClientSignature(), 
             application.getClientPub(), 
             application.getClientUID(), 
+            AnontionAccount.DEFAULT_defaultExpiration,
+            AnontionAccount.DEFAULT_minimumExpiration,
+            AnontionAccount.DEFAULT_maximumExpiration,
             false);
                
         AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
@@ -241,7 +245,8 @@ public class AccountPostController {
             account.getClientId(), 
             auths.getUsername(), 
             auths.getPassword(), 
-            100.0f, 
+            AnontionAccount.CONSTANT_COMPLETED_POW_PERCENTAGE, 
+            account.getSipExpiration(),
             true);
       
       } else {
@@ -256,6 +261,7 @@ public class AccountPostController {
             "", 
             "", 
             progress, 
+            0,
             false);
       }
     }
