@@ -23,7 +23,7 @@ public class AsteriskEndpointBean {
 
     String disallow = "all";
 
-    String allow = "h264,g729,gsm";
+    String allow = "h264,g729,gsm,opus,speex";
     
     String directMedia = "no";
 
