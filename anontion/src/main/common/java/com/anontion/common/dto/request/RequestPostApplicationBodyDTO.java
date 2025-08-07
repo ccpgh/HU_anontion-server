@@ -13,9 +13,6 @@ public class RequestPostApplicationBodyDTO {
   @NotNull(message = "Client Id cannot be null.")
   private UUID clientId;
 
-  @NotBlank(message = "Client Name cannot be blank.")
-  private String clientName;
-
   @NotBlank(message = "Client Pub cannot be blank.")
   private String clientPub;
 
