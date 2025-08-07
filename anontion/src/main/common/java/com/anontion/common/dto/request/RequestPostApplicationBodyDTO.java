@@ -32,16 +32,6 @@ public class RequestPostApplicationBodyDTO {
     
     this.clientId = clientId;
   }
-
-  public String getClientName() {
-    
-    return clientName;
-  }
-
-  public void setClientName(String clientName) {
- 
-    this.clientName = clientName;
-  }
   
   public String getClientPub() {
     

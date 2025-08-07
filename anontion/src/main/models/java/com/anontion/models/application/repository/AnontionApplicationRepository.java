@@ -9,4 +9,5 @@ public interface AnontionApplicationRepository extends JpaRepository<AnontionApp
 
     boolean existsById(AnontionApplicationId applicationId);
     
+    boolean existsByClientName(String clientName);
 }

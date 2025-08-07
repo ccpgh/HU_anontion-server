@@ -52,21 +52,26 @@ public class ApplicationPostController {
     }
 
     UUID   clientId   = request.getBody().getClientId();
-    String clientPub  = request.getBody().getClientPub();   
-    String clientName = request.getBody().getClientName();
-
-    if (clientName.isBlank()) {
-      
-      return Responses.getBAD_REQUEST(
-          "Bad client name!");
-    }
-
-    String enceyptedName = AnontionSecuritySCRYPT.hashBase64(clientName);
+    String clientPub  = request.getBody().getClientPub();  
+    String enceyptedName = null;
     
-    if (enceyptedName.isBlank()) {
+    while (true) { 
       
-      return Responses.getBAD_REQUEST(
-          "Bad account name!");
+      // Given low chance of clash this is safe enough for now. 
+      // TODO put in auto-retry transaction.
+
+      enceyptedName = 
+          AnontionSecuritySCRYPT.hashBase64(UUID.randomUUID().toString());
+
+      if (!enceyptedName.isBlank()) {
+
+        if (!applicationRepository.existsByClientName(enceyptedName)) {
+          
+          break;
+        }
+      }
+      
+      AnontionTime.sleep();
     }
      
     Long nowTs = AnontionTime.tsN();

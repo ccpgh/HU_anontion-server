@@ -14,5 +14,13 @@ public class AnontionTime {
    
     return new Date().toString();
   }
+ 
+  public static void sleep() {    
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
 }
 
