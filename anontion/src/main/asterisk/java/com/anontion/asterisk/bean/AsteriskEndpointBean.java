@@ -21,6 +21,8 @@ public class AsteriskEndpointBean {
 
     String context = "external";
 
+    String messageContext = "messages";
+
     String disallow = "all";
 
     String allow = "h264,g729,gsm,opus,speex";
@@ -56,7 +58,7 @@ public class AsteriskEndpointBean {
       callerId = name;
     }
     
-    return new AsteriskEndpoint(name, transport, aor, auth, context, disallow,
+    return new AsteriskEndpoint(name, transport, aor, auth, context, messageContext, disallow,
         allow, directMedia, trustIdOutbound, dtmfMode, forceRport, rtpSymmetric, sendRpid, iceSupport,
         tosVideo, cosVideo, allowSubscribe, callerId);
   }
