@@ -28,6 +28,9 @@ public class AsteriskEndpoint {
   @Column(nullable = false, name = "context", length = 40)
   private String context;
 
+  @Column(nullable = false, name = "message_context", length = 40)
+  private String messageContext;
+
   @Column(nullable = false, name = "disallow", length = 200)
   private String disallow;
 
@@ -79,8 +82,8 @@ public class AsteriskEndpoint {
 
   }
 
-  public AsteriskEndpoint(String id, String transport, String aors, String auth, String context, String disallow,
-      String allow, String directMedia, String trustIdOutbound, String dtmfMode, String forceRport,
+  public AsteriskEndpoint(String id, String transport, String aors, String auth, String context, String messageContext,
+      String disallow, String allow, String directMedia, String trustIdOutbound, String dtmfMode, String forceRport,
       String rtpSymmetric, String sendRpid, String iceSupport, String tosVideo, Integer cosVideo, 
       String allowSubscribe, String callerId) {
 
@@ -93,6 +96,8 @@ public class AsteriskEndpoint {
     this.auth = auth;
 
     this.context = context;
+    
+    this.messageContext = messageContext;
 
     this.disallow = disallow;
 
@@ -171,6 +176,16 @@ public class AsteriskEndpoint {
     this.context = context;
   }
 
+  public String getMessageContext() {
+
+    return messageContext;
+  }
+
+  public void setMessageContext(String messageContext) {
+
+    this.messageContext = messageContext;
+  }
+  
   public String getDisallow() {
 
     return disallow;
