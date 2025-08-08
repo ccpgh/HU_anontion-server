@@ -11,4 +11,6 @@ public interface AsteriskAuthRepository extends JpaRepository<AsteriskAuth, Stri
   boolean existsById(String asteriskAuthId);
     
   Optional<AsteriskAuth> findById(String id);
+  
+  Optional<AsteriskAuth> findByUsernameAndPassword(String username, String password);
 }

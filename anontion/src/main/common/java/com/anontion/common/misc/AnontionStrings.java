@@ -4,6 +4,14 @@ import java.util.ArrayList;
 
 public class AnontionStrings {
 
+  private static String VALID_CHARACTERS_IN_NAME = "^[A-Za-z0-9- ]+$"; 
+  
+  private static Integer PASSWORD_MINCHARS = 8; // TODO check with client
+  private static Integer PASSWORD_MAXCHARS = 20; // TODO check with client
+
+  private static Integer USERNAME_MINCHARS = 2; // TODO check with client
+  private static Integer USERNAME_MAXCHARS = 20;  // TODO check with client
+      
   public static String concat(String[] tokens, String delimiter) {
 
     StringBuffer buffer = new StringBuffer();
@@ -37,5 +45,49 @@ public class AnontionStrings {
     }
    
     return buffer.toArray(new String[0]);
+  }
+    
+  public static boolean isValidName(String name) {
+
+    if (name == null) {
+      return false;
+    }
+        
+    if (!name.matches(AnontionStrings.VALID_CHARACTERS_IN_NAME)) {
+      return false;
+    }
+    
+    if (name != name.trim()) {
+      return false;
+    }
+
+    if (name.contains("  ")) {
+      return false;
+    }
+
+    return name.length() >= USERNAME_MINCHARS && 
+        name.length() <= USERNAME_MAXCHARS;
+  }
+  
+  public static boolean isValidPassword(String password) {
+
+    if (password == null) {
+      return false;
+    }
+        
+    if (!password.matches(AnontionStrings.VALID_CHARACTERS_IN_NAME)) {
+      return false;
+    }
+    
+    if (password != password.trim()) {
+      return false;
+    }
+
+    if (password.contains("  ")) {
+      return false;
+    }
+
+    return password.length() >= PASSWORD_MINCHARS && 
+        password.length() <= PASSWORD_MAXCHARS;
   }
 }
