@@ -91,6 +91,10 @@ java {
     }
 }
 
+//tasks.withType(JavaCompile).configureEach {
+//    options.compilerArgs << "-parameters"
+//}
+
 sourceSets {
     common {
         java {
