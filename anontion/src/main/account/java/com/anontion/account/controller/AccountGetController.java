@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anontion.asterisk.model.AsteriskAuth;
+import com.anontion.asterisk.model.AsteriskEndpoint;
 import com.anontion.asterisk.repository.AsteriskAuthRepository;
+import com.anontion.asterisk.repository.AsteriskEndpointRepository;
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionLog;
@@ -24,8 +26,11 @@ import com.anontion.common.dto.response.ResponsePostDTO;
 public class AccountGetController {
 
   @Autowired
+  private AsteriskEndpointRepository endpointRepository;
+
+  @Autowired
   private AsteriskAuthRepository authRepository;
-  
+
   @GetMapping(path = "/account/")
   public ResponseEntity<ResponseDTO> getAccount(@RequestParam("sipUsername") String sipUsername,
       @RequestParam("sipPassword") String sipPassword) {
@@ -38,15 +43,19 @@ public class AccountGetController {
           "Transaction rejected.");
     }
       
-    Optional<AsteriskAuth> auth0 = 
-        authRepository.findByUsernameAndPassword(sipUsername, sipPassword);
+    Optional<AsteriskEndpoint> auth0 = 
+        endpointRepository.findById(sipUsername);
     
     if (auth0.isEmpty()) {
       return Responses.getBAD_REQUEST(
           "No matching account found.", 
           "Transaction rejected.");
     }
-    
+
+    AsteriskEndpoint endpoint = auth0.get();
+
+    _logger.info("DEBUG Found account with aors = '" + endpoint.getAors() + "'");
+        
     ResponseGetAccountBodyDTO body = new ResponseGetAccountBodyDTO("placeholder");
         
     ResponsePostDTO response = new ResponsePostDTO(
