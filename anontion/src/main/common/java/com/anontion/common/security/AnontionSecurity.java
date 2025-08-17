@@ -178,10 +178,10 @@ public class AnontionSecurity {
       return "";
     }
     
-    return base64Encoded.replace('/', '1').replace('+', '1').replace("=", "");
+    return base64Encoded.replace('/', '-').replace('+', '_').replace("=", "");
   }
   
-  public static String decodeFromSafeBase64_(String safePubEncoded) {
+  public static String decodeFromSafeBase64(String safePubEncoded) {
 
     String buffer = safePubEncoded.replace('-', '/').replace('_', '+');
 
