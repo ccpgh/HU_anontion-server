@@ -158,7 +158,8 @@ public class AccountPostController {
       
       AnontionAccount account = accountO.get();
 
-      Optional<AsteriskAuth> authO = authRepository.findById(account.getClientPub());
+      Optional<AsteriskAuth> authO = authRepository.findById(
+          AnontionSecurity.makeSafeIfRequired(account.getClientPub()));
 
       if (authO.isPresent()) {
         
@@ -169,7 +170,8 @@ public class AccountPostController {
             account.getClientTs(), 
             account.getClientName(),
             account.getClientId(), 
-            auth.getUsername(), 
+            AnontionSecurity.makeSafeIfRequired(account.getClientPub()),
+            auth.getUsername(),
             auth.getPassword(),
             AnontionAccount.CONSTANT_COMPLETED_POW_PERCENTAGE, 
             account.getSipExpiration(),
@@ -186,24 +188,27 @@ public class AccountPostController {
 
       if (approved(dto.getClientTs(), nowTs)) {
 
+        String foreignKey = AnontionSecurity.generateForeignKey();
+        
         AnontionAccount account = new AnontionAccount(
             dto.getClientTs(),
             dto.getClientName(),
             dto.getClientId(),
             dto.getClientSignature(), 
+            application.getServerSignature(), 
             application.getClientPub(), 
             application.getClientUID(), 
             AnontionAccount.DEFAULT_defaultExpiration,
             AnontionAccount.DEFAULT_minimumExpiration,
             AnontionAccount.DEFAULT_maximumExpiration,
             false);
-               
+              
         AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
-            account.getClientPub(), 
-            account.getClientName());
+            AnontionSecurity.makeSafeIfRequired(account.getClientPub()),
+            foreignKey);
                                     
         AsteriskAuth auths = authBean.createAsteriskAuth(
-            account.getClientPub(),
+            foreignKey,
             account.getClientName(),
             AnontionSecurity.generatePassword());
 
@@ -214,8 +219,7 @@ public class AccountPostController {
         }
         
         AsteriskAor aors = aorBean.createAsteriskAor(
-            application.getClientPub(),
-            account.getClientName());
+            AnontionSecurity.makeSafeIfRequired(application.getClientPub()));
         
         try {
 
@@ -243,6 +247,7 @@ public class AccountPostController {
             account.getClientTs(), 
             account.getClientName(),
             account.getClientId(), 
+            AnontionSecurity.makeSafeIfRequired(account.getClientPub()), 
             auths.getUsername(), 
             auths.getPassword(), 
             AnontionAccount.CONSTANT_COMPLETED_POW_PERCENTAGE, 
@@ -258,6 +263,7 @@ public class AccountPostController {
             dto.getClientTs(),
             dto.getClientName(),
             dto.getClientId(),
+            "", 
             "", 
             "", 
             progress, 

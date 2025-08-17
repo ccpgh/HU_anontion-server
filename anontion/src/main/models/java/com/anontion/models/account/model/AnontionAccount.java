@@ -38,6 +38,9 @@ public class AnontionAccount {
   @Column(name = "client_id", nullable = false)
   private UUID clientId;
 
+  @Column(name = "client_signature", nullable = false, length = 255)
+  private String clientSignature;
+
   @Column(name = "server_signature", nullable = false, length = 255)
   private String serverSignature;
 
@@ -71,9 +74,9 @@ public class AnontionAccount {
     
   }
 
-  public AnontionAccount(Long clientTs, String clientName, UUID clientId, String serverSignature, 
-      String clientPub, String clientUID, Integer defaultExpiration, Integer minimumExpiration, 
-      Integer maximumExpiration, boolean isDisabled) {
+  public AnontionAccount(Long clientTs, String clientName, UUID clientId, String clientSignature, 
+      String serverSignature, String clientPub, String clientUID, Integer defaultExpiration, 
+      Integer minimumExpiration, Integer maximumExpiration, boolean isDisabled) {
 
     this.clientTs = clientTs;
 
@@ -81,6 +84,8 @@ public class AnontionAccount {
     
     this.clientId = clientId;
         
+    this.clientSignature = clientSignature;
+    
     this.serverSignature = serverSignature;
     
     this.clientPub = clientPub;
@@ -146,6 +151,16 @@ public class AnontionAccount {
     this.clientPub = clientPub;
   }
 
+  public String getClientSignature() {
+    
+    return clientSignature;
+  }
+
+  public void setClientSignature(String clientSignature) {
+   
+    this.clientSignature = clientSignature;
+  }
+
   public String getServerSignature() {
     
     return serverSignature;
@@ -155,7 +170,7 @@ public class AnontionAccount {
    
     this.serverSignature = serverSignature;
   }
-  
+
   public String getClientUid() {
     
     return clientUID;

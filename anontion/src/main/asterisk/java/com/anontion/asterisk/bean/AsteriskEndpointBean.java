@@ -11,13 +11,13 @@ public class AsteriskEndpointBean {
     
   }
 
-  public AsteriskEndpoint createAsteriskEndppint(String id, String name) {
+  public AsteriskEndpoint createAsteriskEndppint(String pub, String foreignKey) {
     
     String transport = "transport-id";
 
-    String aor = name;
+    String aor = pub;
 
-    String auth = id;
+    String auth = foreignKey;
 
     String context = "external";
 
@@ -49,16 +49,16 @@ public class AsteriskEndpointBean {
     
     String callerId = null;
 
-    if (name.length() > 1) {
+    if (pub.length() > 1) {
 
-      callerId = name.substring(0, Math.min(39, name.length()));
+      callerId = pub.substring(0, Math.min(39, pub.length())); // TODO magic !!
     
     } else {
     
-      callerId = name;
+      callerId = pub;
     }
     
-    return new AsteriskEndpoint(name, transport, aor, auth, context, messageContext, disallow,
+    return new AsteriskEndpoint(pub, transport, aor, auth, context, messageContext, disallow,
         allow, directMedia, trustIdOutbound, dtmfMode, forceRport, rtpSymmetric, sendRpid, iceSupport,
         tosVideo, cosVideo, allowSubscribe, callerId);
   }

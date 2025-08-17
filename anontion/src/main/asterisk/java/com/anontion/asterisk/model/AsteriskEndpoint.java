@@ -82,12 +82,12 @@ public class AsteriskEndpoint {
 
   }
 
-  public AsteriskEndpoint(String id, String transport, String aors, String auth, String context, String messageContext,
+  public AsteriskEndpoint(String pub, String transport, String aors, String auth, String context, String messageContext,
       String disallow, String allow, String directMedia, String trustIdOutbound, String dtmfMode, String forceRport,
       String rtpSymmetric, String sendRpid, String iceSupport, String tosVideo, Integer cosVideo, 
       String allowSubscribe, String callerId) {
 
-    this.id = id;
+    this.id = pub;
 
     this.transport = transport;
 
@@ -132,7 +132,7 @@ public class AsteriskEndpoint {
   }
 
   public void setId(String id) {
-
+    
     this.id = id;
   }
 

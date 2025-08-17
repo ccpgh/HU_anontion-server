@@ -11,7 +11,7 @@ public class AsteriskAorBean {
     
   }
   
-  public AsteriskAor createAsteriskAor(String id, String name) {
+  public AsteriskAor createAsteriskAor(String pub) {
     
     Integer maxContacts = 1;
     
@@ -21,6 +21,6 @@ public class AsteriskAorBean {
     
     String supportPath = "yes";
     
-    return new AsteriskAor(name, maxContacts , removeExisting, qualifyFrequency, supportPath);
+    return new AsteriskAor(pub, maxContacts , removeExisting, qualifyFrequency, supportPath);
   }  
 }

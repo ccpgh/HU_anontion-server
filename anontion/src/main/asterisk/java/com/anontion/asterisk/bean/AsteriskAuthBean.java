@@ -11,10 +11,10 @@ public class AsteriskAuthBean {
     
   }
   
-  public AsteriskAuth createAsteriskAuth(String id, String username, String password) {
+  public AsteriskAuth createAsteriskAuth(String foreignKey, String username, String password) {
     
     String authType = "userpass";
-        
-    return new AsteriskAuth(id, authType, username, password);
+            
+    return new AsteriskAuth(foreignKey, authType, username, password);
   }
 }

@@ -16,6 +16,8 @@ public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
   
   private String sipUsername;
 
+  private String sipUserId;
+
   private String sipPassword;
 
   private Integer sipRegisterExpiry;
@@ -29,7 +31,7 @@ public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
   }
 
   public ResponsePostAccountBodyDTO(UUID accountId, Long clientTs, String clientName, 
-      UUID clientId, String sipUsername, String sipPassword, Float progressPercentage, 
+      UUID clientId, String sipUsername, String sipUserId, String sipPassword, Float progressPercentage, 
       Integer sipRegisterExpiry, boolean isApproved) {
     
     this.accountId = accountId;
@@ -41,6 +43,8 @@ public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
     this.clientId = clientId;
     
     this.sipUsername = sipUsername;
+
+    this.sipUserId = sipUserId;
 
     this.sipPassword = sipPassword;
 
@@ -124,6 +128,15 @@ public class ResponsePostAccountBodyDTO extends ResponseBodyDTO {
     this.sipUsername = sipUsername;
   }
 
+  public String getSipUserId() {
+    
+    return sipUserId;
+  }
+
+  public void setSipUserId(String sipUserId) {
+    
+    this.sipUserId = sipUserId;
+  }
 
   public String getSipPassword() {
     
