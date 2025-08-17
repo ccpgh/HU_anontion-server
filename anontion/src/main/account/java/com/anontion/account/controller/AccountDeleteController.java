@@ -21,6 +21,7 @@ import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionStrings;
+import com.anontion.common.security.AnontionSecurity;
 import com.anontion.models.account.model.AnontionAccount;
 import com.anontion.models.account.repository.AnontionAccountRepository;
 import com.anontion.models.application.model.AnontionApplication;
@@ -109,31 +110,44 @@ public class AccountDeleteController {
     Optional<AnontionAccount> accountO = 
         accountRepository.findByClientTsAndClientNameAndClientId(ts, name, uuid);
 
-    Optional<AsteriskEndpoint> endpoint0 = 
-        endpointRepository.findById(name);
+    if (accountO.isEmpty()) {
+
+      return Responses.getBAD_REQUEST(
+          "Could not find account.");      
+    }
+
+    AnontionAccount account = accountO.get();
     
-    String pub = AccountDeleteController.getPub(applicationO, accountO);
+    Optional<AsteriskEndpoint> endpoint0 = 
+        endpointRepository.findById(name);  
+    
+    String pub = AccountDeleteController.getPub(applicationO, account);
 
     AsteriskAor aors = null;
-
-    Optional<AsteriskAor> aors0 = 
-        aorRepository.findById(name);
-    
-    if (aors0.isPresent()) {
-      
-      aors = aors0.get();
-    }
 
     AsteriskAuth auths = null;
 
     if (pub != null && !pub.isBlank()) {
 
-      Optional<AsteriskAuth> auth0 = 
-          authRepository.findById(pub);
+      Optional<AsteriskAor> aors0 = 
+          aorRepository.findById(AnontionSecurity.encodeToSafeBase64(pub));
       
-      if (auth0.isPresent()) {
+      if (aors0.isPresent()) {
         
-        auths = auth0.get();
+        aors = aors0.get();
+      }
+
+      if (endpoint0.isPresent()) {
+
+        AsteriskEndpoint endpoint = endpoint0.get();
+        
+        Optional<AsteriskAuth> auth0 = 
+            authRepository.findById(endpoint.getAuth());
+
+        if (auth0.isPresent()) {
+
+          auths = auth0.get();
+        }
       }
     }
     
@@ -151,19 +165,14 @@ public class AccountDeleteController {
     return Responses.getOK();    
   }
   
-  private static String getPub(Optional<AnontionApplication> applicationO, Optional<AnontionAccount> accountO) {
+  private static String getPub(Optional<AnontionApplication> applicationO, AnontionAccount account) {
     
     if (applicationO.isPresent()) {
       
       return applicationO.get().getClientPub();
     }
 
-    if (accountO.isPresent()) {
-      
-      return accountO.get().getClientPub();
-    }
-
-    return null;
+    return account.getClientPub();
   }
   
   final private static AnontionLog _logger = new AnontionLog(ApplicationDeleteController.class.getName());
