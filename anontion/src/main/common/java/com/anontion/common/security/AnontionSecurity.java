@@ -152,8 +152,7 @@ public class AnontionSecurity {
           (c >= 'a' && c <= 'z') ||
           (c >= '0' && c <= '9') ||
           c == '-' || 
-          c == '.' || 
-          c == '=')) {
+          c == '_')) {
             
         return false;
       }
@@ -178,7 +177,7 @@ public class AnontionSecurity {
       return "";
     }
     
-    return base64Encoded.replace('/', '-').replace('+', '.').replace("=", "");
+    return base64Encoded.replace('/', '-').replace('+', '_').replace("=", "");
   }
   
   public static String decodeFromSafeBase6_(String safePubEncoded) {
