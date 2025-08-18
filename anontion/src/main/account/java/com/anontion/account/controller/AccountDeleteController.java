@@ -109,19 +109,10 @@ public class AccountDeleteController {
 
     Optional<AnontionAccount> accountO = 
         accountRepository.findByClientTsAndClientNameAndClientId(ts, name, uuid);
-
-    if (accountO.isEmpty()) {
-
-      return Responses.getBAD_REQUEST(
-          "Could not find account.");      
-    }
-
-    AnontionAccount account = accountO.get();
     
-    Optional<AsteriskEndpoint> endpoint0 = 
-        endpointRepository.findById(name);  
+    Optional<AsteriskEndpoint> endpoint0 = null;  
     
-    String pub = AccountDeleteController.getPub(applicationO, account);
+    String pub = AccountDeleteController.getPub(applicationO, accountO);
 
     AsteriskAor aors = null;
 
@@ -129,6 +120,8 @@ public class AccountDeleteController {
 
     if (pub != null && !pub.isBlank()) {
 
+      endpoint0 = endpointRepository.findById(AnontionSecurity.encodeToSafeBase64(pub));
+      
       Optional<AsteriskAor> aors0 = 
           aorRepository.findById(AnontionSecurity.encodeToSafeBase64(pub));
       
@@ -154,7 +147,7 @@ public class AccountDeleteController {
     if (!accountService.deleteTxApplicationAndAccountAndEndpoint(
         applicationO.orElse(null), 
         accountO.orElse(null),
-        endpoint0.orElse(null),
+        (endpoint0 == null ? null : endpoint0.orElse(null)),
         auths,
         aors)) {
       
@@ -165,14 +158,19 @@ public class AccountDeleteController {
     return Responses.getOK();    
   }
   
-  private static String getPub(Optional<AnontionApplication> applicationO, AnontionAccount account) {
+  private static String getPub(Optional<AnontionApplication> applicationO, Optional<AnontionAccount> account) {
     
     if (applicationO.isPresent()) {
       
       return applicationO.get().getClientPub();
     }
 
-    return account.getClientPub();
+    if (account.isPresent()) {
+      
+      return account.get().getClientPub();
+    }
+
+    return null;
   }
   
   final private static AnontionLog _logger = new AnontionLog(ApplicationDeleteController.class.getName());

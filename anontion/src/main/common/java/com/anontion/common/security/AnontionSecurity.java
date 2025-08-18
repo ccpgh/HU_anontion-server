@@ -152,7 +152,7 @@ public class AnontionSecurity {
           (c >= 'a' && c <= 'z') ||
           (c >= '0' && c <= '9') ||
           c == '-' || 
-          c == '_' || 
+          c == '.' || 
           c == '=')) {
             
         return false;
@@ -181,7 +181,7 @@ public class AnontionSecurity {
     return base64Encoded.replace('/', '-').replace('+', '.').replace("=", "");
   }
   
-  public static String decodeFromSafeBase64(String safePubEncoded) {
+  public static String decodeFromSafeBase6_(String safePubEncoded) {
 
     String buffer = safePubEncoded.replace('-', '/').replace('_', '+');
 
