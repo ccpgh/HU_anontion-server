@@ -188,7 +188,8 @@ public class AccountPostController {
 
       if (approved(dto.getClientTs(), nowTs)) {
 
-        String foreignKey = AnontionSecurity.generateForeignKey();
+        String foreignKey1 = AnontionSecurity.generateForeignKey();
+        String foreignKey2 = AnontionSecurity.generateForeignKey();
         
         AnontionAccount account = new AnontionAccount(
             dto.getClientTs(),
@@ -205,11 +206,11 @@ public class AccountPostController {
               
         AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
             AnontionSecurity.makeSafeIfRequired(account.getClientPub()),
-            foreignKey);
+            foreignKey1);
                                     
         AsteriskAuth auths = authBean.createAsteriskAuth(
-            foreignKey,
-            account.getClientName(),
+            foreignKey1,
+            foreignKey2, //account.getClientName(),
             AnontionSecurity.generatePassword());
 
         if (auths.getUsername().isEmpty()) {
