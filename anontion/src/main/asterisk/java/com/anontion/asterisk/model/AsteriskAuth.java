@@ -23,14 +23,21 @@ public class AsteriskAuth {
   @Column(nullable = false, name = "username", length = 40)
   private String username;
 
-  @Column(nullable = false, name = "password", length = 80)
-  private String password;
+  //@Column(nullable = false, name = "password", length = 80)
+  //private String password;
+
+  @Column(nullable = false, name = "md5_cred", length = 40)
+  private String md5Cred;
+
+  @Column(nullable = false, name = "realm", length = 255)
+  private String realm;
 
   public AsteriskAuth() {
 
   }
 
-  public AsteriskAuth(String id, String authType, String username, String password) {
+  //public AsteriskAuth(String id, String authType, String username, String password) {
+  public AsteriskAuth(String id, String authType, String username, String password, String md5Cred, String realm) {
 
     this.id = id;
 
@@ -38,7 +45,11 @@ public class AsteriskAuth {
     
     this.username = username;
     
-    this.password = password;
+    //this.password = password;
+
+    this.md5Cred = md5Cred;
+    
+    this.realm = realm;
   }
 
   public String getId() {
@@ -71,13 +82,35 @@ public class AsteriskAuth {
     this.username = username;
   }
 
-  public String getPassword() {
-    
-    return password;
+//  public String getPassword() {
+//    
+//    return password;
+//  }
+//
+//  public void setPassword(String password) {
+//    
+//    this.password = password;
+//  }
+  
+  public String getMd5Cred() {
+
+    return md5Cred;
   }
 
-  public void setPassword(String password) {
-    
-    this.password = password;
+  public void setMd5Cred(String md5Cred) {
+
+    this.md5Cred = md5Cred;
   }
+      
+  public String getRealm() {
+
+    return realm;
+  }
+
+  public void setRealm(String realm) {
+
+    this.realm = realm;
+  }
+
 }
+

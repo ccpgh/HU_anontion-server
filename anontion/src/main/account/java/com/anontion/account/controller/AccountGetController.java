@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anontion.asterisk.model.AsteriskAuth;
@@ -43,12 +44,16 @@ public class AccountGetController {
           "Transaction rejected.");
     }
       
+    String md5Input = sipUserId + ":asterisk:" + sipPassword;
+    
+    String md5Cred = DigestUtils.md5DigestAsHex(md5Input.getBytes());
+    
     Optional<AsteriskAuth> auth0 = 
-        authRepository.findByUsernameAndPassword(sipUserId, sipPassword);
+        authRepository.findByUsernameAndMd5Cred(sipUserId, md5Cred);
     
     if (auth0.isEmpty()) {
       return Responses.getBAD_REQUEST(
-          "No account(auth).", 
+          "No account(auth)", 
           "");
     }
 

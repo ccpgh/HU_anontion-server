@@ -172,7 +172,7 @@ public class AccountPostController {
             account.getClientId(), 
             AnontionSecurity.makeSafeIfRequired(account.getClientPub()),
             auth.getUsername(),
-            auth.getPassword(),
+            "",
             AnontionAccount.CONSTANT_COMPLETED_POW_PERCENTAGE, 
             account.getSipExpiration(),
             true);
@@ -207,11 +207,13 @@ public class AccountPostController {
         AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
             AnontionSecurity.makeSafeIfRequired(account.getClientPub()),
             foreignKey1);
-                                    
+                     
+        String password = AnontionSecurity.generatePassword();
+        
         AsteriskAuth auths = authBean.createAsteriskAuth(
             foreignKey1,
             foreignKey2, //account.getClientName(),
-            AnontionSecurity.generatePassword());
+            password);
 
         if (auths.getUsername().isEmpty()) {
           
@@ -250,7 +252,7 @@ public class AccountPostController {
             account.getClientId(), 
             AnontionSecurity.makeSafeIfRequired(account.getClientPub()), 
             auths.getUsername(), 
-            auths.getPassword(), 
+            password, 
             AnontionAccount.CONSTANT_COMPLETED_POW_PERCENTAGE, 
             account.getSipExpiration(),
             true);
