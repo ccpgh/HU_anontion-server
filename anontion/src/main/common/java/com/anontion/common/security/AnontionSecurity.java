@@ -178,7 +178,7 @@ public class AnontionSecurity {
       return "";
     }
     
-    return base64Encoded.replace('/', '-').replace('+', '_').replace("=", "");
+    return base64Encoded.replace('/', '1').replace('+', '1').replace("=", "");
   }
   
   public static String decodeFromSafeBase64(String safePubEncoded) {
