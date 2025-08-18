@@ -5,11 +5,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Pattern;
 
 @Entity
-@Table(name = "ps_endpoints")
+@Table(
+    name = "ps_endpoints",
+    uniqueConstraints = { @UniqueConstraint(columnNames = {"auth"}), 
+        @UniqueConstraint(columnNames = {"aors"}) }
+)
 public class AsteriskEndpoint {
 
   @Id

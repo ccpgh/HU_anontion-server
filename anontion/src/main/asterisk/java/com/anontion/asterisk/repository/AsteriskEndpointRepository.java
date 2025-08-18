@@ -1,5 +1,6 @@
 package com.anontion.asterisk.repository;
 
+import com.anontion.asterisk.model.AsteriskAuth;
 import com.anontion.asterisk.model.AsteriskEndpoint;
 
 import java.util.Optional;
@@ -11,4 +12,6 @@ public interface AsteriskEndpointRepository extends JpaRepository<AsteriskEndpoi
   boolean existsById(String asteriskEndpointId);
 
   Optional<AsteriskEndpoint> findById(String id);  
+  
+  Optional<AsteriskEndpoint> findByAuth(String auth);
 }

@@ -2,25 +2,25 @@ package com.anontion.common.dto.response;
 
 public class ResponseGetAccountBodyDTO extends ResponseBodyDTO {
 
-  private String placeholder;
+  private String sipUsername;
 
   public ResponseGetAccountBodyDTO() {
 
   }
 
-  public ResponseGetAccountBodyDTO(String placeholder) {
+  public ResponseGetAccountBodyDTO(String sipUsername) {
     
-    this.placeholder = placeholder;
+    this.sipUsername = sipUsername;
   }
 
-  public String getPLaceholder() {
+  public String getSipUsername() {
 
-    return placeholder;
+    return sipUsername;
   }
 
-  public void setPlaceholder(String placeholder) {
-    
-    this.placeholder = placeholder;
+  public void setSipUsername(String sipUsername) {
+   
+    this.sipUsername = sipUsername;
   }
   
 }

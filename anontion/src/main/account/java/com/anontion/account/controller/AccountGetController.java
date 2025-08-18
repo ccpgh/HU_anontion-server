@@ -32,10 +32,10 @@ public class AccountGetController {
   private AsteriskAuthRepository authRepository;
 
   @GetMapping(path = "/account/")
-  public ResponseEntity<ResponseDTO> getAccount(@RequestParam("sipUsername") String sipUsername,
+  public ResponseEntity<ResponseDTO> getAccount(@RequestParam("sipUserId") String sipUserId,
       @RequestParam("sipPassword") String sipPassword) {
 
-    if (!AnontionStrings.isValidName(sipUsername) ||
+    if (!AnontionStrings.isValidName(sipUserId) ||
         !AnontionStrings.isValidPassword(sipPassword)) {
       
       return Responses.getBAD_REQUEST(
@@ -43,20 +43,31 @@ public class AccountGetController {
           "Transaction rejected.");
     }
       
-    Optional<AsteriskEndpoint> auth0 = 
-        endpointRepository.findById(sipUsername);
+    Optional<AsteriskAuth> auth0 = 
+        authRepository.findByUsernameAndPassword(sipUserId, sipPassword);
     
     if (auth0.isEmpty()) {
       return Responses.getBAD_REQUEST(
-          "No matching account found.", 
-          "Transaction rejected.");
+          "No account(auth).", 
+          "");
     }
 
-    AsteriskEndpoint endpoint = auth0.get();
+    AsteriskAuth auth = auth0.get();
 
-    _logger.info("DEBUG Found account with aors = '" + endpoint.getAors() + "'");
-        
-    ResponseGetAccountBodyDTO body = new ResponseGetAccountBodyDTO("placeholder");
+    _logger.info("DEBUG Found account with auth id = '" + auth.getId() + "'");
+
+    Optional<AsteriskEndpoint> endpoint0 = 
+        endpointRepository.findByAuth(auth.getId());
+    
+    if (endpoint0.isEmpty()) {
+      return Responses.getBAD_REQUEST(
+          "No account(endpoint).", 
+          "");      
+    }
+
+    AsteriskEndpoint endpoint = endpoint0.get();
+
+    ResponseGetAccountBodyDTO body = new ResponseGetAccountBodyDTO(endpoint.getId());
         
     ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 0, "Ok."), body);
