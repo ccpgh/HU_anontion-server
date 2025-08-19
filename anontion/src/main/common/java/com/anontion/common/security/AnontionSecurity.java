@@ -177,8 +177,8 @@ public class AnontionSecurity {
       return "";
     }
     
-    //return base64Encoded.replace('/', '-').replace('+', '_').replace("=", ""); // TODO fix !
-    return base64Encoded.replace('/', '1').replace('+', '1').replace("=", "");
+    //return base64Encoded.replace('/', '-').replace('+', '_').replace("=", ""); // TODO copy to revert tests
+    return base64Encoded.replace('/', '-').replace('+', '_').replace("=", "");
   }
   
   public static String decodeFromSafeBase6_(String safePubEncoded) {
