@@ -19,6 +19,7 @@ import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionStrings;
+import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.dto.response.ResponseGetAccountBodyDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.dto.response.ResponsePostDTO;
@@ -72,7 +73,8 @@ public class AccountGetController {
 
     AsteriskEndpoint endpoint = endpoint0.get();
 
-    ResponseGetAccountBodyDTO body = new ResponseGetAccountBodyDTO(endpoint.getId());
+    ResponseGetAccountBodyDTO body = new ResponseGetAccountBodyDTO(AnontionSecurityECDSA.pubS(),
+        endpoint.getId());
         
     ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 0, "Ok."), body);
