@@ -1,0 +1,6 @@
+<urlrewrite>
+ <rule>
+  <from>^(?!/connection)(/.*)?$</from>
+  <to>/connection$1</to>
+</rule>
+</urlrewrite>

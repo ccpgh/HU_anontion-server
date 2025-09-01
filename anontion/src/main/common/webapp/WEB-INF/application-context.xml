@@ -12,7 +12,7 @@
            								 http://www.springframework.org/schema/mvc
                            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="com.anontion.common, com.anontion.application, com.anontion.account, com.anontion.system, com.anontion.asterisk, com.anontion.models, com.anontion.services " />
+    <context:component-scan base-package="com.anontion.common, com.anontion.application, com.anontion.account, com.anontion.connection, com.anontion.system, com.anontion.asterisk, com.anontion.models, com.anontion.services " />
 
     <context:annotation-config/>
 
@@ -30,7 +30,7 @@
 
     <bean id="entityManagerFactoryService" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="dataSourceServer">
      <property name="dataSource" ref="dataSourceServer" />
-     <property name="packagesToScan" value="com.anontion.models.application.model, com.anontion.models.account.model, com.anontion.asterisk.model" />
+     <property name="packagesToScan" value="com.anontion.models.application.model, com.anontion.models.account.model, com.anontion.models.connection.model, com.anontion.asterisk.model" />
      <property name="jpaVendorAdapter">
          <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
              <property name="generateDdl" value="true"/>
@@ -50,7 +50,7 @@
     </bean>
 
     <jpa:repositories
-            base-package="com.anontion.models.application, com.anontion.models.account, com.anontion.asterisk"
+            base-package="com.anontion.models.application, com.anontion.models.account, com.anontion.models.connection, com.anontion.asterisk"
             entity-manager-factory-ref="entityManagerFactoryService"
             transaction-manager-ref="transactionManagerService" />
 

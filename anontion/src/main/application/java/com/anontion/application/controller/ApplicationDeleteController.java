@@ -14,7 +14,7 @@ import com.anontion.common.misc.AnontionLog;
 public class ApplicationDeleteController {
     
   @DeleteMapping(path = "/application/{id}")
-  public ResponseEntity<ResponseDTO> deletedeleteAccountApplication(@PathVariable String id) {
+  public ResponseEntity<ResponseDTO> deleteApplication(@PathVariable String id) {
 
     _logger.severe("NYI " + id);
     

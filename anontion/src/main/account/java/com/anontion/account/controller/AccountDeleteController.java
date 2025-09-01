@@ -51,7 +51,7 @@ public class AccountDeleteController {
   private AscountService accountService;
  
   @DeleteMapping("/account/{id}")
-  public ResponseEntity<ResponseDTO> deleteApplication(@PathVariable("id") String id) {
+  public ResponseEntity<ResponseDTO> deleteAccount(@PathVariable("id") String id) {
 
     String[] tokens = AnontionStrings.split(id, ":");
     

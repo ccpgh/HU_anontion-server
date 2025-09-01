@@ -126,6 +126,11 @@ sourceSets {
             srcDir 'src/main/account/java'
         }        
     }
+    connection {
+        java {
+            srcDir 'src/main/connection/java'
+        }
+    }
     system {
         java {
             srcDir 'src/main/system/java'
@@ -186,6 +191,20 @@ task compileAccount(type: JavaCompile) {
     files("$buildDir/classes/application")
 }
 
+task compileConnection(type: JavaCompile) {
+    dependsOn compileApplication, compileAccount 
+    source sourceSets.connection.java
+    destinationDirectory = file("$buildDir/classes/connection")
+    classpath = sourceSets.main.compileClasspath +
+            files("$buildDir/classes/asterisk") +
+            files("$buildDir/classes/services") +
+            files("$buildDir/classes/models") +
+            files("$buildDir/classes/common") +
+            files("$buildDir/classes/application") +
+            files("$buildDir/classes/account") +
+            files("$buildDir/classes/connection")
+}
+
 task compileSystem(type: JavaCompile) {
     dependsOn compileCommon, compileApplication, compileAsterisk, compileModels, compileServices
     source sourceSets.system.java
@@ -196,7 +215,7 @@ task compileSystem(type: JavaCompile) {
 }
 
 tasks.withType(War) {
-    dependsOn compileCommon, compileModels, compileServices, compileAsterisk, compileApplication, compileAccount, compileSystem
+    dependsOn compileCommon, compileModels, compileServices, compileAsterisk, compileApplication, compileAccount, compileConnection, compileSystem
 }
 
 task commonJar(type: Jar) {
@@ -394,6 +413,82 @@ task accountWar(type: War) {
     archiveVersion = '1.0.0'
 }
 
+task connectionWar(type: War) {
+    dependsOn commonJar
+    dependsOn modelsJar
+    dependsOn servicesJar
+    dependsOn asteriskJar
+    dependsOn accountWar
+
+    from("$projectDir/src/main/connection/webapp/WEB-INF") {
+        include '*.xml'
+        into 'WEB-INF'
+    }
+
+    from("$projectDir/src/main/common/webapp/WEB-INF") {
+        include 'application-context.xml'
+        into 'WEB-INF'
+    }
+
+    from("$projectDir/src/main/common/webapp/WEB-INF/classes") {
+        include 'logback.xml'
+        into 'WEB-INF/classes'
+    }
+
+    //from("$projectDir/src/main/common/webapp/META-INF") {
+    //    include '*.*'
+    //    into 'META-INF'
+    //}
+
+    from("$projectDir/src/main/connection/resources") {
+        include '**/application.properties'
+        into 'WEB-INF/classes'
+    }
+
+    from(configurations.runtimeClasspath) {
+        into 'WEB-INF/lib'
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    from("$buildDir/classes/account") {
+        include '**/*.class'
+        into 'WEB-INF/classes'
+    }
+
+    from("$buildDir/classes/application") {
+        include '**/*.class'
+        into 'WEB-INF/classes'
+    }
+
+    from("$buildDir/classes/connection") {
+        include '**/*.class'
+        into 'WEB-INF/classes'
+    }
+
+    from("$buildDir/libs") {
+        include '**/anontion-common-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
+    from("$buildDir/libs") {
+        include '**/anontion-asterisk-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
+    from("$buildDir/libs") {
+        include '**/anontion-services-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
+    from("$buildDir/libs") {
+        include '**/anontion-models-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
+    archiveBaseName = 'connection'
+    archiveVersion = '1.0.0'
+}
+
 task systemWar(type: War) {
     dependsOn commonJar
     dependsOn modelsJar
@@ -459,7 +554,7 @@ task systemWar(type: War) {
     archiveVersion = '1.0.0'
 }
 
-build.dependsOn commonJar, asteriskJar, servicesJar, modelsJar, applicationWar, accountWar, systemWar
+build.dependsOn commonJar, asteriskJar, servicesJar, modelsJar, applicationWar, accountWar, connectionWar, systemWar
 
 tasks.named('war') {
     enabled = false
