@@ -28,8 +28,11 @@ public class RequestPostConnectionBodyDTO {
   @NotNull(message = "Now Timestamp cannot be null.")
   private Long nowTs;
 
-  @NotBlank(message = "Client Signature cannot be blank.")
-  private String clientSignature;
+  @NotBlank(message = "Client Signature1 cannot be blank.")
+  private String clientSignature1;
+
+  @NotBlank(message = "Client Signature2 cannot be blank.")
+  private String clientSignature2;
 
   public RequestPostConnectionBodyDTO() {
     
@@ -95,14 +98,25 @@ public class RequestPostConnectionBodyDTO {
     this.nowTs = nowTs;
   } 
   
-  public String getClientSignature() {
+  public String getClientSignature1() {
     
-    return clientSignature;
+    return clientSignature1;
   }
 
-  public void setClientSignature(String clientSignature) {
+  public void setClientSignature1(String clientSignature1) {
  
-    this.clientSignature = clientSignature;
+    this.clientSignature1 = clientSignature1;
   }
+
+  public String getClientSignature2() {
+    
+    return clientSignature2;
+  }
+
+  public void setClientSignature2(String clientSignature2) {
+ 
+    this.clientSignature2 = clientSignature2;
+  }
+
 }
 

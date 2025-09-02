@@ -181,7 +181,7 @@ public class AnontionSecurity {
     return base64Encoded.replace('/', '-').replace('+', '_').replace("=", "");
   }
   
-  public static String decodeFromSafeBase6_(String safePubEncoded) {
+  public static String decodeFromSafeBase64(String safePubEncoded) {
 
     String buffer = safePubEncoded.replace('-', '/').replace('_', '+');
 

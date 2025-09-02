@@ -23,6 +23,7 @@ import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionConfig;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionTime;
+import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.security.AnontionSecurityECIES_ECDH;
 import com.anontion.models.account.model.AnontionAccount;
@@ -69,8 +70,9 @@ public class ConnectionPostController {
     String clientName = dto.getClientName();   
     Long clientTs = dto.getClientTs();
     String localSipAddress = dto.getLocalSipAddress();   
-    String remoteSipAddress = dto.getRemoteSipAddress();   
-    String clientSignature = dto.getClientSignature();   
+    String remoteSipAddress = dto.getRemoteSipAddress();
+    String clientSignature1 = dto.getClientSignature1();   
+    String clientSignature2 = dto.getClientSignature2();   
     Long nowTs = dto.getNowTs();
     
     Long diff = nowTs - AnontionTime.tsN();
@@ -130,11 +132,11 @@ public class ConnectionPostController {
     buffer1.append("_"); 
     buffer1.append(nowTs);
 
-    _logger.info("DEBUG cleartext '" + buffer1.toString() + "'");
+    _logger.info("DEBUG cleartext1 '" + buffer1.toString() + "'");
     
     ECPublicKeyParameters pub = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(account.getClientPub());
     
-    if (!AnontionSecurityECDSA.checkSignature(buffer1.toString(), clientSignature, pub)) {
+    if (!AnontionSecurityECDSA.checkSignature(buffer1.toString(), clientSignature1, pub)) {
 
       StringBuilder buffer2 = new StringBuilder();
 
@@ -156,11 +158,49 @@ public class ConnectionPostController {
           false);
       
       ResponsePostDTO response = new ResponsePostDTO(
-          new ResponseHeaderDTO(true, 0, "Bad signature."), body);
+          new ResponseHeaderDTO(true, 0, "Bad master signature."), body);
       
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    StringBuilder buffer6 = new StringBuilder();
+    buffer6.append(localSipAddress);
+    buffer6.append("_");  
+    buffer6.append(remoteSipAddress);
+        
+    _logger.info("DEBUG cleartext2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + "'");
+
+    String localPubString = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
+        
+    ECPublicKeyParameters localPub = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(localPubString);
+
+    if (!AnontionSecurityECDSA.checkSignature(buffer6.toString(), clientSignature2, localPub)) {
+
+      StringBuilder buffer2 = new StringBuilder();
+
+      buffer2.append(localSipAddress);
+      buffer2.append("_");  
+      buffer2.append(remoteSipAddress);
+      buffer2.append("_"); 
+      buffer2.append(nowTs);
+      buffer2.append("_true_false_false");
+      
+      String signature = AnontionSecurityECDSA.sign(buffer2.toString());
+      
+      ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+          remoteSipAddress,
+          nowTs,
+          signature,
+          true,
+          false,
+          false);
+      
+      ResponsePostDTO response = new ResponsePostDTO(
+          new ResponseHeaderDTO(true, 0, "Bad local signature."), body);
+      
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
     Long now = AnontionTime.tsN();
     
     Long sipTsA = null;
@@ -175,7 +215,7 @@ public class ConnectionPostController {
 
       sipTsA = now;
       sipEndpointA = localSipAddress;
-      sipSignatureA = ""; // TODO populate and check
+      sipSignatureA = clientSignature2;
 
       sipEndpointB = remoteSipAddress;
 
@@ -185,7 +225,7 @@ public class ConnectionPostController {
 
       sipTsB = now;
       sipEndpointB = localSipAddress;
-      sipSignatureB = ""; // TODO populate and check
+      sipSignatureB = clientSignature2;
     }
     
     AtomicBoolean isRetry = new AtomicBoolean(false);
