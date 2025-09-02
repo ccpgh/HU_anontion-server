@@ -69,6 +69,8 @@ public class AccountService {
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean deleteTxApplicationAndAccountAndEndpoint(AnontionApplication application, AnontionAccount account, AsteriskEndpoint endpoint, AsteriskAuth auth, AsteriskAor aor) {
     
+    // NYI - add delete of connections
+    
     try {
 
       if (account != null) {
