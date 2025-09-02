@@ -27,7 +27,7 @@ import com.anontion.models.account.repository.AnontionAccountRepository;
 import com.anontion.models.application.model.AnontionApplication;
 import com.anontion.models.application.model.AnontionApplicationId;
 import com.anontion.models.application.repository.AnontionApplicationRepository;
-import com.anontion.services.service.AscountService;
+import com.anontion.services.service.AccountService;
 
 @RestController
 public class AccountDeleteController {
@@ -48,7 +48,7 @@ public class AccountDeleteController {
   private AsteriskAuthRepository authRepository;
   
   @Autowired
-  private AscountService accountService;
+  private AccountService accountService;
  
   @DeleteMapping("/account/{id}")
   public ResponseEntity<ResponseDTO> deleteAccount(@PathVariable("id") String id) {

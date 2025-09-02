@@ -13,4 +13,11 @@ import java.util.UUID;
 public interface AnontionConnectionRepository extends JpaRepository<AnontionConnection, Long> {
 
   Optional<AnontionConnection> findByConnectionId(UUID connectionId);
+  
+  Optional<AnontionConnection> findBySipEndpointAAndSipEndpointB(String sipEndpointA, String sipEndpointB);
+
+//  @Lock(LockModeType.PESSIMISTIC_WRITE)
+//  @Query("SELECT c FROM AnontionConnection c WHERE c.sipEndpointA = :A AND c.sipEndpointB = :B")
+//  Optional<AnontionConnection> findForUpdate(@Param("A") String sipEndpointA, @Param("B") String sipEndpointB);
+  
 }

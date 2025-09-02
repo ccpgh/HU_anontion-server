@@ -6,11 +6,11 @@ public class AnontionStrings {
 
   private static String VALID_CHARACTERS_IN_NAME = "^[A-Za-z0-9- ]+$"; 
   
-  private static Integer PASSWORD_MINCHARS = 8; // TODO check with client
-  private static Integer PASSWORD_MAXCHARS = 20; // TODO check with client
+  private static Integer PASSWORD_MINCHARS = 8; // NYI agree with client
+  private static Integer PASSWORD_MAXCHARS = 20; // NYI agree with client
 
-  private static Integer USERNAME_MINCHARS = 2; // TODO check with client
-  private static Integer USERNAME_MAXCHARS = 20;  // TODO check with client
+  private static Integer USERNAME_MINCHARS = 2; // NYI agree with client
+  private static Integer USERNAME_MAXCHARS = 20;  // NYI agree with client
       
   public static String concat(String[] tokens, String delimiter) {
 

@@ -21,7 +21,7 @@ import com.anontion.common.dto.request.RequestPostAccountBodyDTO;
 import com.anontion.common.dto.request.RequestPostAccountDTO;
 
 import com.anontion.models.application.repository.AnontionApplicationRepository;
-import com.anontion.services.service.AscountService;
+import com.anontion.services.service.AccountService;
 import com.anontion.asterisk.bean.AsteriskAorBean;
 import com.anontion.asterisk.bean.AsteriskAuthBean;
 import com.anontion.asterisk.bean.AsteriskEndpointBean;
@@ -75,7 +75,7 @@ public class AccountPostController {
   private AsteriskAuthBean authBean;
   
   @Autowired
-  private AscountService accountService;
+  private AccountService accountService;
   
   @PostMapping(path = "/account/")
   public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestPostAccountDTO request,
@@ -312,5 +312,4 @@ public class AccountPostController {
   
   final private static AnontionLog _logger = new AnontionLog(AccountPostController.class.getName());
 }
-
 

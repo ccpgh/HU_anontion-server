@@ -19,7 +19,7 @@ import com.anontion.models.application.model.AnontionApplication;
 import com.anontion.models.application.repository.AnontionApplicationRepository;
 
 @Service
-public class AscountService {
+public class AccountService {
 
   @Autowired
   private AsteriskEndpointRepository endpointRepository;
@@ -36,7 +36,7 @@ public class AscountService {
   @Autowired
   private AnontionApplicationRepository applicationRepository;
 
-  public AscountService() {
+  public AccountService() {
   }
 
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
@@ -108,6 +108,6 @@ public class AscountService {
     }
   }
   
-  final private static AnontionLog _logger = new AnontionLog(AscountService.class.getName());
+  final private static AnontionLog _logger = new AnontionLog(AccountService.class.getName());
 }
 
