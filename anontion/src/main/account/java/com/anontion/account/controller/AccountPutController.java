@@ -15,11 +15,7 @@ public class AccountPutController {
   @PutMapping("/account/")
   public ResponseEntity<ResponseDTO> putAccount() {
 
-    _logger.severe("NYI");
-
     return Responses.getNYI();    
   }
-  
-  final private static AnontionLog _logger = new AnontionLog(AccountPutController.class.getName());
 }
 

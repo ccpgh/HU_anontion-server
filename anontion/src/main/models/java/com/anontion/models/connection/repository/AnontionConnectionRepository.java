@@ -5,6 +5,8 @@ import com.anontion.models.connection.model.AnontionConnection;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
@@ -13,11 +15,7 @@ import java.util.UUID;
 public interface AnontionConnectionRepository extends JpaRepository<AnontionConnection, Long> {
 
   Optional<AnontionConnection> findByConnectionId(UUID connectionId);
-  
-  Optional<AnontionConnection> findBySipEndpointAAndSipEndpointB(String sipEndpointA, String sipEndpointB);
 
-//  @Lock(LockModeType.PESSIMISTIC_WRITE)
-//  @Query("SELECT c FROM AnontionConnection c WHERE c.sipEndpointA = :A AND c.sipEndpointB = :B")
-//  Optional<AnontionConnection> findForUpdate(@Param("A") String sipEndpointA, @Param("B") String sipEndpointB);
-  
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and sip_signature_A IS NOT NULL and sip_signature_B IS NOT NULL and sip_ts_A IS NOT NULL and sip_ts_B IS NOT NULL", nativeQuery = true)
+  Optional<AnontionConnection> findBySipEndpointAAndSipEndpointB(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB);  
 }

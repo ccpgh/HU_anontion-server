@@ -15,11 +15,7 @@ public class ConnectionPutController {
   @PutMapping("/connection/")
   public ResponseEntity<ResponseDTO> putConnection() {
 
-    _logger.severe("NYI");
-
     return Responses.getNYI();    
   }
-  
-  final private static AnontionLog _logger = new AnontionLog(ConnectionPutController.class.getName());
 }
 

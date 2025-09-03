@@ -13,14 +13,10 @@ import com.anontion.common.misc.AnontionLog;
 @RestController
 public class ApplicationDeleteController {
     
-  @DeleteMapping(path = "/application/{id}")
-  public ResponseEntity<ResponseDTO> deleteApplication(@PathVariable String id) {
+  @DeleteMapping(path = "/application/")
+  public ResponseEntity<ResponseDTO> deleteApplication() {
 
-    _logger.severe("NYI " + id);
-    
     return Responses.getNYI();    
   }
-  
-  final private static AnontionLog _logger = new AnontionLog(ApplicationDeleteController.class.getName());
 }
 

@@ -15,11 +15,7 @@ public class ConnectionDeleteController {
   @DeleteMapping("/connection/")
   public ResponseEntity<ResponseDTO> deleteConnection() {
 
-    _logger.severe("NYI");
-
     return Responses.getNYI();    
   }
-  
-  final private static AnontionLog _logger = new AnontionLog(ConnectionDeleteController.class.getName());
 }
 
