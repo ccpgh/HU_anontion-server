@@ -75,6 +75,8 @@ public class ConnectionPostController {
     String clientSignature2 = dto.getClientSignature2();   
     Long nowTs = dto.getNowTs();
     
+    String localSipAddressUnsafe = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
+    
     Long diff = nowTs - AnontionTime.tsN();
     
     if (diff > AnontionConfig._CONTACT_CONNECTION_MAX ||
@@ -85,6 +87,8 @@ public class ConnectionPostController {
           "bad nowTs"); 
     }
     
+    _logger.info("DEBUG connection account keys clientTs '" + clientTs + "' clientName '" + clientName + "' clientId '" + clientId + "'");
+
     Optional<AnontionAccount> accountO = accountRepository.findByClientTsAndClientNameAndClientId(
         clientTs,
         clientName,
@@ -114,6 +118,8 @@ public class ConnectionPostController {
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "No account."), body);
       
+      _logger.info("DEBUG connection no account");
+      
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
@@ -132,7 +138,7 @@ public class ConnectionPostController {
     buffer1.append("_"); 
     buffer1.append(nowTs);
 
-    _logger.info("DEBUG cleartext1 '" + buffer1.toString() + "'");
+    _logger.info("DEBUG connection cleartext1 '" + buffer1.toString() + "'");
     
     ECPublicKeyParameters pub = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(account.getClientPub());
     
@@ -160,6 +166,8 @@ public class ConnectionPostController {
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "Bad master signature."), body);
       
+      _logger.info("DEBUG connection bad master signature");
+
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -167,8 +175,8 @@ public class ConnectionPostController {
     buffer6.append(localSipAddress);
     buffer6.append("_");  
     buffer6.append(remoteSipAddress);
-        
-    _logger.info("DEBUG cleartext2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + "'");
+     
+    _logger.info("DEBUG connection cleartext2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + "' localSipAddressUnsafe '" + localSipAddressUnsafe + "'");
 
     String localPubString = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
         
@@ -197,6 +205,8 @@ public class ConnectionPostController {
       
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "Bad local signature."), body);
+      
+      _logger.info("DEBUG connection bad local signature");
       
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -252,7 +262,9 @@ public class ConnectionPostController {
           isRetry.get() ? true : false);
       
       ResponsePostDTO response = new ResponsePostDTO(
-          new ResponseHeaderDTO(true, 0, "DB update not completed."), body);
+          new ResponseHeaderDTO(true, 0, "db update not completed."), body);
+      
+      _logger.info("DEBUG connection db update not completed");
       
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -278,6 +290,8 @@ public class ConnectionPostController {
     
     ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 0, "Ok."), body);
+    
+    _logger.info("DEBUG connection ok");
     
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
