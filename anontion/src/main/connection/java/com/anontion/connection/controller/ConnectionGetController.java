@@ -31,21 +31,21 @@ public class ConnectionGetController {
     if (sipUsername1.isBlank() ||
         sipUsername2.isBlank()) {
 
-      _logger.info("failed param check");
+      _logger.info("failed param check null");
 
       return Responses.getBAD_REQUEST(
           "Failed param check");
     }
 
-    if (!AnontionSecurity.isBase64(sipUsername1) ||
-        !AnontionSecurity.isBase64(sipUsername2)) {
+    if ((!AnontionSecurity.isBase64(sipUsername1) && !AnontionSecurity.isSafeBase64(sipUsername1)) ||
+        (!AnontionSecurity.isBase64(sipUsername2) && !AnontionSecurity.isSafeBase64(sipUsername2))) {
 
-      _logger.info("failed param check");
+      _logger.info("failed param check type");
 
       return Responses.getBAD_REQUEST(
           "Failed param check");
     }
-    
+
     String sipEndpointA = AnontionSecurity.encodeToSafeBase64(sipUsername1);
 
     String sipEndpointB = AnontionSecurity.encodeToSafeBase64(sipUsername2);
@@ -53,7 +53,7 @@ public class ConnectionGetController {
     if (!AnontionSecurity.isSafeBase64(sipEndpointA) ||
         !AnontionSecurity.isSafeBase64(sipEndpointB)) {
 
-      _logger.info("failed param check");
+      _logger.info("failed param check converted");
 
       return Responses.getBAD_REQUEST(
           "Failed param check");
