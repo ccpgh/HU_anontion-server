@@ -4,10 +4,9 @@ import jakarta.persistence.Column;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -18,12 +17,11 @@ import com.anontion.common.misc.AnontionTime;
 @Entity
 @Table(
   name = "anontion_connection",
-  uniqueConstraints = { @UniqueConstraint(columnNames = {"sip_address1", "sip_address2"}) }
+  uniqueConstraints = { @UniqueConstraint(columnNames = {"connection_id"}) }
 )
+@IdClass(AnontionConnectionId.class)
 public class AnontionConnection {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "connection_id")
   private UUID connectionId;
 
@@ -33,6 +31,7 @@ public class AnontionConnection {
   @Column(name = "sip_ts_A", nullable = true)
   private Long sipTsA;
   
+  @Id
   @Column(name = "sip_endpoint_A", nullable = false, length = 255)
   private String sipEndpointA;
 
@@ -42,6 +41,7 @@ public class AnontionConnection {
   @Column(name = "sip_ts_B", nullable = true)
   private Long sipTsB;
 
+  @Id
   @Column(name = "sip_endpoint_B", nullable = false, length = 255)
   private String sipEndpointB;
 
@@ -59,6 +59,8 @@ public class AnontionConnection {
   public AnontionConnection(Long sipTsA, String sipEndpointA, String sipSignatureA,
       Long sipTsB, String sipEndpointB, String sipSignatureB) {
     
+    this.connectionId = UUID.randomUUID();
+
     this.connectionTs = AnontionTime.tsN();
     
     this.sipTsA = sipTsA;
