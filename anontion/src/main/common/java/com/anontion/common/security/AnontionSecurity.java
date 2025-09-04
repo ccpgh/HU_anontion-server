@@ -172,6 +172,11 @@ public class AnontionSecurity {
   
   public static String encodeToSafeBase64(String base64Encoded) {
     
+    if (isSafeBase64(base64Encoded)) {
+    
+      return base64Encoded;
+    }
+    
     if (!isBase64(base64Encoded)) {
       
       return "";
