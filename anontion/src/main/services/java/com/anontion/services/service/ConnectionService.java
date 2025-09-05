@@ -23,8 +23,9 @@ public class ConnectionService {
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean saveTxConnection(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry) {
 
-    Optional<AnontionConnection> connection0 = null;
+    _logger.info("DEBUG saveTxConnection called");
     
+    Optional<AnontionConnection> connection0 = null;
     
     try {
 
@@ -44,7 +45,9 @@ public class ConnectionService {
     }
     
     if (connection0.isEmpty()) {
-      
+
+      _logger.info("DEBUG saveTxConnection empty");
+
       AnontionConnection connection = new AnontionConnection(null, sipEndpointA, null, null, sipEndpointB, null);
       
       try {
@@ -77,10 +80,14 @@ public class ConnectionService {
       }
     }
 
+    _logger.info("DEBUG saveTxConnection not empty");
+
     AnontionConnection connection = connection0.get();
     
     if (connection.getSipTsA() != null && connection.getSipSignatureA() != null &&
         connection.getSipTsB() != null && connection.getSipSignatureB() != null) { 
+
+      _logger.info("DEBUG saveTxConnection all populated");
 
       isRetry.set(false);
       
@@ -90,19 +97,27 @@ public class ConnectionService {
     // else check which side i am and update 
     
     if (sipTsA != null && sipSignatureA != null) {
+      
+      _logger.info("DEBUG saveTxConnection A update");
 
       if (connection.getSipTsA() == null) {
        
+        _logger.info("DEBUG saveTxConnection A update 1");
+
         connection.setSipTsA(sipTsA);
       }
       
       if (connection.getSipSignatureA() == null) {
-        
+
+        _logger.info("DEBUG saveTxConnection A update 2");
+
         connection.setSipSignatureA(sipSignatureA);
       }
       
       try {
       
+        _logger.info("DEBUG saveTxConnection A update save");
+
         connectionRepository.save(connection);
         
       } catch (Exception e) {
@@ -118,19 +133,27 @@ public class ConnectionService {
     }
 
     if (sipTsB != null && sipSignatureB != null) {
-      
+
+      _logger.info("DEBUG saveTxConnection B update");
+
       if (connection.getSipTsB() == null) {
-        
+
+        _logger.info("DEBUG saveTxConnection B update 1");
+
         connection.setSipTsB(sipTsB);
       }
       
       if (connection.getSipSignatureB() == null) {
+        
+        _logger.info("DEBUG saveTxConnection B update 2");
         
         connection.setSipSignatureB(sipSignatureB);
       }
       
       try {
         
+        _logger.info("DEBUG saveTxConnection B update save");
+
         connectionRepository.save(connection);
         
       } catch (Exception e) {
@@ -146,6 +169,8 @@ public class ConnectionService {
     }
 
     // NOTE: as the saying goes - should not get here!
+    
+    _logger.info("DEBUG saveTxConnection hit bottom");
     
     isRetry.set(false);
     

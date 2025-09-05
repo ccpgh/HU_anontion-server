@@ -171,6 +171,8 @@ public class ConnectionPostController {
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    _logger.info("DEBUG connection signature1 ok");
+
     StringBuilder buffer6 = new StringBuilder();
     buffer6.append(localSipAddress);
     buffer6.append("_");  
@@ -211,6 +213,8 @@ public class ConnectionPostController {
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
+    _logger.info("DEBUG connection signature2 ok");
+
     Long now = AnontionTime.tsN();
     
     Long sipTsA = null;
@@ -223,6 +227,8 @@ public class ConnectionPostController {
 
     if (localSipAddress.compareTo(remoteSipAddress) < 0) {
 
+      _logger.info("DEBUG connection selected A");
+      
       sipTsA = now;
       sipEndpointA = localSipAddress;
       sipSignatureA = clientSignature2;
@@ -230,7 +236,9 @@ public class ConnectionPostController {
       sipEndpointB = remoteSipAddress;
 
     } else {
-      
+
+      _logger.info("DEBUG connection selected B");
+
       sipEndpointA = remoteSipAddress;
 
       sipTsB = now;
@@ -240,6 +248,8 @@ public class ConnectionPostController {
     
     AtomicBoolean isRetry = new AtomicBoolean(false);
      
+    _logger.info("DEBUG connection calling tx");
+
     if (!connectionService.saveTxConnection(sipTsA, sipEndpointA, sipSignatureA, sipTsB, sipEndpointB, sipSignatureB, isRetry)) {
       
       StringBuilder buffer4 = new StringBuilder();
@@ -269,6 +279,8 @@ public class ConnectionPostController {
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
+    _logger.info("DEBUG connection OK");
+
     StringBuilder buffer5 = new StringBuilder();
 
     buffer5.append(localSipAddress);
