@@ -29,7 +29,7 @@ public class ConnectionService {
     
     try {
 
-      connection0 = connectionRepository.findBySipEndpointAAndSipEndpointB(sipEndpointA, sipEndpointB);
+      connection0 = connectionRepository.findBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB);
       
     } catch (Exception e) {
 
