@@ -3,6 +3,9 @@ package com.anontion.common.security;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Base64;
+
+import com.anontion.common.misc.AnontionConfig;
+
 import java.nio.ByteBuffer;
 
 public class AnontionSecurity {
@@ -115,7 +118,7 @@ public class AnontionSecurity {
 
     return buffer.reverse().toString();
   }
-  
+    
   public static boolean isBase64(String base64) { // TODO improve = padding only
 
     if (base64.isEmpty()) {
@@ -209,5 +212,36 @@ public class AnontionSecurity {
     
     return id;
   }  
+  
+  public static String fromSipAddressToSipname(String sipAddress) {
+    
+    String buffer = sipAddress;
+    
+    if (sipAddress.length() >= AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX.length() &&
+        sipAddress.substring(0, AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX.length()).equals(
+            AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX)) {
+
+      buffer = buffer.substring(AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX.length());
+    
+    } else if (sipAddress.length() >= AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX.length() &&
+          sipAddress.substring(0, AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX.length()).equals(
+              AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX)) {
+
+        buffer = buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX.length());
+    }
+
+    int index = buffer.indexOf('@');
+    
+    if (index == 0) {
+      
+      buffer = "";
+      
+    } else if (index > 0) {
+      
+      buffer = buffer.substring(0, index);
+    }
+    
+    return buffer;
+  }
 }
 

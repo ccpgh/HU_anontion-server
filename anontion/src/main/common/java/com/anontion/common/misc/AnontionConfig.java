@@ -8,5 +8,9 @@ public class AnontionConfig {
   public static int _CONTACT_CONNECTION_MAX = 60;
   public static int _CONTACT_CONNECTION_MIN = -15;
 
- 
+  public static String _CONTACT_CONNECTION_SIP_NAME = "sip";
+  public static String _CONTACT_CONNECTION_PJSIP_NAME = "pjsip";
+  public static String _CONTACT_CONNECTION_PJSIP_COLON = ":";
+  public static String _CONTACT_CONNECTION_SIP_PREFIX = _CONTACT_CONNECTION_SIP_NAME + _CONTACT_CONNECTION_PJSIP_COLON;
+  public static String _CONTACT_CONNECTION_PJSIP_PREFIX = _CONTACT_CONNECTION_PJSIP_NAME + _CONTACT_CONNECTION_PJSIP_COLON;
 }

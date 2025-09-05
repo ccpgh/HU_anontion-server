@@ -31,14 +31,27 @@ public class ConnectionGetController {
     if (sipUsername1.isBlank() ||
         sipUsername2.isBlank()) {
 
-      _logger.info("failed param check null");
+      _logger.info("failed param check blank");
 
       return Responses.getBAD_REQUEST(
           "Failed param check");
     }
 
-    if ((!AnontionSecurity.isBase64(sipUsername1) && !AnontionSecurity.isSafeBase64(sipUsername1)) ||
-        (!AnontionSecurity.isBase64(sipUsername2) && !AnontionSecurity.isSafeBase64(sipUsername2))) {
+    String convertedSipUsername1 = AnontionSecurity.fromSipAddressToSipname(sipUsername1);
+    
+    String convertedSipUsername2 = AnontionSecurity.fromSipAddressToSipname(sipUsername2);
+
+    if (convertedSipUsername1.isBlank() ||
+        convertedSipUsername2.isBlank()) {
+
+      _logger.info("failed param check converted blank");
+
+      return Responses.getBAD_REQUEST(
+          "Failed param check");
+    }
+
+    if ((!AnontionSecurity.isBase64(convertedSipUsername1) && !AnontionSecurity.isSafeBase64(convertedSipUsername1)) ||
+        (!AnontionSecurity.isBase64(convertedSipUsername2) && !AnontionSecurity.isSafeBase64(convertedSipUsername2))) {
 
       _logger.info("failed param check type");
 
@@ -46,9 +59,9 @@ public class ConnectionGetController {
           "Failed param check");
     }
 
-    String sipEndpointA = AnontionSecurity.encodeToSafeBase64(sipUsername1);
+    String sipEndpointA = AnontionSecurity.encodeToSafeBase64(convertedSipUsername1);
 
-    String sipEndpointB = AnontionSecurity.encodeToSafeBase64(sipUsername2);
+    String sipEndpointB = AnontionSecurity.encodeToSafeBase64(convertedSipUsername2);
 
     if (!AnontionSecurity.isSafeBase64(sipEndpointA) ||
         !AnontionSecurity.isSafeBase64(sipEndpointB)) {
