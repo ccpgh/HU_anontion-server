@@ -217,15 +217,24 @@ public class AnontionSecurity {
     
     String buffer = sipAddress;
     
-    if (sipAddress.length() >= AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX.length() &&
-        sipAddress.substring(0, AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX.length()).equals(
-            AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX)) {
+    if (buffer.length() > 2 &&
+          buffer.charAt(0) == AnontionConfig._CONTACT_CONNECTION_PJSIP_OPENBRACKET && 
+          buffer.charAt(buffer.length()-1) == AnontionConfig._CONTACT_CONNECTION_PJSIP_CLOSEBRACKET) {
+      
+      buffer = buffer.substring(1, buffer.length() - 1);
+    
+    } else if (buffer.length() == 2 &&
+                buffer.charAt(0) == AnontionConfig._CONTACT_CONNECTION_PJSIP_OPENBRACKET && 
+                buffer.charAt(buffer.length()-1) == AnontionConfig._CONTACT_CONNECTION_PJSIP_CLOSEBRACKET) {
+      
+      buffer = "";
+    }
+    
+    if (buffer.startsWith(AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX)) {
 
       buffer = buffer.substring(AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX.length());
     
-    } else if (sipAddress.length() >= AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX.length() &&
-          sipAddress.substring(0, AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX.length()).equals(
-              AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX)) {
+    } else if (buffer.startsWith(AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX)) {
 
         buffer = buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX.length());
     }
