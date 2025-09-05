@@ -73,7 +73,7 @@ public class ConnectionGetController {
     }
     
     Optional<AnontionConnection> connection0 = 
-        (sipEndpointA.compareTo(sipUsername2) < 0) ? connectionRepository.findBySipEndpointAAndSipEndpointB(sipEndpointA, sipEndpointB)
+        (sipEndpointA.compareTo(sipEndpointB) < 0) ? connectionRepository.findBySipEndpointAAndSipEndpointB(sipEndpointA, sipEndpointB)
             : connectionRepository.findBySipEndpointAAndSipEndpointB(sipEndpointB, sipEndpointA);
 
     if (connection0.isEmpty()) {
