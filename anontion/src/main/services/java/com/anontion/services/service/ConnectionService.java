@@ -209,6 +209,7 @@ public class ConnectionService {
     String remoteSipAddress = dto.getRemoteSipAddress();
     String clientSignature1 = dto.getClientSignature1();   
     String clientSignature2 = dto.getClientSignature2();   
+    String connectionType = dto.getConnectionType();   
     Long nowTs = dto.getNowTs();
 
     String localSipAddressUnsafe = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
@@ -219,7 +220,7 @@ public class ConnectionService {
         diff < AnontionConfig._CONTACT_CONNECTION_MIN) {
 
       return Responses.getBAD_REQUEST(
-          "Invalid parameters!", 
+          "Invalid parameters time diff " + diff.toString(), 
           "bad nowTs"); 
     }
 
@@ -271,6 +272,8 @@ public class ConnectionService {
     buffer1.append(localSipAddress);
     buffer1.append("_");  
     buffer1.append(remoteSipAddress);
+    buffer1.append("_");  
+    buffer1.append(connectionType);
     buffer1.append("_"); 
     buffer1.append(nowTs);
 
