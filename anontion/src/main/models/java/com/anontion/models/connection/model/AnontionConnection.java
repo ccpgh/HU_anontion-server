@@ -9,8 +9,10 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.UUID;
+
 
 import com.anontion.common.misc.AnontionTime;
 
@@ -47,6 +49,10 @@ public class AnontionConnection {
 
   @Column(name = "sip_signature_B", nullable = true, length = 255)
   private String sipSignatureB;
+
+  @Pattern(regexp = "direct|indirect|multiple", message = "connectionType must be 'direct', 'indirect', or 'multiple'")
+  @Column(name = "connection_type", nullable = true, length = 255)
+  private String connectionType;
   
   @PrePersist
   @PreUpdate
@@ -57,7 +63,7 @@ public class AnontionConnection {
   }
 
   public AnontionConnection(Long sipTsA, String sipEndpointA, String sipSignatureA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB) {
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String connectionType) {
     
     this.connectionId = UUID.randomUUID();
 
@@ -74,6 +80,8 @@ public class AnontionConnection {
     this.sipEndpointB = sipEndpointB;
     
     this.sipSignatureB = sipSignatureB;
+    
+    this.connectionType = connectionType;
   }
 
   public AnontionConnection() {
@@ -158,6 +166,16 @@ public class AnontionConnection {
   public void setSipSignatureB(String sipSignatureB) {
     
     this.sipSignatureB = sipSignatureB;
+  }
+  
+  public String getConnectionType() {
+    
+    return connectionType;
+  }
+
+  public void setConnectionType(String connectionType) {
+    
+    this.connectionType = connectionType;
   }
 }
 

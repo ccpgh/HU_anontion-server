@@ -25,6 +25,9 @@ public class RequestPostConnectionBodyDTO {
   @NotBlank(message = "Remote Sip Address cannot be blank.")
   private String remoteSipAddress;
 
+  @NotBlank(message = "Connection Type cannot be blank.")
+  private String connectionType;
+
   @NotNull(message = "Now Timestamp cannot be null.")
   private Long nowTs;
 
@@ -88,6 +91,16 @@ public class RequestPostConnectionBodyDTO {
     this.remoteSipAddress = remoteSipAddress;
   }
 
+  public String getConnectionType() {
+    
+    return connectionType;
+  }
+
+  public void setConnectionType(String connectionType) {
+    
+    this.connectionType = connectionType;
+  } 
+  
   public Long getNowTs() {
     
     return nowTs;

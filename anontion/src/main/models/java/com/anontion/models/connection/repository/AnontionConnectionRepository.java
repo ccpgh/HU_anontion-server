@@ -16,8 +16,8 @@ public interface AnontionConnectionRepository extends JpaRepository<AnontionConn
 
   Optional<AnontionConnection> findByConnectionId(UUID connectionId);
 
-  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB", nativeQuery = true)
-  Optional<AnontionConnection> findBySipEndpointAAndSipEndpointBRelaxed(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB);  
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and connection_type = 'direct' ", nativeQuery = true)
+  Optional<AnontionConnection> findDirectBySipEndpointAAndSipEndpointBRelaxed(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB);  
   
   @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and sip_signature_A IS NOT NULL and sip_signature_B IS NOT NULL and sip_ts_A IS NOT NULL and sip_ts_B IS NOT NULL", nativeQuery = true)
   Optional<AnontionConnection> findBySipEndpointAAndSipEndpointB(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB);  
