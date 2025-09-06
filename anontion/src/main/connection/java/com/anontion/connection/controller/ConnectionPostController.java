@@ -45,9 +45,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ConnectionPostController {
   
   @Autowired
-  private AnontionAccountRepository accountRepository;
-  
-  @Autowired
   private ConnectionService connectionService;
 
   @PostMapping(path = "/connection/")
@@ -73,7 +70,7 @@ public class ConnectionPostController {
 
     if (dto.getConnectionType().equals("direct")) {
       
-      return connectionService.postDirectConnection();
+      return connectionService.postDirectConnection(dto);
     }
 
     if (dto.getConnectionType().equals("indirect")) {
