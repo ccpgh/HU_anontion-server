@@ -57,7 +57,7 @@ public class ConnectionPostController {
           .collect(Collectors.joining(" "));
 
       return Responses.getBAD_REQUEST(
-          "Invalid parameters!", 
+          "Invalid parameters bindings!", 
           message);      
     }
 
