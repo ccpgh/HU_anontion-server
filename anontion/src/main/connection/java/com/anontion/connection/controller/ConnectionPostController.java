@@ -428,7 +428,7 @@ public class ConnectionPostController {
         clientId.toString().toLowerCase(), 
         clientName, 
         clientTs.toString(), 
-        remoteSipAddress, 
+        localSipAddress, 
         remoteSipAddress, 
         connectionType, 
         nowTs.toString() }, 
@@ -510,30 +510,18 @@ public class ConnectionPostController {
     
     if (!localSipAddress.equals(remoteSipAddress)) {
       
-      String buffer2 = AnontionStrings.concat(new String[] { 
-          localSipAddress, 
-          remoteSipAddress,
-          nowTs.toString(),
-          "true_false_false"}, 
-          "_");
-      
-      String signature = AnontionSecurityECDSA.sign(buffer2);
-
-      ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
-          remoteSipAddress,
-          nowTs,
-          signature,
-          true,
-          false,
-          false);
-
-      ResponsePostDTO response = new ResponsePostDTO(
-          new ResponseHeaderDTO(true, 0, "Bad local signature."), body);
-
-      _logger.info("DEBUG indirect connection different values");
-
-      return new ResponseEntity<>(response, HttpStatus.OK);
+      return postIndirectConnectionDifferent(dto);
     }
+
+    return postIndirectConnectionSame(dto);
+  }
+  
+  public ResponseEntity<ResponseDTO> postIndirectConnectionSame(RequestPostConnectionBodyDTO dto) {
+        
+    String localSipAddress = dto.getLocalSipAddress();   
+    String remoteSipAddress = dto.getRemoteSipAddress();
+    String clientSignature2 = dto.getClientSignature2();   
+    Long nowTs = dto.getNowTs();
 
     Long sipTsA = AnontionTime.tsN();
     String sipEndpointA = localSipAddress;
@@ -597,6 +585,38 @@ public class ConnectionPostController {
         new ResponseHeaderDTO(true, 0, "Ok."), body);
 
     _logger.info("DEBUG connection ok");
+
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+  
+  public ResponseEntity<ResponseDTO> postIndirectConnectionDifferent(RequestPostConnectionBodyDTO dto) {
+
+    String localSipAddress = dto.getLocalSipAddress();   
+    String remoteSipAddress = dto.getRemoteSipAddress();
+    String clientSignature2 = dto.getClientSignature2();   
+    Long nowTs = dto.getNowTs();
+    
+    String buffer2 = AnontionStrings.concat(new String[] { 
+        localSipAddress, 
+        remoteSipAddress,
+        nowTs.toString(),
+        "false_false_true"}, 
+        "_");
+    
+    String signature = AnontionSecurityECDSA.sign(buffer2);
+
+    ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+        remoteSipAddress,
+        nowTs,
+        signature,
+        false,
+        false,
+        true);
+
+    ResponsePostDTO response = new ResponsePostDTO(
+        new ResponseHeaderDTO(true, 0, "Different indirect connection values."), body);
+
+    _logger.info("DEBUG indirect connection different values");
 
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
