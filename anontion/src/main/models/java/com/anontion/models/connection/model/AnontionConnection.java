@@ -57,7 +57,7 @@ public class AnontionConnection {
   @PrePersist
   @PreUpdate
   private void validateSipOrder() {
-      if (sipEndpointA.compareTo(sipEndpointB) >= 0) {
+      if (sipEndpointA.compareTo(sipEndpointB) > 0) {
           throw new IllegalStateException("sipEndpointA must be less than sipEndpointB");
       }
   }

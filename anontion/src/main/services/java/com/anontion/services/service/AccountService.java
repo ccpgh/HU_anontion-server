@@ -3,6 +3,7 @@ package com.anontion.services.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.stereotype.Service;
 //import jakarta.transaction.Transactional;
 
@@ -44,6 +45,8 @@ public class AccountService {
 
     try {
       
+      _logger.info("DEBUG saveTxAccountAndEndpoint called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
+
       applicationRepository.delete(application);
       
       endpointRepository.save(endpoint);    
@@ -72,6 +75,8 @@ public class AccountService {
     // NYI - add delete of connections
     
     try {
+      
+      _logger.info("DEBUG deleteTxApplicationAndAccountAndEndpoint called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
 
       if (account != null) {
 

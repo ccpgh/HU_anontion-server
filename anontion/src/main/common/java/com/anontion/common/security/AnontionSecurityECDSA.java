@@ -389,7 +389,7 @@ abstract public class AnontionSecurityECDSA {
 
     String[] tokens = { name, ts.toString(), client.toString(), pub};
     
-    return AnontionSecuritySHA.hash(AnontionStrings.concat(tokens, ":"));
+    return AnontionSecuritySHA.hash(AnontionStrings.concatLowercase(tokens, ":"));
   }
 
   public static ECPrivateKeyParameters decodeECPrivateKeyParametersFromBase64D(String base64Key) {

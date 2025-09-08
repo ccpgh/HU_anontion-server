@@ -12,6 +12,11 @@ public class AnontionStrings {
   private static Integer USERNAME_MINCHARS = 2; // NYI agree with client
   private static Integer USERNAME_MAXCHARS = 20;  // NYI agree with client
       
+  public static String concatLowercase(String[] tokens, String delimiter) {
+
+    return concat(tokens, delimiter).toString().toLowerCase();
+  }
+  
   public static String concat(String[] tokens, String delimiter) {
 
     StringBuffer buffer = new StringBuffer();
@@ -29,7 +34,7 @@ public class AnontionStrings {
         first = false;
       }
       
-      buffer.append(token.toLowerCase());      
+      buffer.append(token);      
     } 
     
     return buffer.toString();

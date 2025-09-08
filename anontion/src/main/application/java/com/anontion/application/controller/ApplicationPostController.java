@@ -89,7 +89,7 @@ public class ApplicationPostController {
 
     AnontionPOW pow = new AnontionPOW();
 
-    String clientUID = AnontionStrings.concat(new String[] { 
+    String clientUID = AnontionStrings.concatLowercase(new String[] { 
         enceyptedName, 
         nowTs.toString(), 
         clientId.toString() }, ":");
