@@ -25,7 +25,7 @@ public class ConnectionService {
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean saveTxConnectionIndirectBase(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, StringBuilder buffer) {
     
-    _logger.info("DEBUG saveTxConnectionIndirectBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive()+ " with sipSignatureA " + sipSignatureA + " sipSignatureB " + sipSignatureA);
+    _logger.info("DEBUG saveTxConnectionIndirectBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
     
     Optional<AnontionConnection> connection0 = null;
 
@@ -379,11 +379,11 @@ public class ConnectionService {
 
     if (sipEndpointA != null) {
       
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, connection.getSipTsB(), connection.getSipEndpointB(), connection.getSipSignatureB(), "indirect");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipTsA, connection.getSipEndpointB(), connection.getSipSignatureB(), "indirect");
 
     } else if (sipEndpointB != null) {
             
-      newConnection = new AnontionConnection(connection.getSipTsA(), connection.getSipEndpointA(), connection.getSipSignatureA(), sipTsB, sipEndpointB, sipSignatureB, "indirect");
+      newConnection = new AnontionConnection(sipTsB, connection.getSipEndpointA(), connection.getSipSignatureA(), sipTsB, sipEndpointB, sipSignatureB, "indirect");
 
     } else {
       
@@ -424,6 +424,193 @@ public class ConnectionService {
       
       return false;
     }    
+  }
+  
+  @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
+  public boolean saveTxConnectionMultipleBase(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry) {
+    
+    _logger.info("DEBUG saveTxConnectionMultipleBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
+    
+    Optional<AnontionConnection> connection0 = null;
+
+    try {
+
+      connection0 = connectionRepository.findMultipleBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB);
+      
+    } catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.info("DEBUG saveTxConnectionMultipleBase exception " + e.toString() + " when trying to find connection.");
+      
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }
+    
+    if (connection0.isEmpty()) {
+
+      _logger.info("DEBUG saveTxConnectionMultipleBase empty");
+
+      AnontionConnection connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipTsA, sipEndpointB, sipSignatureA, "multiple");
+      
+      try {
+        
+        connection = connectionRepository.save(connection);
+
+        isRetry.set(false);
+        
+        return true;
+
+      } catch (DataIntegrityViolationException e) {
+
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+        _logger.exception(e);
+
+        isRetry.set(true);
+        
+        return false;
+      }
+      catch (Exception e) {
+
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+        _logger.exception(e);
+
+        isRetry.set(false);
+        
+        return false;
+      }
+    }
+    
+    _logger.info("DEBUG saveTxConnectionMultipleBase matched");
+
+    isRetry.set(false);
+    
+    return true;
+  }
+  
+  @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
+  public boolean saveTxConnectionMultipleUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
+
+    _logger.info("DEBUG saveTxConnectionMultipleUpdate called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
+
+    Optional<AnontionConnection> connection0 = null;
+
+    try {
+
+      connection0 = connectionRepository.findMultipleBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, remoteSipAddress);
+      
+    } catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.info("DEBUG saveTxConnectionMultipleUpdate exception " + e.toString() + " when trying to find remote multiple connection '" + remoteSipAddress + "'");
+      
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }   
+    
+    if (connection0.isEmpty()) {
+
+      _logger.info("DEBUG saveTxConnectionMultipleUpdate empty");
+      
+      Optional<AnontionConnection> connection1 = null;
+      
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      isRetry.set(true);
+
+      return false;
+    }
+
+    Optional<AnontionConnection> connection1 = null;
+
+    try {
+
+      connection1 = connectionRepository.findMultipleBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB);
+      
+    } catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.info("DEBUG saveTxConnectionMultipleUpdate exception " + e.toString() + " when trying to find existing multiple connection '" + sipEndpointA + " and " + sipEndpointB + "'");
+      
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }   
+    
+    if (!connection1.isEmpty()) {
+
+      _logger.info("DEBUG saveTxConnectionMultipleUpdate connection already exists.");
+      
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      isRetry.set(false);
+
+      return true;
+    }
+
+    AnontionConnection connection = connection0.get();
+    
+    AnontionConnection newConnection = null;
+
+    if (sipSignatureA == null) {
+      
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, connection.getSipSignatureA(), sipTsB, sipEndpointB, sipSignatureB, "multiple");
+
+    } else if (sipSignatureB == null) {
+            
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipTsB, sipEndpointB, connection.getSipSignatureB(), "multiple");
+
+    } else {
+      
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.info("DEBUG saveTxConnectionMultipleUpdate either sipSignatureA set or sipSignatureB set must be null");
+
+      isRetry.set(false);
+      
+      return false;
+    }
+
+    try {
+
+      newConnection = connectionRepository.save(newConnection);
+
+      isRetry.set(false);
+      
+      return true;
+
+    } catch (DataIntegrityViolationException e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(true);
+      
+      return false;
+    }
+    catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }  
   }
   
   final private static AnontionLog _logger = new AnontionLog(ConnectionService.class.getName());

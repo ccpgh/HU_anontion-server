@@ -187,7 +187,7 @@ public class ConnectionPostController {
         nowTs.toString() }, 
         "_");
     
-    _logger.info("DEBUG direct connection cleartext1 '" + buffer1.toString() + "'");
+    _logger.info("DEBUG direct connection signature check 1 '" + buffer1.toString() + "'");
 
     ECPublicKeyParameters pub = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(account.getClientPub());
 
@@ -226,7 +226,7 @@ public class ConnectionPostController {
         remoteSipAddress }, 
         "_");
     
-    _logger.info("DEBUG direct connection cleartext2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + 
+    _logger.info("DEBUG direct connection signature check 2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + 
         "' localSipAddressUnsafe '" + localSipAddressUnsafe + "'");
 
     String localPubString = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
@@ -363,17 +363,7 @@ public class ConnectionPostController {
     String clientSignature2 = dto.getClientSignature2();   
     String connectionType = dto.getConnectionType();   
     Long nowTs = dto.getNowTs();
-    
-    _logger.info("DEBUG clientId " + clientId);
-    _logger.info("DEBUG clientName " + clientName);
-    _logger.info("DEBUG clientTs " + clientTs);
-    _logger.info("DEBUG localSipAddress " + localSipAddress);
-    _logger.info("DEBUG remoteSipAddress " + remoteSipAddress);
-    _logger.info("DEBUG clientSignature1 " + clientSignature1);
-    _logger.info("DEBUG clientSignature2 " + clientSignature2);
-    _logger.info("DEBUG connectionType " + connectionType);
-    _logger.info("DEBUG nowTs " + nowTs);
-    
+        
     String localSipAddressUnsafe = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
 
     Long diff = nowTs - AnontionTime.tsN();
@@ -399,7 +389,7 @@ public class ConnectionPostController {
 
     if (accountO.isEmpty()) {
       
-      _logger.info("DEBUG account not found");
+      _logger.info("DEBUG indirect account not found");
       
       String buffer0 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -427,7 +417,7 @@ public class ConnectionPostController {
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    _logger.info("DEBUG account found");
+    _logger.info("DEBUG indirect account found");
 
     AnontionAccount account = accountO.get();
 
@@ -441,7 +431,7 @@ public class ConnectionPostController {
         nowTs.toString() }, 
         "_");
     
-    _logger.info("DEBUG indirect connection cleartext1 '" + buffer1.toString() + "'");
+    _logger.info("DEBUG indirect connection signature check 1 '" + buffer1.toString() + "'");
 
     ECPublicKeyParameters pub = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(account.getClientPub());
 
@@ -480,7 +470,7 @@ public class ConnectionPostController {
         remoteSipAddress }, 
         "_");
     
-    _logger.info("DEBUG indirect connection cleartext2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + 
+    _logger.info("DEBUG indirect connection signature check 2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + 
         "' localSipAddressUnsafe '" + localSipAddressUnsafe + "' remoteSipAddress '" + remoteSipAddress + "'");
 
     String localPubString = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
@@ -527,6 +517,8 @@ public class ConnectionPostController {
   
   public ResponseEntity<ResponseDTO> postIndirectConnectionSame(RequestPostConnectionBodyDTO dto) {
         
+    _logger.info("DEBUG indirect postIndirectConnectionSame called");
+
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();
     String clientSignature2 = dto.getClientSignature2();   
@@ -605,6 +597,8 @@ public class ConnectionPostController {
   
   public ResponseEntity<ResponseDTO> postIndirectConnectionDifferent(RequestPostConnectionBodyDTO dto) {
 
+    _logger.info("DEBUG indirect postIndirectConnectionDifferent called");
+
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();
     String clientSignature2 = dto.getClientSignature2();   
@@ -633,7 +627,7 @@ public class ConnectionPostController {
     
     AtomicBoolean isRetry = new AtomicBoolean(false);
 
-    _logger.info("DEBUG connection calling saveTxConnectionIndirectUpdate");
+    _logger.info("DEBUG connection indirect calling saveTxConnectionIndirectUpdate");
     
     if (!connectionService.saveTxConnectionIndirectUpdate(sipTsA, sipEndpointA, sipSignatureA, sipTsB, sipEndpointB, sipSignatureB, isRetry, localSipAddress, remoteSipAddress)) {
 
@@ -658,7 +652,7 @@ public class ConnectionPostController {
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "connection base update not completed."), body);
 
-      _logger.info("DEBUG connection base update not completed");
+      _logger.info("DEBUG connection indirect base update not completed");
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -681,7 +675,7 @@ public class ConnectionPostController {
         false,
         true,
         false,
-        "Ok. Connection connected. Odd values.");
+        "Ok. Connection indirect connected. Odd values.");
 
     ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 0, "Ok."), body);
@@ -700,10 +694,337 @@ public class ConnectionPostController {
     String clientSignature2 = dto.getClientSignature2();   
     String connectionType = dto.getConnectionType();   
     Long nowTs = dto.getNowTs();
+        
+    _logger.info("DEBUG clientId " + clientId);
+    _logger.info("DEBUG clientName " + clientName);
+    _logger.info("DEBUG clientTs " + clientTs);
+    _logger.info("DEBUG localSipAddress " + localSipAddress);
+    _logger.info("DEBUG remoteSipAddress " + remoteSipAddress);
+    _logger.info("DEBUG clientSignature1 " + clientSignature1);
+    _logger.info("DEBUG clientSignature2 " + clientSignature2);
+    _logger.info("DEBUG connectionType " + connectionType);
+    _logger.info("DEBUG nowTs " + nowTs);
     
-    _logger.info("NYI multiple");
+    String localSipAddressUnsafe = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
+
+    Long diff = nowTs - AnontionTime.tsN();
+
+    if (diff > AnontionConfig._CONTACT_CONNECTION_MAX ||
+        diff < AnontionConfig._CONTACT_CONNECTION_MIN) {
+
+      return Responses.getBAD_REQUEST(
+          "Invalid parameters time diff " + diff.toString(), 
+          "bad nowTs"); 
+    }
     
-    return Responses.getNYI();
+    _logger.info("DEBUG multiple connection nowTs " + nowTs + " tN from message " + AnontionTime.tsN() + " diff " + diff);
+
+
+    _logger.info("DEBUG multiple connection account keys clientTs '" + clientTs + 
+        "' clientName '" + clientName + "' clientId '" + clientId + "'");
+
+    Optional<AnontionAccount> accountO = accountRepository.findByClientTsAndClientNameAndClientId(
+        clientTs,
+        clientName,
+        clientId);
+
+    if (accountO.isEmpty()) {
+      
+      _logger.info("DEBUG multiple account not found");
+      
+      String buffer0 = AnontionStrings.concat(new String[] { 
+          localSipAddress, 
+          remoteSipAddress, 
+          nowTs.toString(), 
+          "true_false_false" }, 
+          "_");
+      
+      String signature = AnontionSecurityECDSA.sign(buffer0);
+
+      ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+          remoteSipAddress,
+          nowTs,
+          signature,
+          true,
+          false,
+          false,
+          "Multiple connection no account");
+
+      ResponsePostDTO response = new ResponsePostDTO(
+          new ResponseHeaderDTO(true, 0, "Multiple connection no account."), body);
+
+      _logger.info("DEBUG multiple connection no account");
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    _logger.info("DEBUG multiple account found");
+
+    AnontionAccount account = accountO.get();
+
+    String buffer1 = AnontionStrings.concat(new String[] { 
+        clientId.toString().toLowerCase(), 
+        clientName, 
+        clientTs.toString(), 
+        localSipAddress, 
+        remoteSipAddress, 
+        connectionType, 
+        nowTs.toString() }, 
+        "_");
+    
+    _logger.info("DEBUG multiple connection signature check 1 '" + buffer1.toString() + "'");
+
+    ECPublicKeyParameters pub = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(account.getClientPub());
+
+    if (!AnontionSecurityECDSA.checkSignature(buffer1, clientSignature1, pub)) {
+
+      String buffer2 = AnontionStrings.concat(new String[] { 
+          localSipAddress, 
+          remoteSipAddress, 
+          nowTs.toString(), 
+          "true_false_false" }, 
+          "_");
+      
+      String signature = AnontionSecurityECDSA.sign(buffer2);
+
+      ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+          remoteSipAddress,
+          nowTs,
+          signature,
+          true,
+          false,
+          false,
+          "Multiple connection bad master signature.");
+
+      ResponsePostDTO response = new ResponsePostDTO(
+          new ResponseHeaderDTO(true, 0, "Bad master signature."), body);
+
+      _logger.info("DEBUG multiple connection bad master signature");
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    _logger.info("DEBUG signature connection signature check 1 ok");
+
+    String buffer6 = AnontionStrings.concat(new String[] { 
+        localSipAddress, 
+        remoteSipAddress }, 
+        "_");
+    
+    _logger.info("DEBUG signature connection signature check 2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + 
+        "' localSipAddressUnsafe '" + localSipAddressUnsafe + "' remoteSipAddress '" + remoteSipAddress + "'");
+
+    String localPubString = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
+
+    ECPublicKeyParameters localPub = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(localPubString);
+
+    if (!AnontionSecurityECDSA.checkSignature(buffer6, clientSignature2, localPub)) {
+
+      String buffer2 = AnontionStrings.concat(new String[] { 
+          localSipAddress, 
+          remoteSipAddress,
+          nowTs.toString(),
+          "true_false_false"}, 
+          "_");
+      
+      String signature = AnontionSecurityECDSA.sign(buffer2);
+
+      ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+          remoteSipAddress,
+          nowTs,
+          signature,
+          true,
+          false,
+          false,
+          "Multiple connection bad local signature.");
+
+      ResponsePostDTO response = new ResponsePostDTO(
+          new ResponseHeaderDTO(true, 0, "Bad local signature."), body);
+
+      _logger.info("DEBUG multiple connection bad local signature");
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    _logger.info("DEBUG multiple connection signature2 ok");
+    
+    if (!localSipAddress.equals(remoteSipAddress)) {
+      
+      return postMultipleConnectionDifferent(dto);
+    }
+
+    return postMultipleConnectionSame(dto);
+  }
+  
+  public ResponseEntity<ResponseDTO> postMultipleConnectionDifferent(RequestPostConnectionBodyDTO dto) {
+    
+    _logger.info("DEBUG indirect postMasterConnectionDifferent called");
+
+    String localSipAddress = dto.getLocalSipAddress();   
+    String remoteSipAddress = dto.getRemoteSipAddress();
+    String clientSignature2 = dto.getClientSignature2();   
+    Long nowTs = dto.getNowTs();
+
+    Long sipTsA = null;
+    String sipEndpointA = null;
+    String sipSignatureA = null;
+
+    Long sipTsB = null;
+    String sipEndpointB = null;
+    String sipSignatureB = null;
+    
+    if (localSipAddress.compareTo(remoteSipAddress) < 0) {
+
+      sipEndpointA = localSipAddress;
+      sipSignatureA = clientSignature2;
+      sipTsA = nowTs;
+      
+      sipEndpointB = remoteSipAddress;
+      sipTsB = nowTs;
+          
+    } else {
+
+      sipEndpointA = remoteSipAddress;
+      sipTsA = nowTs;
+
+      sipEndpointB = localSipAddress;      
+      sipSignatureB = clientSignature2;
+      sipTsB = nowTs;
+    }
+
+    AtomicBoolean isRetry = new AtomicBoolean(false);
+
+    if (!connectionService.saveTxConnectionMultipleUpdate(sipTsA, sipEndpointA, sipSignatureA, sipTsB, sipEndpointB, sipSignatureB, isRetry, localSipAddress, remoteSipAddress)) {
+
+      String buffer4 = AnontionStrings.concat(new String[] { 
+          localSipAddress, 
+          remoteSipAddress,
+          nowTs.toString(),
+          isRetry.get() ? "false_false_true" : "true_false_false"}, 
+          "_");
+
+      String signature = AnontionSecurityECDSA.sign(buffer4);
+
+      ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+          remoteSipAddress,
+          nowTs,
+          signature,
+          isRetry.get() ? false : true,
+          false,
+          isRetry.get() ? true : false,
+          "Connection db base update failed");
+
+      ResponsePostDTO response = new ResponsePostDTO(
+         new ResponseHeaderDTO(true, 0, "connection db base update failed."), body);
+
+      _logger.info("DEBUG connection multiple db base update failed");
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    _logger.info("DEBUG connection multiple OK");
+
+    String buffer5 = AnontionStrings.concat(new String[] { 
+        localSipAddress, 
+        remoteSipAddress,
+        nowTs.toString(),
+        "false_true_false"}, 
+        "_");
+    
+    String signature = AnontionSecurityECDSA.sign(buffer5);
+
+    ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+        remoteSipAddress,
+        nowTs,
+        signature,
+        false,
+        true,
+        false,
+        "OK. connection connected.");
+
+    ResponsePostDTO response = new ResponsePostDTO(
+        new ResponseHeaderDTO(true, 0, "Ok."), body);
+
+    _logger.info("DEBUG connection Ok. Even values.");
+
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+  
+  public ResponseEntity<ResponseDTO> postMultipleConnectionSame(RequestPostConnectionBodyDTO dto) {
+ 
+    _logger.info("DEBUG multiple postMasterConnectionSame called");
+
+    String localSipAddress = dto.getLocalSipAddress();   
+    String remoteSipAddress = dto.getRemoteSipAddress();
+    String clientSignature2 = dto.getClientSignature2();   
+    Long nowTs = dto.getNowTs();
+
+    Long sipTsA = AnontionTime.tsN();
+    String sipEndpointA = localSipAddress;
+    String sipSignatureA = clientSignature2;
+
+    Long sipTsB = null;
+    String sipEndpointB = localSipAddress;
+    String sipSignatureB = null;
+
+    AtomicBoolean isRetry = new AtomicBoolean(false);
+
+    _logger.info("DEBUG connection multiple calling saveTxConnectionMultipleBase");
+        
+    if (!connectionService.saveTxConnectionMultipleBase(sipTsA, sipEndpointA, sipSignatureA, sipTsB, sipEndpointB, sipSignatureB, isRetry)) {
+
+      String buffer4 = AnontionStrings.concat(new String[] { 
+          localSipAddress, 
+          remoteSipAddress,
+          nowTs.toString(),
+          isRetry.get() ? "false_false_true" : "true_false_false"}, 
+          "_");
+
+      String signature = AnontionSecurityECDSA.sign(buffer4);
+
+      ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+          remoteSipAddress,
+          nowTs,
+          signature,
+          isRetry.get() ? false : true,
+          false,
+          isRetry.get() ? true : false,
+          "Connection db base insert not completed");
+
+      ResponsePostDTO response = new ResponsePostDTO(
+         new ResponseHeaderDTO(true, 0, "connection db base insert not completed."), body);
+
+      _logger.info("DEBUG connection multiple db base insert not completed");
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    _logger.info("DEBUG connection multiple OK");
+
+    String buffer5 = AnontionStrings.concat(new String[] { 
+        localSipAddress, 
+        remoteSipAddress,
+        nowTs.toString(),
+        "false_true_false"}, 
+        "_");
+    
+    String signature = AnontionSecurityECDSA.sign(buffer5);
+
+    ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+        remoteSipAddress,
+        nowTs,
+        signature,
+        false,
+        true,
+        false,
+        "OK. connection connected.");
+
+    ResponsePostDTO response = new ResponsePostDTO(
+        new ResponseHeaderDTO(true, 0, "Ok."), body);
+
+    _logger.info("DEBUG connection Ok. Even values.");
+
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
   
   final private static AnontionLog _logger = new AnontionLog(ConnectionPostController.class.getName());
