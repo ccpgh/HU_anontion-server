@@ -17,9 +17,12 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
   private boolean isConnected;
 
   private boolean isUnconnected;
+  
+  private String serverMessage;
 
   public ResponsePostConnectionBodyDTO(String localSipAddress, String remoteSipAddress, 
-      Long nowTs, String serverSignature, boolean isRejected, boolean isConnected, boolean isUnconnected) {
+      Long nowTs, String serverSignature, boolean isRejected, boolean isConnected, boolean isUnconnected,
+      String serverMessage) {
     
     this.localSipAddress = localSipAddress;
     
@@ -34,6 +37,8 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
     this.isConnected = isConnected;
     
     this.isUnconnected = isUnconnected;
+    
+    this.serverMessage = serverMessage;
   }
   
   public String getLocalSipAddress() {
@@ -74,6 +79,16 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
   public void setServerSignature(String serverSignature) {
  
     this.serverSignature = serverSignature;
+  }
+      
+  public String getServerMessage() {
+    
+    return serverMessage;
+  }
+
+  public void setServerMessage(String serverMessage) {
+ 
+    this.serverMessage = serverMessage;
   }
   
   @JsonProperty("isRejected")

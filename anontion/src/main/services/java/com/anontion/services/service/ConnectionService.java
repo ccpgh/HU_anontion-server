@@ -23,9 +23,9 @@ public class ConnectionService {
   private AnontionConnectionRepository connectionRepository;
     
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionIndirectBase(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry) {
+  public boolean saveTxConnectionIndirectBase(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, StringBuilder buffer) {
     
-    _logger.info("DEBUG saveTxConnectionIndirectBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
+    _logger.info("DEBUG saveTxConnectionIndirectBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive()+ " with sipSignatureA " + sipSignatureA + " sipSignatureB " + sipSignatureA);
     
     Optional<AnontionConnection> connection0 = null;
 
@@ -50,7 +50,7 @@ public class ConnectionService {
 
       _logger.info("DEBUG saveTxConnectionIndirectBase empty");
 
-      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, sipSignatureA, null, sipEndpointB, null, "indirect");
+      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, sipSignatureA, null, sipEndpointB, sipSignatureA, "indirect");
       
       try {
         
@@ -86,15 +86,55 @@ public class ConnectionService {
 
     AnontionConnection connection = connection0.get();
 
-    if (connection.getSipSignatureA().equals(sipSignatureA)) {
+    if (connection.getSipEndpointA().equals(sipEndpointA) && connection.getSipEndpointB().equals(sipEndpointB) && sipEndpointA.equals(sipEndpointB)) {
+
+      Optional<AnontionConnection> connection1 = connectionRepository.findIndirectBySipEndpointAAndSipSignatureARelaxed(sipEndpointA, sipSignatureA);
       
-      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+      if (connection1.isEmpty()) {
+        
+        connection1 = connectionRepository.findIndirectBySipEndpointBAndSipSignatureBRelaxed(sipEndpointA, sipSignatureA);
 
-      _logger.info("DEBUG saveTxConnectionIndirectBase match state 1");
+        if (!connection1.isEmpty()) {
 
+          buffer.append(connection1.get().getSipEndpointA());
+        }
+        
+      } else {
+      
+        buffer.append(connection1.get().getSipEndpointB());
+      }
+      
+      if (connection1.isEmpty()) {
+
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+        _logger.info("DEBUG saveTxConnectionIndirectBase match on base connection but did not find corresponding update connection");
+
+        isRetry.set(true);
+
+        return false;
+      }
+      
+      try {
+      
+        connectionRepository.delete(connection);
+      
+      } catch (Exception e) {
+
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+        _logger.exception(e);
+
+        isRetry.set(false);
+        
+        return false;
+      }
+      
+      _logger.info("DEBUG saveTxConnectionIndirectBase got corresponding remote '" + buffer.toString() + "'");
+      
       isRetry.set(true);
 
-      return true;
+      return true;      
     }
 
     _logger.info("DEBUG saveTxConnectionIndirectBase not match on state 1");
@@ -180,8 +220,6 @@ public class ConnectionService {
       return true;
     }
 
-    // else check which side i am and update 
-    
     if (sipTsA != null && sipSignatureA != null) {
       
       _logger.info("DEBUG saveTxConnectionDirect A update");
@@ -261,6 +299,131 @@ public class ConnectionService {
     isRetry.set(false);
     
     return false;
+  }
+  
+  @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
+  public boolean saveTxConnectionIndirectUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
+    
+    _logger.info("DEBUG saveTxConnectionIndirectUpdate called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
+    
+    Optional<AnontionConnection> connection0 = null;
+
+    try {
+
+      connection0 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, remoteSipAddress);
+      
+    } catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.info("DEBUG saveTxConnectionIndirectUpdate exception " + e.toString() + " when trying to find connection.");
+      
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }
+    
+    if (connection0.isEmpty()) {
+
+      _logger.info("DEBUG saveTxConnectionIndirectUpdate empty");
+      
+      Optional<AnontionConnection> connection1 = null;
+
+      try {
+        
+        if (localSipAddress.compareTo(remoteSipAddress) < 0) {
+
+          connection1 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(localSipAddress, remoteSipAddress);
+        
+        } else {
+                    
+          connection1 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, localSipAddress);
+        }
+
+        if (connection1.isEmpty()) {
+
+          _logger.info("DEBUG saveTxConnectionIndirectUpdate not matched on stage 2 indirect connection");
+
+          TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+          isRetry.set(true);
+        
+          return false;
+        }
+        
+        _logger.info("DEBUG saveTxConnectionIndirectUpdate matched on stage 2 indirect connection");
+        
+        isRetry.set(false);
+        
+        return true;
+
+      } catch (Exception e) {
+      
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+        _logger.info("DEBUG saveTxConnectionIndirectUpdate exception " + e.toString() + " when trying to find indirect unequal connection.");
+        
+        _logger.exception(e);
+
+        isRetry.set(false);
+        
+        return false;
+      }
+    }
+
+    AnontionConnection connection = connection0.get();
+    
+    AnontionConnection newConnection = null;
+
+    if (sipEndpointA != null) {
+      
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, connection.getSipTsB(), connection.getSipEndpointB(), connection.getSipSignatureB(), "indirect");
+
+    } else if (sipEndpointB != null) {
+            
+      newConnection = new AnontionConnection(connection.getSipTsA(), connection.getSipEndpointA(), connection.getSipSignatureA(), sipTsB, sipEndpointB, sipSignatureB, "indirect");
+
+    } else {
+      
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.info("DEBUG either setSipEndpointA set or setSipEndpointB set must be set");
+
+      isRetry.set(false);
+      
+      return false;
+    }
+
+    try {
+
+      newConnection = connectionRepository.save(newConnection);
+
+      isRetry.set(true);
+      
+      return true;
+
+    } catch (DataIntegrityViolationException e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(true);
+      
+      return false;
+    }
+    catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }    
   }
   
   final private static AnontionLog _logger = new AnontionLog(ConnectionService.class.getName());
