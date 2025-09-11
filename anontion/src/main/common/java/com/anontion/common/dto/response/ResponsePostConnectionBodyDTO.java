@@ -18,11 +18,13 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
 
   private boolean isRetry;
   
+  private String returnPassword;
+  
   private String serverMessage;
 
   public ResponsePostConnectionBodyDTO(String localSipAddress, String remoteSipAddress, 
       Long nowTs, String serverSignature, boolean isRejected, boolean isConnected, boolean isRetry,
-      String serverMessage) {
+      String returnPassword, String serverMessage) {
     
     this.localSipAddress = localSipAddress;
     
@@ -37,6 +39,8 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
     this.isConnected = isConnected;
     
     this.isRetry = isRetry;
+    
+    this.returnPassword = returnPassword;
     
     this.serverMessage = serverMessage;
   }
@@ -126,5 +130,16 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
     
     this.isRetry = isRetry;
   }
+  
+  public String getReturnPassword() {
+    
+    return returnPassword;
+  }
+
+  public void setReturnPassword(String returnPassword) {
+ 
+    this.returnPassword = returnPassword;
+  }
+
 }
 

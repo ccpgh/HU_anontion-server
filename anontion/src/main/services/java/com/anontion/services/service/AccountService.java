@@ -47,7 +47,10 @@ public class AccountService {
       
       _logger.info("DEBUG saveTxAccountAndEndpoint called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
 
-      applicationRepository.delete(application);
+      if(application != null) {
+      
+        applicationRepository.delete(application);
+      }
       
       endpointRepository.save(endpoint);    
 

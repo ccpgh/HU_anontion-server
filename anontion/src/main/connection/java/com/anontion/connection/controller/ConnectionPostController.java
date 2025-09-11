@@ -130,6 +130,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "Direct connection same local and remote accounts.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -163,6 +164,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "Direct connection no account");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -207,6 +209,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "Direct connection bad master signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -249,6 +252,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "Direct connection bad local signature");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -294,6 +298,42 @@ public class ConnectionPostController {
 
     AtomicBoolean isRetry = new AtomicBoolean(false);
 
+    StringBuilder returnPassword = new StringBuilder();
+
+    String clientUID = AnontionStrings.concatLowercase(new String[] { 
+        clientName, 
+        nowTs.toString(), 
+        clientId.toString() }, ":");
+
+    if (connectionService.createTxAccountIfConnected(sipEndpointA, sipEndpointB, isRetry, localSipAddress, remoteSipAddress, returnPassword, clientTs, clientName, clientId, clientUID)) { // NYI needsa timeout
+      
+      String buffer5 = AnontionStrings.concat(new String[] { 
+          localSipAddress, 
+          remoteSipAddress,
+          nowTs.toString(),
+          "false_true_false"}, 
+          "_");
+      
+      String signature = AnontionSecurityECDSA.sign(buffer5);
+
+      ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+          remoteSipAddress,
+          nowTs,
+          signature,
+          false,
+          true, // NNN
+          false,
+          returnPassword.toString(),
+          "Ok connection connected and account exists.");
+
+      ResponsePostDTO response = new ResponsePostDTO(
+          new ResponseHeaderDTO(true, 0, "Ok."), body);
+
+      _logger.info("DEBUG direct connection and account ok");
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     _logger.info("DEBUG direct connection calling connectionService");
 
     if (!connectionService.saveTxConnectionDirect(sipTsA, sipEndpointA, sipSignatureA, 
@@ -315,6 +355,7 @@ public class ConnectionPostController {
           !isRetry.get(),
           false,
           isRetry.get(),
+          "",
           "Direct connection db updates not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -341,6 +382,7 @@ public class ConnectionPostController {
         false,
         true,
         true,
+        "",
         "Ok connection connected.");
 
     ResponsePostDTO response = new ResponsePostDTO(
@@ -406,6 +448,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "Indirect connection no account");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -452,6 +495,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "Indirect connection bad master signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -494,6 +538,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "indirect connection bad local signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -556,6 +601,7 @@ public class ConnectionPostController {
           !isRetry.get(),
           false,
           isRetry.get(),
+          "",
           "Connection db base insert not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -584,6 +630,7 @@ public class ConnectionPostController {
         false,
         true,
         true,
+        "",
         "OK. connection connected.");
 
     ResponsePostDTO response = new ResponsePostDTO(
@@ -626,6 +673,8 @@ public class ConnectionPostController {
     
     AtomicBoolean isRetry = new AtomicBoolean(false);
 
+    // NYI find record and create account side if exists 
+    
     _logger.info("DEBUG connection indirect calling saveTxConnectionIndirectUpdate");
     
     if (!connectionService.saveTxConnectionIndirectUpdate(sipTsA, sipEndpointA, sipSignatureA, sipTsB, sipEndpointB, 
@@ -647,6 +696,7 @@ public class ConnectionPostController {
           !isRetry.get(),
           false,
           isRetry.get(),
+          "",
           "Connection base update not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -675,6 +725,7 @@ public class ConnectionPostController {
         false,
         true,
         true,
+        "",
         "Ok. Connection indirect connected. Odd values.");
 
     ResponsePostDTO response = new ResponsePostDTO(
@@ -748,6 +799,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "Multiple connection no account");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -794,6 +846,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "Multiple connection bad master signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -836,6 +889,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "Multiple connection bad local signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -894,6 +948,8 @@ public class ConnectionPostController {
 
     AtomicBoolean isRetry = new AtomicBoolean(false);
     
+    // NYI find record and create account side if exists 
+    
     if (!connectionService.saveTxConnectionMultipleUpdate(sipTsA, sipEndpointA, sipSignatureA, 
         sipTsB, sipEndpointB, sipSignatureB, isRetry, localSipAddress, remoteSipAddress)) {
 
@@ -913,6 +969,7 @@ public class ConnectionPostController {
           !isRetry.get(),
           false,
           isRetry.get(),
+          "",
           "Connection db base update failed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -941,6 +998,7 @@ public class ConnectionPostController {
         false,
         true,
         true,
+        "",
         "OK. connection connected.");
 
     ResponsePostDTO response = new ResponsePostDTO(
@@ -969,6 +1027,8 @@ public class ConnectionPostController {
     String sipSignatureB = null;
 
     AtomicBoolean isRetry = new AtomicBoolean(false);
+    
+    // NYI find record and create account side if exists 
 
     _logger.info("DEBUG connection multiple calling saveTxConnectionMultipleBase");
         
@@ -991,6 +1051,7 @@ public class ConnectionPostController {
           !isRetry.get(),
           false,
           isRetry.get(),
+          "",
           "Connection db base insert not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -1019,6 +1080,7 @@ public class ConnectionPostController {
         false,
         true,
         true,
+        "",
         "OK. connection connected.");
 
     ResponsePostDTO response = new ResponsePostDTO(
@@ -1031,5 +1093,4 @@ public class ConnectionPostController {
   
   final private static AnontionLog _logger = new AnontionLog(ConnectionPostController.class.getName());
 }
-
 
