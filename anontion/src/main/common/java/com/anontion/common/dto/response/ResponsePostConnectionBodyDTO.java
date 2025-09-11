@@ -16,12 +16,12 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
 
   private boolean isConnected;
 
-  private boolean isUnconnected;
+  private boolean isRetry;
   
   private String serverMessage;
 
   public ResponsePostConnectionBodyDTO(String localSipAddress, String remoteSipAddress, 
-      Long nowTs, String serverSignature, boolean isRejected, boolean isConnected, boolean isUnconnected,
+      Long nowTs, String serverSignature, boolean isRejected, boolean isConnected, boolean isRetry,
       String serverMessage) {
     
     this.localSipAddress = localSipAddress;
@@ -36,7 +36,7 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
     
     this.isConnected = isConnected;
     
-    this.isUnconnected = isUnconnected;
+    this.isRetry = isRetry;
     
     this.serverMessage = serverMessage;
   }
@@ -115,16 +115,16 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
     this.isConnected = isConnected;
   }
   
-  @JsonProperty("isUnconnected")
-  public boolean isUnconnected() {
+  @JsonProperty("isRetry")
+  public boolean isRetry() {
     
-    return isUnconnected;
+    return isRetry;
   }
 
-  @JsonProperty("isUnconnected")
-  public void setUnconnected(boolean isUnconnected) {
+  @JsonProperty("isRetry")
+  public void setRetry(boolean isRetry) {
     
-    this.isUnconnected = isUnconnected;
+    this.isRetry = isRetry;
   }
 }
 

@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+import org.springframework.util.DigestUtils;
+
 import com.anontion.common.misc.AnontionConfig;
 
 import java.nio.ByteBuffer;
@@ -69,6 +71,17 @@ public class AnontionSecurity {
   public static String generatePassword() {
     
     return generateRandomSequenceString(20, 40);
+  }
+  
+  public static String generateMD5Password(String nonce, String password) {
+    
+    String authType = "md5";
+    
+    String md5Input = nonce + ":asterisk:" + password;
+    
+    String md5Cred = DigestUtils.md5DigestAsHex(md5Input.getBytes());
+    
+    return md5Cred;
   }
 
   private static String generateRandomSequenceString(int low, int high) {

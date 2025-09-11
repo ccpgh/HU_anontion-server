@@ -23,7 +23,8 @@ public class ConnectionService {
   private AnontionConnectionRepository connectionRepository;
     
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionIndirectBase(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, StringBuilder buffer) {
+  public boolean saveTxConnectionIndirectBase(Long sipTsA, String sipEndpointA, String sipSignatureA, 
+      Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, StringBuilder buffer) {
     
     _logger.info("DEBUG saveTxConnectionIndirectBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
     
@@ -147,7 +148,8 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionDirect(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry) {
+  public boolean saveTxConnectionDirect(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, 
+      String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry) {
 
     _logger.info("DEBUG saveTxConnectionDirect called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
     
@@ -302,7 +304,8 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionIndirectUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
+  public boolean saveTxConnectionIndirectUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, 
+      String sipSignatureB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
     
     _logger.info("DEBUG saveTxConnectionIndirectUpdate called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
     
@@ -427,7 +430,8 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionMultipleBase(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry) {
+  public boolean saveTxConnectionMultipleBase(Long sipTsA, String sipEndpointA, String sipSignatureA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry) {
     
     _logger.info("DEBUG saveTxConnectionMultipleBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
     
@@ -494,7 +498,8 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionMultipleUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
+  public boolean saveTxConnectionMultipleUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
 
     _logger.info("DEBUG saveTxConnectionMultipleUpdate called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
 
