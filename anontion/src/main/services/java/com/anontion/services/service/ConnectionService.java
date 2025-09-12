@@ -838,7 +838,175 @@ public class ConnectionService {
     } 
   }
   
+  @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
+  public boolean createTxAccountIfConnected(String sipEndpoint, AtomicBoolean isRetry, String localSipAddress, StringBuilder returnPassword, 
+      Long clientTs, String clientName, UUID clientId, String clientUID) {
+
+    _logger.info("DEBUG createTxAccountIfConnected called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpoint '" + sipEndpoint + "'");
+
+    Optional<AnontionConnection> connection0 = null;
+
+    try {
+
+      connection0 = connectionRepository.findBySipEndpointAAndSipEndpointBIdentical(sipEndpoint);
+      
+    } catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.info("DEBUG createTxAccountIfConnected exception " + e.toString() + " when trying to find existing connection '" + sipEndpoint + "'");
+      
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }   
+    
+    if (connection0.isEmpty()) {
+
+      _logger.info("DEBUG createTxAccountIfConnected no connection exists");
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      isRetry.set(true);
+
+      return false;
+    }
+    
+    AnontionConnection connection = connection0.get();
+    
+    String password = AnontionSecurity.generatePassword();
+    
+    String foreignKey1 = AnontionSecurity.generateForeignKey();
+    
+    String foreignKey2 = AnontionSecurity.generateForeignKey();
+    
+    String md5Passsword = AnontionStrings.generateAsteriskMD5(foreignKey2, AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM, password);
+    
+    _logger.info("DEBUG createTxAccountIfConnected updating with endpoint '" + localSipAddress + "'");
+
+    if (!connection.getSipPasswordA().isEmpty() && 
+        !connection.getSipPasswordA().equals(connection.getSipPasswordB())) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      isRetry.set(false);
+
+      return false;
+    }
+    
+    if (!connection.getSipPasswordA().isEmpty()) {
+
+      returnPassword.append(connection.getSipPasswordA());
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      isRetry.set(false);
+
+      return true;
+    }
+
+    String unsafeSipEndpoint = AnontionSecurity.decodeFromSafeBase64(sipEndpoint);
+
+    ECPublicKeyParameters pub = null;
+
+    try {
+
+      pub = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(unsafeSipEndpoint);
+
+    } catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(false);
+
+      return false;
+    }
+
+    String passwordA = AnontionSecurityECIES_ECDH.encrypt(pub, password);
+
+    returnPassword.append(passwordA);
+
+    connection.setSipPasswordA(passwordA); 
+
+    connection.setSipPasswordB(passwordA); 
+
+    AnontionAccount account = new AnontionAccount(
+        clientTs, // NYI primary key issues 
+        localSipAddress,
+        clientId,
+        "", // NYI do later 
+        "", // NYI do later ! 
+        localSipAddress, 
+        localSipAddress, // clientUID // NYI use ? needed?
+        AnontionAccount.DEFAULT_defaultExpiration,
+        AnontionAccount.DEFAULT_minimumExpiration,
+        AnontionAccount.DEFAULT_maximumExpiration,
+        false);
+    
+    AsteriskEndpoint endpoint = endpointBean.createAsteriskEndppint(
+        AnontionSecurity.makeSafeIfRequired(localSipAddress),
+        foreignKey1);
+
+    AsteriskAor aor = aorBean.createAsteriskAor(
+        AnontionSecurity.makeSafeIfRequired(localSipAddress));
+    
+    AsteriskAuth auth = authBean.createAsteriskAuth(
+        foreignKey1,
+        foreignKey2, //account.getClientName(),
+        md5Passsword,
+        AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM,
+        AnontionConfig._ASTERISK_PASSWORD_ENCODING_AUTHTYPE);
+    
+    if (!accountService.saveTxAccountAndEndpoint(
+        null,
+        account, 
+        endpoint, 
+        auth, 
+        aor)) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      isRetry.set(false);
+
+      return false;
+    }
+    
+    try {
+
+      connection = connectionRepository.save(connection);
+
+      isRetry.set(false);
+      
+      return true;
+
+    } catch (DataIntegrityViolationException e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }
+    catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    } 
+  }
+  
   final private static AnontionLog _logger = new AnontionLog(ConnectionService.class.getName());
 }
+
 
 
