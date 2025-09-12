@@ -692,7 +692,7 @@ public class ConnectionService {
     
     String md5Passsword = AnontionStrings.generateAsteriskMD5(foreignKey2, AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM, password);
     
-    _logger.info("DEBUG createTxAccountIfConnected updating with foreignKey1 '" + foreignKey1 + "' foreignKey2 '" + foreignKey2 + "' md5Passsword '" + md5Passsword + "'");
+    _logger.info("DEBUG createTxAccountIfConnected NNN updating with foreignKey1 '" + foreignKey1 + "' foreignKey2 '" + foreignKey2 + "' md5Passsword '" + md5Passsword + "'");
 
     if (sipEndpointA.equals(localSipAddress)) {
       
@@ -705,6 +705,8 @@ public class ConnectionService {
         returnPassword.append(connection.getSipPasswordA());
         
         returnSipUserId.append(foreignKey2);
+        
+        _logger.info("DEBUG createTxAccountIfConnected NNN set connection foreignKey2 " + foreignKey2);
 
         isRetry.set(false);
 
@@ -734,6 +736,8 @@ public class ConnectionService {
       
       returnSipUserId.append(foreignKey2);
 
+      _logger.info("DEBUG createTxAccountIfConnected NNN set NOT connection foreignKey2 " + foreignKey2);
+
       connection.setSipPasswordA(passwordA);
       
     } else if (sipEndpointB.equals(localSipAddress)) {
@@ -747,6 +751,8 @@ public class ConnectionService {
         returnPassword.append(connection.getSipPasswordB());
         
         returnSipUserId.append(foreignKey2);
+
+        _logger.info("DEBUG createTxAccountIfConnected NNN set connection foreignKey2 " + foreignKey2);
 
         isRetry.set(false);
 
@@ -775,6 +781,8 @@ public class ConnectionService {
       returnPassword.append(passwordB);
 
       returnSipUserId.append(foreignKey2);
+
+      _logger.info("DEBUG createTxAccountIfConnected NNN set NOT connection foreignKey2 " + foreignKey2);
 
       connection.setSipPasswordB(passwordB);
     }
@@ -898,7 +906,7 @@ public class ConnectionService {
     
     String md5Passsword = AnontionStrings.generateAsteriskMD5(foreignKey2, AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM, password);
     
-    _logger.info("DEBUG createTxAccountIfConnected updating with foreignKey1 '" + foreignKey1 + "' foreignKey2 '" + foreignKey2 + "' md5Passsword '" + md5Passsword + "'");
+    _logger.info("DEBUG createTxAccountIfConnected NNN updating with foreignKey1 '" + foreignKey1 + "' foreignKey2 '" + foreignKey2 + "' md5Passsword '" + md5Passsword + "'");
 
     _logger.info("DEBUG createTxAccountIfConnected updating with endpoint '" + localSipAddress + "'");
 
@@ -917,6 +925,8 @@ public class ConnectionService {
       returnPassword.append(connection.getSipPasswordA());
 
       returnSipUserId.append(foreignKey2);
+
+      _logger.info("DEBUG createTxAccountIfConnected NNN set connection foreignKey2 " + foreignKey2);
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
@@ -949,6 +959,8 @@ public class ConnectionService {
     returnPassword.append(passwordA);
 
     returnSipUserId.append(foreignKey2);
+
+    _logger.info("DEBUG createTxAccountIfConnected NNN set NOT connection foreignKey2 " + foreignKey2);
 
     connection.setSipPasswordA(passwordA); 
 
