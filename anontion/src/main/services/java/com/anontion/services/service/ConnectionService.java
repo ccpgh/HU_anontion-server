@@ -692,6 +692,8 @@ public class ConnectionService {
     
     String md5Passsword = AnontionStrings.generateAsteriskMD5(foreignKey2, AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM, password);
     
+    _logger.info("DEBUG createTxAccountIfConnected updating with foreignKey1 '" + foreignKey1 + "' foreignKey2 '" + foreignKey2 + "' md5Passsword '" + md5Passsword + "'");
+
     if (sipEndpointA.equals(localSipAddress)) {
       
       _logger.info("DEBUG createTxAccountIfConnected updating A with endpoint '" + localSipAddress + "'");
@@ -896,6 +898,8 @@ public class ConnectionService {
     
     String md5Passsword = AnontionStrings.generateAsteriskMD5(foreignKey2, AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM, password);
     
+    _logger.info("DEBUG createTxAccountIfConnected updating with foreignKey1 '" + foreignKey1 + "' foreignKey2 '" + foreignKey2 + "' md5Passsword '" + md5Passsword + "'");
+
     _logger.info("DEBUG createTxAccountIfConnected updating with endpoint '" + localSipAddress + "'");
 
     if (!connection.getSipPasswordA().isEmpty() && 

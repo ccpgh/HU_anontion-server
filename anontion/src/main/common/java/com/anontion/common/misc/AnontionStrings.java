@@ -98,7 +98,7 @@ public class AnontionStrings {
         password.length() <= PASSWORD_MAXCHARS;
   }
   
-  public static String generateAsteriskMD5(String nonce, String password, String realm) {
+  public static String generateAsteriskMD5(String nonce, String realm, String password) {
     
     String md5Input = nonce + ":" + realm + ":" + password;
     
