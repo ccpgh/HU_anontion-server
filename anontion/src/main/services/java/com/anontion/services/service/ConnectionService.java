@@ -684,6 +684,8 @@ public class ConnectionService {
     
     String password = AnontionSecurity.generatePassword();
     
+    password = "password"; //TODO remove
+    
     String foreignKey1 = AnontionSecurity.generateForeignKey();
     
     String foreignKey2 = AnontionSecurity.generateForeignKey();
@@ -886,6 +888,8 @@ public class ConnectionService {
     
     String password = AnontionSecurity.generatePassword();
     
+    password = "password"; //TODO remove
+
     String foreignKey1 = AnontionSecurity.generateForeignKey();
     
     String foreignKey2 = AnontionSecurity.generateForeignKey();
