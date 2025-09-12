@@ -305,7 +305,7 @@ public class ConnectionPostController {
         nowTs.toString(), 
         clientId.toString() }, ":");
 
-    if (connectionService.createTxAccountIfConnected(sipEndpointA, sipEndpointB, isRetry, localSipAddress, remoteSipAddress, returnPassword, clientTs, clientName, clientId, clientUID)) { // NYI needsa timeout
+    if (connectionService.createTxAccountIfConnected(sipEndpointA, sipEndpointB, isRetry, localSipAddress, remoteSipAddress, returnPassword, clientTs, clientName, clientId, clientUID)) { // NYI needs a timeout
       
       String buffer5 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -321,7 +321,7 @@ public class ConnectionPostController {
           nowTs,
           signature,
           false,
-          true, // NNN
+          true, 
           false,
           returnPassword.toString(),
           "Ok connection connected and account exists.");
@@ -370,7 +370,7 @@ public class ConnectionPostController {
         localSipAddress, 
         remoteSipAddress,
         nowTs.toString(),
-        "false_true_true"}, // 1. NNN
+        "false_true_true"},
         "_");
     
     String signature = AnontionSecurityECDSA.sign(buffer5);
@@ -618,7 +618,7 @@ public class ConnectionPostController {
         localSipAddress, 
         buffer.toString(), // remoteSipAddress,
         nowTs.toString(),
-        "false_true_true"}, // 2. NNN 
+        "false_true_true"}, 
         "_");
     
     String signature = AnontionSecurityECDSA.sign(buffer5);
@@ -650,13 +650,21 @@ public class ConnectionPostController {
     String clientSignature2 = dto.getClientSignature2();   
     Long nowTs = dto.getNowTs();
 
+    UUID clientId = dto.getClientId();
+    String clientName = dto.getClientName();   
+    Long clientTs = dto.getClientTs();
+
+    // NYI clean up
+    
     Long sipTsA = null;
     String sipEndpointA = null;
     String sipSignatureA = null;
+    String sipSignatureACreate = null;
 
     Long sipTsB = null;
     String sipEndpointB = null;
     String sipSignatureB = null;
+    String sipSignatureBCreate = null;
     
     if (localSipAddress.compareTo(remoteSipAddress) < 0) {
 
@@ -664,18 +672,59 @@ public class ConnectionPostController {
       sipSignatureA = clientSignature2;
       sipTsA = nowTs;
       
+      sipSignatureACreate = localSipAddress;
+      sipSignatureBCreate = remoteSipAddress;
+      
     } else {
       
       sipEndpointB = localSipAddress;      
       sipSignatureB = clientSignature2;
       sipTsB = nowTs;
+      
+      sipSignatureBCreate = localSipAddress;
+      sipSignatureACreate = remoteSipAddress;
     }
     
     AtomicBoolean isRetry = new AtomicBoolean(false);
-
-    // NYI find record and create account side if exists 
     
     _logger.info("DEBUG connection indirect calling saveTxConnectionIndirectUpdate");
+    
+    StringBuilder returnPassword = new StringBuilder();
+
+    String clientUID = AnontionStrings.concatLowercase(new String[] { 
+        clientName, 
+        nowTs.toString(), 
+        clientId.toString() }, ":");
+    
+    if (connectionService.createTxAccountIfConnected(sipSignatureACreate, sipSignatureBCreate, isRetry, localSipAddress, remoteSipAddress, 
+        returnPassword, clientTs, clientName, clientId, clientUID)) { // NYI needs a timeout
+      
+      String buffer5 = AnontionStrings.concat(new String[] { 
+          localSipAddress, 
+          remoteSipAddress,
+          nowTs.toString(),
+          "false_true_false"}, 
+          "_");
+      
+      String signature = AnontionSecurityECDSA.sign(buffer5);
+
+      ResponsePostConnectionBodyDTO body = new ResponsePostConnectionBodyDTO(localSipAddress,
+          remoteSipAddress,
+          nowTs,
+          signature,
+          false,
+          true, 
+          false,
+          returnPassword.toString(),
+          "Ok connection connected and account exists.");
+
+      ResponsePostDTO response = new ResponsePostDTO(
+          new ResponseHeaderDTO(true, 0, "Ok."), body);
+
+      _logger.info("DEBUG direct connection and account ok");
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     
     if (!connectionService.saveTxConnectionIndirectUpdate(sipTsA, sipEndpointA, sipSignatureA, sipTsB, sipEndpointB, 
         sipSignatureB, isRetry, localSipAddress, remoteSipAddress)) {
@@ -713,7 +762,7 @@ public class ConnectionPostController {
         localSipAddress, 
         remoteSipAddress,
         nowTs.toString(),
-        "false_true_true"}, // 3. NNN 
+        "false_true_true"}, 
         "_");
     
     String signature = AnontionSecurityECDSA.sign(buffer5);
@@ -1093,4 +1142,3 @@ public class ConnectionPostController {
   
   final private static AnontionLog _logger = new AnontionLog(ConnectionPostController.class.getName());
 }
-
