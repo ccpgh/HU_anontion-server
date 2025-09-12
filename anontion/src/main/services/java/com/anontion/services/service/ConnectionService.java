@@ -646,7 +646,7 @@ public class ConnectionService {
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean createTxAccountIfConnected(String sipEndpointA, String sipEndpointB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress, StringBuilder returnPassword, 
-      Long clientTs, String clientName, UUID clientId, String clientUID) {
+      StringBuilder returnSipUserId, Long clientTs, String clientName, UUID clientId, String clientUID) {
 
     _logger.info("DEBUG createTxAccountIfConnected called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
 
@@ -700,6 +700,8 @@ public class ConnectionService {
 
         returnPassword.append(connection.getSipPasswordA());
         
+        returnSipUserId.append(foreignKey2);
+
         isRetry.set(false);
 
         return true;
@@ -725,6 +727,8 @@ public class ConnectionService {
       String passwordA = AnontionSecurityECIES_ECDH.encrypt(pubA, password);
 
       returnPassword.append(passwordA);
+      
+      returnSipUserId.append(foreignKey2);
 
       connection.setSipPasswordA(passwordA);
       
@@ -737,6 +741,8 @@ public class ConnectionService {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
         returnPassword.append(connection.getSipPasswordB());
+        
+        returnSipUserId.append(foreignKey2);
 
         isRetry.set(false);
 
@@ -763,6 +769,8 @@ public class ConnectionService {
       String passwordB = AnontionSecurityECIES_ECDH.encrypt(pubB, password);
 
       returnPassword.append(passwordB);
+
+      returnSipUserId.append(foreignKey2);
 
       connection.setSipPasswordB(passwordB);
     }
@@ -840,7 +848,7 @@ public class ConnectionService {
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean createTxAccountIfConnected(String sipEndpoint, AtomicBoolean isRetry, String localSipAddress, StringBuilder returnPassword, 
-      Long clientTs, String clientName, UUID clientId, String clientUID) {
+      StringBuilder returnSipUserId, Long clientTs, String clientName, UUID clientId, String clientUID) {
 
     _logger.info("DEBUG createTxAccountIfConnected called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpoint '" + sipEndpoint + "'");
 
@@ -900,6 +908,8 @@ public class ConnectionService {
 
       returnPassword.append(connection.getSipPasswordA());
 
+      returnSipUserId.append(foreignKey2);
+
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
       isRetry.set(false);
@@ -929,6 +939,8 @@ public class ConnectionService {
     String passwordA = AnontionSecurityECIES_ECDH.encrypt(pub, password);
 
     returnPassword.append(passwordA);
+
+    returnSipUserId.append(foreignKey2);
 
     connection.setSipPasswordA(passwordA); 
 
@@ -1007,6 +1019,7 @@ public class ConnectionService {
   
   final private static AnontionLog _logger = new AnontionLog(ConnectionService.class.getName());
 }
+
 
 
 

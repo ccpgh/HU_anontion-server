@@ -131,6 +131,7 @@ public class ConnectionPostController {
           false,
           false,
           "",
+          "",
           "Direct connection same local and remote accounts.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -164,6 +165,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "",
           "Direct connection no account");
 
@@ -210,6 +212,7 @@ public class ConnectionPostController {
           false,
           false,
           "",
+          "",
           "Direct connection bad master signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -252,6 +255,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "",
           "Direct connection bad local signature");
 
@@ -300,13 +304,15 @@ public class ConnectionPostController {
 
     StringBuilder returnPassword = new StringBuilder();
 
+    StringBuilder returnSipUserId = new StringBuilder();
+
     String clientUID = AnontionStrings.concatLowercase(new String[] { 
         clientName, 
         nowTs.toString(), 
         clientId.toString() }, ":");
 
     if (connectionService.createTxAccountIfConnected(sipEndpointA, sipEndpointB, isRetry, localSipAddress, 
-        remoteSipAddress, returnPassword, clientTs, clientName, clientId, clientUID)) {
+        remoteSipAddress, returnPassword, returnSipUserId, clientTs, clientName, clientId, clientUID)) {
       
       String buffer5 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -325,6 +331,7 @@ public class ConnectionPostController {
           true, 
           false,
           returnPassword.toString(),
+          returnSipUserId.toString(),
           "Ok connection connected and account exists.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -357,6 +364,7 @@ public class ConnectionPostController {
           false,
           isRetry.get(),
           "",
+          "",
           "Direct connection db updates not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -383,6 +391,7 @@ public class ConnectionPostController {
         false,
         true,
         true,
+        "",
         "",
         "Ok connection connected.");
 
@@ -450,6 +459,7 @@ public class ConnectionPostController {
           false,
           false,
           "",
+          "",
           "Indirect connection no account");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -497,6 +507,7 @@ public class ConnectionPostController {
           false,
           false,
           "",
+          "",
           "Indirect connection bad master signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -539,6 +550,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "",
           "indirect connection bad local signature.");
 
@@ -603,6 +615,7 @@ public class ConnectionPostController {
           false,
           isRetry.get(),
           "",
+          "",
           "Connection db base insert not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -631,6 +644,7 @@ public class ConnectionPostController {
         false,
         true,
         true,
+        "",
         "",
         "OK. connection connected.");
 
@@ -690,13 +704,15 @@ public class ConnectionPostController {
     
     StringBuilder returnPassword = new StringBuilder();
 
+    StringBuilder returnSipUserId = new StringBuilder();
+    
     String clientUID = AnontionStrings.concatLowercase(new String[] { 
         clientName, 
         nowTs.toString(), 
         clientId.toString() }, ":");
     
     if (connectionService.createTxAccountIfConnected(sipSignatureACreate, sipSignatureBCreate, isRetry, localSipAddress, remoteSipAddress, 
-        returnPassword, clientTs, clientName, clientId, clientUID)) { 
+        returnPassword, returnSipUserId, clientTs, clientName, clientId, clientUID)) { 
       
       String buffer5 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -715,6 +731,7 @@ public class ConnectionPostController {
           true, 
           false,
           returnPassword.toString(),
+          returnSipUserId.toString(),
           "Ok connection connected and account exists.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -745,6 +762,7 @@ public class ConnectionPostController {
           false,
           isRetry.get(),
           "",
+          "",
           "Connection base update not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -773,6 +791,7 @@ public class ConnectionPostController {
         false,
         true,
         true,
+        "",
         "",
         "Ok. Connection indirect connected. Odd values.");
 
@@ -848,6 +867,7 @@ public class ConnectionPostController {
           false,
           false,
           "",
+          "",
           "Multiple connection no account");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -895,6 +915,7 @@ public class ConnectionPostController {
           false,
           false,
           "",
+          "",
           "Multiple connection bad master signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -937,6 +958,7 @@ public class ConnectionPostController {
           true,
           false,
           false,
+          "",
           "",
           "Multiple connection bad local signature.");
 
@@ -1020,6 +1042,7 @@ public class ConnectionPostController {
           false,
           isRetry.get(),
           "",
+          "",
           "Connection db base update failed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -1034,13 +1057,15 @@ public class ConnectionPostController {
     
     StringBuilder returnPassword = new StringBuilder();
 
+    StringBuilder returnSipUserId = new StringBuilder();
+
     String clientUID = AnontionStrings.concatLowercase(new String[] { 
         clientName, 
         nowTs.toString(), 
         clientId.toString() }, ":");
     
     if (connectionService.createTxAccountIfConnected(sipEndpointA, sipEndpointB, isRetry, localSipAddress, 
-        remoteSipAddress, returnPassword, clientTs, clientName, clientId, clientUID)) {
+        remoteSipAddress, returnPassword, returnSipUserId, clientTs, clientName, clientId, clientUID)) {
       
       String buffer5 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -1059,6 +1084,7 @@ public class ConnectionPostController {
           true, 
           false,
           returnPassword.toString(),
+          returnSipUserId.toString(),
           "Ok connection connected and account exists.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -1085,6 +1111,7 @@ public class ConnectionPostController {
         false,
         true,
         true,
+        "",
         "",
         "OK. connection connected.");
 
@@ -1141,6 +1168,7 @@ public class ConnectionPostController {
           false,
           isRetry.get(),
           "",
+          "",
           "Connection db base insert not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -1155,13 +1183,15 @@ public class ConnectionPostController {
 
     StringBuilder returnPassword = new StringBuilder();
 
+    StringBuilder returnSipUserId = new StringBuilder();
+
     String clientUID = AnontionStrings.concatLowercase(new String[] { 
         clientName, 
         nowTs.toString(), 
         clientId.toString() }, ":");
 
     if (connectionService.createTxAccountIfConnected(sipEndpointA, isRetry, localSipAddress, 
-        returnPassword, clientTs, clientName, clientId, clientUID)) { 
+        returnPassword, returnSipUserId, clientTs, clientName, clientId, clientUID)) { 
       
       String buffer5 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -1180,6 +1210,7 @@ public class ConnectionPostController {
           true, 
           false,
           returnPassword.toString(),
+          returnSipUserId.toString(),
           "Ok connection connected and account exists.");
 
       ResponsePostDTO response = new ResponsePostDTO(
@@ -1207,6 +1238,7 @@ public class ConnectionPostController {
         true,
         true,
         "",
+        "",
         "OK. connection connected.");
 
     ResponsePostDTO response = new ResponsePostDTO(
@@ -1219,6 +1251,5 @@ public class ConnectionPostController {
   
   final private static AnontionLog _logger = new AnontionLog(ConnectionPostController.class.getName());
 }
-
 
 
