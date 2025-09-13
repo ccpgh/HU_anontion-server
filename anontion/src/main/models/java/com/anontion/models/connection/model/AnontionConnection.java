@@ -40,6 +40,9 @@ public class AnontionConnection {
   @Column(name = "sip_signature_A", nullable = true, length = 255)
   private String sipSignatureA;
 
+  @Column(name = "sip_password_A", nullable = true, length = 255)
+  private String sipPasswordA;
+
   @Column(name = "sip_ts_B", nullable = true)
   private Long sipTsB;
 
@@ -53,7 +56,10 @@ public class AnontionConnection {
   @Pattern(regexp = "direct|indirect|multiple", message = "connectionType must be 'direct', 'indirect', or 'multiple'")
   @Column(name = "connection_type", nullable = true, length = 255)
   private String connectionType;
-  
+
+  @Column(name = "sip_password_B", nullable = true, length = 255)
+  private String sipPasswordB;
+
   @PrePersist
   @PreUpdate
   private void validateSipOrder() {
@@ -82,6 +88,10 @@ public class AnontionConnection {
     this.sipSignatureB = sipSignatureB;
     
     this.connectionType = connectionType;
+    
+    this.sipPasswordA = "";
+    
+    this.sipPasswordB = "";
   }
 
   public AnontionConnection() {
@@ -138,6 +148,18 @@ public class AnontionConnection {
     this.sipSignatureA = sipSignatureA;
   }
 
+  public String getSipPasswordA() {
+    
+    return sipPasswordA;
+  }
+
+  public void setSipPasswordA(String sipPasswordA) {
+    
+    this.sipPasswordA = sipPasswordA;
+  }
+
+  //
+
   public Long getSipTsB() {
     
     return sipTsB;
@@ -167,6 +189,18 @@ public class AnontionConnection {
     
     this.sipSignatureB = sipSignatureB;
   }
+  
+  public String getSipPasswordB() {
+    
+    return sipPasswordB;
+  }
+
+  public void setSipPasswordB(String sipPasswordB) {
+    
+    this.sipPasswordB = sipPasswordB;
+  }
+  
+  //
   
   public String getConnectionType() {
     

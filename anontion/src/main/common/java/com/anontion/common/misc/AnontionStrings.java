@@ -2,6 +2,8 @@ package com.anontion.common.misc;
 
 import java.util.ArrayList;
 
+import org.springframework.util.DigestUtils;
+
 public class AnontionStrings {
 
   private static String VALID_CHARACTERS_IN_NAME = "^[A-Za-z0-9- ]+$"; 
@@ -94,5 +96,12 @@ public class AnontionStrings {
 
     return password.length() >= PASSWORD_MINCHARS && 
         password.length() <= PASSWORD_MAXCHARS;
+  }
+  
+  public static String generateAsteriskMD5(String nonce, String realm, String password) {
+    
+    String md5Input = nonce + ":" + realm + ":" + password;
+    
+    return DigestUtils.md5DigestAsHex(md5Input.getBytes());
   }
 }

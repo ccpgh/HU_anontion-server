@@ -23,9 +23,6 @@ public class AsteriskAuth {
   @Column(nullable = false, name = "username", length = 40)
   private String username;
 
-  //@Column(nullable = false, name = "password", length = 80)
-  //private String password;
-
   @Column(nullable = false, name = "md5_cred", length = 40)
   private String md5Cred;
 
@@ -36,8 +33,7 @@ public class AsteriskAuth {
 
   }
 
-  //public AsteriskAuth(String id, String authType, String username, String password) {
-  public AsteriskAuth(String id, String authType, String username, String password, String md5Cred, String realm) {
+  public AsteriskAuth(String id, String username, String md5Cred, String realm, String authType) {
 
     this.id = id;
 
@@ -45,8 +41,6 @@ public class AsteriskAuth {
     
     this.username = username;
     
-    //this.password = password;
-
     this.md5Cred = md5Cred;
     
     this.realm = realm;
@@ -82,16 +76,6 @@ public class AsteriskAuth {
     this.username = username;
   }
 
-//  public String getPassword() {
-//    
-//    return password;
-//  }
-//
-//  public void setPassword(String password) {
-//    
-//    this.password = password;
-//  }
-  
   public String getMd5Cred() {
 
     return md5Cred;

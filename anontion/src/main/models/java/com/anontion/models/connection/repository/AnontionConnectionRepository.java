@@ -29,7 +29,10 @@ public interface AnontionConnectionRepository extends JpaRepository<AnontionConn
 
   @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a != sip_endpoint_b AND sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and sip_signature_A IS NOT NULL and sip_signature_B IS NOT NULL and sip_ts_A IS NOT NULL and sip_ts_B IS NOT NULL", nativeQuery = true)
   Optional<AnontionConnection> findBySipEndpointAAndSipEndpointB(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB);  
-  
+
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = sip_endpoint_b AND sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointA and sip_signature_A IS NOT NULL and sip_signature_B IS NOT NULL and sip_ts_A IS NOT NULL and sip_ts_B IS NOT NULL", nativeQuery = true)
+  Optional<AnontionConnection> findBySipEndpointAAndSipEndpointBIdentical(@Param("sipEndpointA") String sipEndpointA);  
+
   @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_signature_a = :sipSignatureA and connection_type = 'indirect' AND sip_endpoint_a != sip_endpoint_b ", nativeQuery = true)
   Optional<AnontionConnection> findIndirectBySipEndpointAAndSipSignatureARelaxed(@Param("sipEndpointA") String sipEndpointA, @Param("sipSignatureA") String sipSignatureA);  
   

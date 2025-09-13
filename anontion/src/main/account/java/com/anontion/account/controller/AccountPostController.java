@@ -36,7 +36,9 @@ import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponsePostDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.dto.response.Responses;
+import com.anontion.common.misc.AnontionConfig;
 import com.anontion.common.misc.AnontionLog;
+import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
@@ -209,11 +211,15 @@ public class AccountPostController {
             foreignKey1);
                      
         String password = AnontionSecurity.generatePassword();
-        
+
+        String md5Passsword = AnontionStrings.generateAsteriskMD5(foreignKey2, AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM, password);
+
         AsteriskAuth auths = authBean.createAsteriskAuth(
             foreignKey1,
             foreignKey2, //account.getClientName(),
-            password);
+            md5Passsword,
+            AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM,
+            AnontionConfig._ASTERISK_PASSWORD_ENCODING_AUTHTYPE);
 
         if (auths.getUsername().isEmpty()) {
           
