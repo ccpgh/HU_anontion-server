@@ -597,7 +597,6 @@ public class ConnectionPostController {
 
     _logger.info("DEBUG indirect connection signature2 ok");
     
-    
     if (!photo.isEmpty()) {
     
       Optional<AnontionImage> image0 = imageRepository.findById(localSipAddress);
@@ -890,6 +889,7 @@ public class ConnectionPostController {
     String clientSignature1 = dto.getClientSignature1();   
     String clientSignature2 = dto.getClientSignature2();   
     String label = dto.getLabel();
+    String photo = dto.getPhoto();
     String connectionType = dto.getConnectionType();   
     Long nowTs = dto.getNowTs();
             
@@ -1048,6 +1048,29 @@ public class ConnectionPostController {
 
     _logger.info("DEBUG multiple connection signature2 ok");
     
+    if (!photo.isEmpty()) {
+      
+      Optional<AnontionImage> image0 = imageRepository.findById(localSipAddress);
+      
+      if (image0.isEmpty()) {
+       
+        try {
+          
+          AnontionImage image = new AnontionImage(localSipAddress, photo);
+        
+          image = imageRepository.save(image);
+        
+        } catch (DataIntegrityViolationException e) {
+        
+          _logger.exception(e);
+        
+        } catch (Exception e) {
+          
+          _logger.exception(e);
+        }        
+      }
+    }    
+    
     if (!localSipAddress.equals(remoteSipAddress)) {
       
       return postMultipleConnectionDifferent(dto);
@@ -1068,38 +1091,45 @@ public class ConnectionPostController {
     UUID clientId = dto.getClientId();
     String clientName = dto.getClientName();   
     Long clientTs = dto.getClientTs();
-
+    String sipLabel = dto.getLabel();
+    
     Long sipTsA = null;
     String sipEndpointA = null;
     String sipSignatureA = null;
-
+    String sipLabelA = null;
+    
     Long sipTsB = null;
     String sipEndpointB = null;
     String sipSignatureB = null;
+    String sipLabelB = null;
     
     if (localSipAddress.compareTo(remoteSipAddress) < 0) {
 
       sipEndpointA = localSipAddress;
       sipSignatureA = clientSignature2;
       sipTsA = nowTs;
-      
+      sipLabelA = sipLabel;
+
       sipEndpointB = remoteSipAddress;
       sipTsB = nowTs;
-          
+      sipLabelB = sipLabel;
+
     } else {
 
       sipEndpointA = remoteSipAddress;
       sipTsA = nowTs;
+      sipLabelA = sipLabel;
 
       sipEndpointB = localSipAddress;      
       sipSignatureB = clientSignature2;
       sipTsB = nowTs;
+      sipLabelB = sipLabel;
     }
 
     AtomicBoolean isRetry = new AtomicBoolean(false);
     
-    if (!connectionService.saveTxConnectionMultipleUpdate(sipTsA, sipEndpointA, sipSignatureA, "",
-        sipTsB, sipEndpointB, sipSignatureB, "", isRetry, localSipAddress, remoteSipAddress)) {
+    if (!connectionService.saveTxConnectionMultipleUpdate(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
+        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, localSipAddress, remoteSipAddress)) {
 
       String buffer4 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -1174,7 +1204,7 @@ public class ConnectionPostController {
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "Ok."), body);
 
-      _logger.info("DEBUG direct connection and account ok");
+      _logger.info("DEBUG multiple different connection and account ok " + (returnPhoto.isEmpty() ? "Has no photo" : "Has photo"));
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -1216,6 +1246,7 @@ public class ConnectionPostController {
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();
     String clientSignature2 = dto.getClientSignature2();   
+    String sipLabel = dto.getLabel();
     Long nowTs = dto.getNowTs();
 
     UUID clientId = dto.getClientId();
@@ -1225,17 +1256,19 @@ public class ConnectionPostController {
     Long sipTsA = AnontionTime.tsN();
     String sipEndpointA = localSipAddress;
     String sipSignatureA = clientSignature2;
+    String sipLabelA = sipLabel;
 
     Long sipTsB = null;
     String sipEndpointB = localSipAddress;
     String sipSignatureB = null;
-
+    String sipLabelB = sipLabel;
+    
     AtomicBoolean isRetry = new AtomicBoolean(false);
     
     _logger.info("DEBUG connection multiple calling saveTxConnectionMultipleBase");
         
-    if (!connectionService.saveTxConnectionMultipleBase(sipTsA, sipEndpointA, sipSignatureA, "",
-        sipTsB, sipEndpointB, sipSignatureB, "", isRetry)) {
+    if (!connectionService.saveTxConnectionMultipleBase(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
+        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry)) {
 
       String buffer4 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -1310,7 +1343,7 @@ public class ConnectionPostController {
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "Ok."), body);
 
-      _logger.info("DEBUG direct connection and account ok");
+      _logger.info("DEBUG multiple connection and account ok.");
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
