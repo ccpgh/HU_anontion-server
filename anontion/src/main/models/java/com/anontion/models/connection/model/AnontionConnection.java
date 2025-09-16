@@ -24,11 +24,15 @@ import com.anontion.common.misc.AnontionTime;
 @IdClass(AnontionConnectionId.class)
 public class AnontionConnection {
 
+  //
+
   @Column(name = "connection_id")
   private UUID connectionId;
 
   @Column(name = "connection_ts", nullable = false)
   private Long connectionTs;
+
+  //
 
   @Column(name = "sip_ts_A", nullable = true)
   private Long sipTsA;
@@ -43,6 +47,11 @@ public class AnontionConnection {
   @Column(name = "sip_password_A", nullable = true, length = 255)
   private String sipPasswordA;
 
+  @Column(name = "sip_label_A", nullable = true, length = 255)
+  private String sipLabelA;
+
+  //
+  
   @Column(name = "sip_ts_B", nullable = true)
   private Long sipTsB;
 
@@ -53,12 +62,19 @@ public class AnontionConnection {
   @Column(name = "sip_signature_B", nullable = true, length = 255)
   private String sipSignatureB;
 
+  @Column(name = "sip_password_B", nullable = true, length = 255)
+  private String sipPasswordB;
+
+  @Column(name = "sip_label_B", nullable = true, length = 255)
+  private String sipLabelB;
+
+  //
+  
   @Pattern(regexp = "direct|indirect|multiple", message = "connectionType must be 'direct', 'indirect', or 'multiple'")
   @Column(name = "connection_type", nullable = true, length = 255)
   private String connectionType;
 
-  @Column(name = "sip_password_B", nullable = true, length = 255)
-  private String sipPasswordB;
+  //
 
   @PrePersist
   @PreUpdate
@@ -68,12 +84,14 @@ public class AnontionConnection {
       }
   }
 
-  public AnontionConnection(Long sipTsA, String sipEndpointA, String sipSignatureA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, String connectionType) {
+  public AnontionConnection(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, String connectionType) {
     
     this.connectionId = UUID.randomUUID();
 
     this.connectionTs = AnontionTime.tsN();
+    
+    //
     
     this.sipTsA = sipTsA;
 
@@ -81,17 +99,25 @@ public class AnontionConnection {
     
     this.sipSignatureA = sipSignatureA;
     
+    this.sipPasswordA = "";
+    
+    this.sipLabelA = sipLabelA;
+    
+    //
+    
     this.sipTsB = sipTsB;
     
     this.sipEndpointB = sipEndpointB;
     
     this.sipSignatureB = sipSignatureB;
     
-    this.connectionType = connectionType;
-    
-    this.sipPasswordA = "";
-    
     this.sipPasswordB = "";
+
+    this.sipLabelB = sipLabelB;
+
+    //
+    
+    this.connectionType = connectionType;
   }
 
   public AnontionConnection() {
@@ -118,6 +144,8 @@ public class AnontionConnection {
     this.connectionTs = connectionTs;
   }
 
+  //
+  
   public Long getSipTsA() {
 
     return sipTsA;
@@ -158,6 +186,16 @@ public class AnontionConnection {
     this.sipPasswordA = sipPasswordA;
   }
 
+  public String getSipLabelA() {
+    
+    return sipLabelA;
+  }
+
+  public void setSipLabelA(String sipLabelA) {
+    
+    this.sipLabelA = sipLabelA;
+  }
+
   //
 
   public Long getSipTsB() {
@@ -190,6 +228,7 @@ public class AnontionConnection {
     this.sipSignatureB = sipSignatureB;
   }
   
+  
   public String getSipPasswordB() {
     
     return sipPasswordB;
@@ -199,7 +238,17 @@ public class AnontionConnection {
     
     this.sipPasswordB = sipPasswordB;
   }
-  
+
+  public String getSipLabelB() {
+    
+    return sipLabelB;
+  }
+
+  public void setSipLabelB(String sipLabelB) {
+    
+    this.sipLabelB = sipLabelB;
+  }
+
   //
   
   public String getConnectionType() {

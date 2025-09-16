@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface AnontionAccountRepository extends JpaRepository<AnontionAccount, Long> {
+public interface AnontionAccountRepository extends JpaRepository<AnontionAccount, UUID> {
 
   //Optional<AnontionAccount> findById(UUID accountId);
   

@@ -18,6 +18,8 @@ import com.anontion.common.security.AnontionSecurityECIES_ECDH;
 import com.anontion.models.account.model.AnontionAccount;
 import com.anontion.models.connection.model.AnontionConnection;
 import com.anontion.models.connection.repository.AnontionConnectionRepository;
+import com.anontion.models.image.model.AnontionImage;
+import com.anontion.models.image.repository.AnontionImageRepository;
 import com.anontion.services.service.ConnectionService;
 
 import java.util.Optional;
@@ -35,7 +37,10 @@ public class ConnectionService {
    
   @Autowired
   private AnontionConnectionRepository connectionRepository;
-    
+
+  @Autowired
+  private AnontionImageRepository imageRepository;
+
   @Autowired
   private AsteriskEndpointBean endpointBean;
 
@@ -49,8 +54,8 @@ public class ConnectionService {
   private AccountService accountService;
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionIndirectBase(Long sipTsA, String sipEndpointA, String sipSignatureA, 
-      Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, StringBuilder buffer) {
+  public boolean saveTxConnectionIndirectBase(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, StringBuilder buffer) {
     
     _logger.info("DEBUG saveTxConnectionIndirectBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
     
@@ -77,7 +82,7 @@ public class ConnectionService {
 
       _logger.info("DEBUG saveTxConnectionIndirectBase empty");
 
-      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, sipSignatureA, null, sipEndpointB, sipSignatureA, "indirect");
+      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, sipSignatureA, sipLabelA, null, sipEndpointB, sipSignatureA, sipLabelB, "indirect");
       
       try {
         
@@ -202,7 +207,7 @@ public class ConnectionService {
 
       _logger.info("DEBUG saveTxConnectionDirect empty");
 
-      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, null, null, sipEndpointB, null, "direct");
+      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, null, "", null, sipEndpointB, null, "", "direct");
       
       try {
         
@@ -330,8 +335,8 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionIndirectUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, String sipEndpointB, 
-      String sipSignatureB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
+  public boolean saveTxConnectionIndirectUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA, Long sipTsB, String sipEndpointB, 
+      String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
     
     _logger.info("DEBUG saveTxConnectionIndirectUpdate called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
     
@@ -408,11 +413,11 @@ public class ConnectionService {
 
     if (sipEndpointA != null) {
       
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipTsA, connection.getSipEndpointB(), connection.getSipSignatureB(), "indirect");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, connection.getSipEndpointB(), connection.getSipSignatureB(), connection.getSipLabelB(), "indirect");
 
     } else if (sipEndpointB != null) {
             
-      newConnection = new AnontionConnection(sipTsB, connection.getSipEndpointA(), connection.getSipSignatureA(), sipTsB, sipEndpointB, sipSignatureB, "indirect");
+      newConnection = new AnontionConnection(sipTsB, connection.getSipEndpointA(), connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, "indirect");
 
     } else {
       
@@ -456,8 +461,8 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionMultipleBase(Long sipTsA, String sipEndpointA, String sipSignatureA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry) {
+  public boolean saveTxConnectionMultipleBase(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry) {
     
     _logger.info("DEBUG saveTxConnectionMultipleBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
     
@@ -484,7 +489,7 @@ public class ConnectionService {
 
       _logger.info("DEBUG saveTxConnectionMultipleBase empty");
 
-      AnontionConnection connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipTsA, sipEndpointB, sipSignatureA, "multiple");
+      AnontionConnection connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, sipEndpointB, sipSignatureA, sipLabelB, "multiple");
       
       try {
         
@@ -524,8 +529,8 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionMultipleUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
+  public boolean saveTxConnectionMultipleUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
 
     _logger.info("DEBUG saveTxConnectionMultipleUpdate called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
 
@@ -597,11 +602,11 @@ public class ConnectionService {
 
     if (sipSignatureA == null) {
       
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, connection.getSipSignatureA(), sipTsB, sipEndpointB, sipSignatureB, "multiple");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, "multiple");
 
     } else if (sipSignatureB == null) {
             
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipTsB, sipEndpointB, connection.getSipSignatureB(), "multiple");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsB, sipEndpointB, connection.getSipSignatureB(), connection.getSipLabelB(), "multiple");
 
     } else {
       
@@ -646,7 +651,7 @@ public class ConnectionService {
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean createTxAccountIfConnected(String sipEndpointA, String sipEndpointB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress, StringBuilder returnPassword, 
-      StringBuilder returnSipUserId, Long clientTs, String clientName, UUID clientId, String clientUID) {
+      StringBuilder returnSipUserId, StringBuilder returnSipLabel, StringBuilder returnPhoto, Long clientTs, String clientName, UUID clientId, String clientUID) {
 
     _logger.info("DEBUG createTxAccountIfConnected called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
 
@@ -731,6 +736,20 @@ public class ConnectionService {
       returnPassword.append(passwordA);
       
       returnSipUserId.append(foreignKey2);
+      
+      returnSipLabel.append(connection.getSipLabelB());
+      
+      Optional<AnontionImage> image0 = imageRepository.findById(remoteSipAddress);
+      
+      if (!image0.isEmpty()) {
+        
+        AnontionImage image = image0.get();
+        
+        if (!image.getBase64EncodedImage().isEmpty()) {
+          
+          returnPhoto.append(image.getBase64EncodedImage());
+        }
+      }
 
       _logger.info("DEBUG createTxAccountIfConnected set NOT connection foreignKey2 " + foreignKey2);
 
@@ -775,6 +794,20 @@ public class ConnectionService {
       returnPassword.append(passwordB);
 
       returnSipUserId.append(foreignKey2);
+
+      returnSipLabel.append(connection.getSipLabelA());
+      
+      Optional<AnontionImage> image0 = imageRepository.findById(remoteSipAddress);
+      
+      if (!image0.isEmpty()) {
+        
+        AnontionImage image = image0.get();
+        
+        if (!image.getBase64EncodedImage().isEmpty()) {
+          
+          returnPhoto.append(image.getBase64EncodedImage());
+        }
+      }
 
       _logger.info("DEBUG createTxAccountIfConnected set NOT connection foreignKey2 " + foreignKey2);
 
@@ -853,8 +886,8 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean createTxAccountIfConnected(String sipEndpoint, AtomicBoolean isRetry, String localSipAddress, StringBuilder returnPassword, 
-      StringBuilder returnSipUserId, Long clientTs, String clientName, UUID clientId, String clientUID) {
+  public boolean createTxAccountIfConnected(String sipEndpoint, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress, StringBuilder returnPassword, 
+      StringBuilder returnSipUserId, StringBuilder returnSipLabel, StringBuilder returnPhoto, Long clientTs, String clientName, UUID clientId, String clientUID) {
 
     _logger.info("DEBUG createTxAccountIfConnected called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpoint '" + sipEndpoint + "'");
 
@@ -950,6 +983,20 @@ public class ConnectionService {
 
     returnSipUserId.append(foreignKey2);
 
+    returnSipLabel.append(connection.getSipLabelA());
+    
+    Optional<AnontionImage> image0 = imageRepository.findById(remoteSipAddress);
+    
+    if (!image0.isEmpty()) {
+      
+      AnontionImage image = image0.get();
+      
+      if (!image.getBase64EncodedImage().isEmpty()) {
+        
+        returnPhoto.append(image.getBase64EncodedImage());
+      }
+    }
+
     _logger.info("DEBUG createTxAccountIfConnected set NOT connection foreignKey2 " + foreignKey2);
 
     connection.setSipPasswordA(passwordA); 
@@ -1029,7 +1076,5 @@ public class ConnectionService {
   
   final private static AnontionLog _logger = new AnontionLog(ConnectionService.class.getName());
 }
-
-
 
 

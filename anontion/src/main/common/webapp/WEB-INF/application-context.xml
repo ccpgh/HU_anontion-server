@@ -33,7 +33,7 @@
 
     <bean id="entityManagerFactoryService" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="dataSourceServer">
      <property name="dataSource" ref="dataSourceServer" />
-     <property name="packagesToScan" value="com.anontion.models.application.model, com.anontion.models.account.model, com.anontion.models.connection.model, com.anontion.asterisk.model, com.anontion.services.service " />
+     <property name="packagesToScan" value="com.anontion.models.application.model, com.anontion.models.account.model, com.anontion.models.connection.model, com.anontion.models.image.model, com.anontion.asterisk.model, com.anontion.services.service " />
      <property name="jpaVendorAdapter">
          <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
              <property name="generateDdl" value="true"/>
@@ -53,7 +53,7 @@
     </bean>
 
     <jpa:repositories
-            base-package="com.anontion.models.application, com.anontion.models.account, com.anontion.models.connection, com.anontion.asterisk, com.anontion.services.service"
+            base-package="com.anontion.models.application, com.anontion.models.account, com.anontion.models.connection, com.anontion.models.image, com.anontion.asterisk, com.anontion.services.service"
             entity-manager-factory-ref="entityManagerFactoryService"
             transaction-manager-ref="transactionManagerService" />
 

@@ -28,6 +28,12 @@ public class RequestPostConnectionBodyDTO {
   @NotBlank(message = "Connection Type cannot be blank.")
   private String connectionType;
 
+  @NotNull(message = "Label cannot be null.")
+  private String label;
+
+  @NotNull(message = "Photo cannot be null.")
+  private String photo;
+
   @NotNull(message = "Now Timestamp cannot be null.")
   private Long nowTs;
 
@@ -129,6 +135,26 @@ public class RequestPostConnectionBodyDTO {
   public void setClientSignature2(String clientSignature2) {
  
     this.clientSignature2 = clientSignature2;
+  }
+
+  public String getLabel() {
+    
+    return label;
+  }
+
+  public void setLabel(String label) {
+ 
+    this.label = label;
+  }
+  
+  public String getPhoto() {
+    
+    return photo;
+  }
+
+  public void setPhoto(String photo) {
+ 
+    this.photo = photo;
   }
 
 }

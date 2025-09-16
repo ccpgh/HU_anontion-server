@@ -22,11 +22,15 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
   
   private String returnSipUserId;
   
+  private String returnSipLabel;
+  
+  private String returnPhoto;
+  
   private String serverMessage;
 
   public ResponsePostConnectionBodyDTO(String localSipAddress, String remoteSipAddress, 
       Long nowTs, String serverSignature, boolean isRejected, boolean isConnected, boolean isRetry,
-      String returnPassword, String returnSipUserId, String serverMessage) {
+      String returnPassword, String returnSipUserId, String returnSipLabel, String returnPhoto, String serverMessage) {
     
     this.localSipAddress = localSipAddress;
     
@@ -45,6 +49,10 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
     this.returnPassword = returnPassword;
 
     this.returnSipUserId = returnSipUserId;
+    
+    this.returnSipLabel = returnSipLabel;
+    
+    this.returnPhoto = returnPhoto;
 
     this.serverMessage = serverMessage;
   }
@@ -155,6 +163,25 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
     this.returnSipUserId = returnSipUserId;
   }
 
+  public String getReturnSipLabel() {
+    
+    return returnSipLabel;
+  }
+
+  public void setReturnSipLabel(String returnSipLabel) {
+ 
+    this.returnSipLabel = returnSipLabel;
+  }
   
+  public String getReturnPhoto() {
+    
+    return returnPhoto;
+  }
+
+  public void setReturnPhoto(String returnPhoto) {
+ 
+    this.returnPhoto = returnPhoto;
+  }
+
 }
 
