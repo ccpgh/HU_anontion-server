@@ -225,45 +225,135 @@ public class AnontionSecurity {
     
     return id;
   }  
-  
+    
   public static String fromSipAddressToSipname(String sipAddress) {
     
-    String buffer = sipAddress;
+    String buffer = sipAddress.trim();
     
-    if (buffer.length() > 2 &&
-          buffer.charAt(0) == AnontionConfig._CONTACT_CONNECTION_PJSIP_OPENBRACKET && 
-          buffer.charAt(buffer.length()-1) == AnontionConfig._CONTACT_CONNECTION_PJSIP_CLOSEBRACKET) {
-      
-      buffer = buffer.substring(1, buffer.length() - 1);
-    
-    } else if (buffer.length() == 2 &&
-                buffer.charAt(0) == AnontionConfig._CONTACT_CONNECTION_PJSIP_OPENBRACKET && 
-                buffer.charAt(buffer.length()-1) == AnontionConfig._CONTACT_CONNECTION_PJSIP_CLOSEBRACKET) {
-      
-      buffer = "";
-    }
-    
-    if (buffer.startsWith(AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX)) {
+    buffer = removeOpenBracket(removeCloseBrakct(buffer));
+        
+    if (isPrefixPjsip(buffer)) {
 
-      buffer = buffer.substring(AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX.length());
+      buffer = removePrefixPjsip(buffer);
     
-    } else if (buffer.startsWith(AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX)) {
+    } else if (isPrefixSips(buffer)) {
 
-        buffer = buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX.length());
+      buffer = removePrefixSips(buffer);
+    
+    } else if (isPrefixSip(buffer)) {
+
+      buffer = removePrefixSip(buffer);
+    
+    } else {
+    
+      return "";
     }
 
-    int index = buffer.indexOf('@');
+    buffer = extractToColon(extractToSemiColon(
+        extractToAt(buffer)));
+        
+    return buffer;
+  }
+  
+  private static String extractToColon(String buffer) {
+    
+    return extractToChar(buffer, ';');
+  }
+
+  private static String extractToSemiColon(String buffer) {
+    
+    return extractToChar(buffer, ';');
+  }
+
+  private static String extractToAt(String buffer) {
+
+    return extractToChar(buffer, '@');
+  }
+  
+  private static String extractToChar(String buffer, char c) {
+
+    int index = buffer.indexOf(c);
     
     if (index == 0) {
       
-      buffer = "";
+      return "";
       
-    } else if (index > 0) {
+    } 
+    
+    if (index > 0) {
       
-      buffer = buffer.substring(0, index);
+      return buffer.substring(0, index);
     }
     
     return buffer;
   }
+  
+  private static String removeOpenBracket(String buffer) {
+    
+    if (!buffer.isEmpty() &&
+        buffer.charAt(0) == AnontionConfig._CONTACT_CONNECTION_PJSIP_OPENBRACKET) {
+      
+      return buffer.substring(1);
+    }
+    
+    return buffer;
+  }
+
+  private static String removeCloseBrakct(String buffer) {
+  
+    if (!buffer.isEmpty() &&
+        buffer.charAt(buffer.length()-1) == AnontionConfig._CONTACT_CONNECTION_PJSIP_CLOSEBRACKET) {
+      
+      return buffer.substring(0, buffer.length());
+    }
+    
+    return buffer;
+  }
+
+  private static boolean isPrefixPjsip(String buffer) {
+
+    return buffer.startsWith(AnontionConfig._CONTACT_CONNECTION_PJSIP_NAME);
+  }
+
+  private static String removePrefixPjsip(String buffer) {
+
+    if (buffer.length() < AnontionConfig._CONTACT_CONNECTION_PJSIP_NAME.length()) {
+    
+      return "";
+    }
+    
+    return buffer.substring(AnontionConfig._CONTACT_CONNECTION_PJSIP_NAME.length());
+  }
+
+  private static boolean isPrefixSips(String buffer) {
+
+    return buffer.startsWith(AnontionConfig._CONTACT_CONNECTION_SIPS_PREFIX);
+  }
+
+  private static String removePrefixSips(String buffer) {
+
+    if (buffer.length() < AnontionConfig._CONTACT_CONNECTION_SIPS_NAME.length()) {
+    
+      return "";
+    }
+    
+    return buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIPS_NAME.length());
+  }
+
+  private static boolean isPrefixSip(String buffer) {
+
+    return buffer.startsWith(AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX);
+  }
+
+  private static String removePrefixSip(String buffer) {
+
+    if (buffer.length() < AnontionConfig._CONTACT_CONNECTION_SIP_NAME.length()) {
+    
+      return "";
+    }
+    
+    return buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIP_NAME.length());
+  }
 }
+
 
