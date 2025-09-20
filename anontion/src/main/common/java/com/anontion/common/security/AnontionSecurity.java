@@ -230,7 +230,7 @@ public class AnontionSecurity {
     
     String buffer = sipAddress.trim();
     
-    buffer = removeOpenBracket(removeCloseBrakct(buffer));
+    buffer = removeOpenBracket(removeCloseBracket(buffer));
         
     if (isPrefixPjsip(buffer)) {
 
@@ -299,7 +299,7 @@ public class AnontionSecurity {
     return buffer;
   }
 
-  private static String removeCloseBrakct(String buffer) {
+  private static String removeCloseBracket(String buffer) {
   
     if (!buffer.isEmpty() &&
         buffer.charAt(buffer.length()-1) == AnontionConfig._CONTACT_CONNECTION_PJSIP_CLOSEBRACKET) {
