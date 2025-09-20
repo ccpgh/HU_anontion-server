@@ -257,7 +257,7 @@ public class AnontionSecurity {
   
   private static String extractToColon(String buffer) {
     
-    return extractToChar(buffer, ';');
+    return extractToChar(buffer, ':');
   }
 
   private static String extractToSemiColon(String buffer) {
