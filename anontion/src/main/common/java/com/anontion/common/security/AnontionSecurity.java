@@ -7,6 +7,7 @@ import java.util.Base64;
 import org.springframework.util.DigestUtils;
 
 import com.anontion.common.misc.AnontionConfig;
+import com.anontion.common.misc.AnontionLog;
 
 import java.nio.ByteBuffer;
 
@@ -246,12 +247,16 @@ public class AnontionSecurity {
     
     } else {
     
+      _logger.info("DEBUG converted sipAddress '" + sipAddress + "' to Username '' - nothing");
+
       return "";
     }
 
     buffer = extractToColon(extractToSemiColon(
         extractToAt(buffer)));
-        
+
+    _logger.info("DEBUG converted sipAddress '" + sipAddress + "' to Username '" + buffer + "'");
+    
     return buffer;
   }
   
@@ -354,6 +359,8 @@ public class AnontionSecurity {
     
     return buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIP_NAME.length());
   }
+  
+  final private static AnontionLog _logger = new AnontionLog(AnontionSecurity.class.getName());
 }
 
 
