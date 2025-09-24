@@ -52,7 +52,7 @@
 
   <context-param>
     <param-name>pow-initial-target</param-name>
-    <param-value>000003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF</param-value>
+    <param-value>00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF</param-value>
   </context-param>
   
 </web-app>
