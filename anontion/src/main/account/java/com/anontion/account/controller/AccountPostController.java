@@ -40,6 +40,7 @@ import com.anontion.common.misc.AnontionConfig;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
+import com.anontion.common.security.AnontionPOW;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.dto.response.ResponsePostAccountBodyDTO;
@@ -51,10 +52,6 @@ import jakarta.servlet.ServletContext;
 @RestController
 public class AccountPostController {
 
-  static final private int _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT = 24 * 60 * 60; // 1 day
-  
-  private int applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT;
-  
   @Autowired
   private AnontionAccountRepository accountRepository;
 
@@ -79,6 +76,10 @@ public class AccountPostController {
   @Autowired
   private AccountService accountService;
   
+  private double _applicationTimeout = AnontionPOW._ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT;
+  
+  private String _applicationPowTarget = "";
+  
   @PostMapping(path = "/account/")
   public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestPostAccountDTO request,
       BindingResult bindingResult) {
@@ -97,6 +98,7 @@ public class AccountPostController {
     
     String powLow  = dto.getPowLow();
     String powHigh = dto.getPowHigh();
+    String powNonce = dto.getPowNonce();
 
     AnontionApplicationId primaryKey = new AnontionApplicationId(
         dto.getClientName(),
@@ -116,7 +118,26 @@ public class AccountPostController {
     
     if (!application.getPowText().equals(dto.getPowText()) || 
         !application.getPowTarget().equals(dto.getPowTarget()) || 
-        application.isDisabled()) {
+        application.isDisabled() ||
+        !AnontionStrings.isHex(powLow) ||
+        !AnontionStrings.isHex(powHigh) || 
+        !AnontionStrings.isHex(powNonce)) {
+      
+      _logger.info("DEBUG account post mismnatch application text '" + 
+          application.getPowText() + 
+          "' vs. '" + 
+          dto.getPowText() + 
+          "' target '" + 
+          application.getPowTarget() + 
+          "' vs. '" + 
+          dto.getPowTarget() + 
+          "' nonce '" +
+          dto.getPowNonce() + 
+          "' low '" +
+          powLow + 
+          "' high '" +
+          powHigh + 
+          "'");
       
       return Responses.getBAD_REQUEST(
           "No active application.", 
@@ -188,7 +209,8 @@ public class AccountPostController {
       
     } else {
 
-      if (approved(dto.getClientTs(), nowTs)) {
+      if (AnontionPOW.isApprovedTime(dto.getClientTs(), nowTs, _applicationTimeout) && 
+          AnontionPOW.isApprovedPow(powLow, powHigh, application.getPowText(), application.getPowTarget(), powNonce)) {
 
         String foreignKey1 = AnontionSecurity.generateForeignKey();
         String foreignKey2 = AnontionSecurity.generateForeignKey();
@@ -264,9 +286,7 @@ public class AccountPostController {
             true);
       
       } else {
-      
-        Float progress = ((nowTs - dto.getClientTs()) / (float) applicationTimeout) * 100.0f;
-        
+              
         body = new ResponsePostAccountBodyDTO(
             new UUID(0L, 0L), 
             dto.getClientTs(),
@@ -275,7 +295,7 @@ public class AccountPostController {
             "", 
             "", 
             "", 
-            progress, 
+            (float) AnontionPOW.calculateProgress(powNonce), 
             0,
             false);
       }
@@ -290,32 +310,63 @@ public class AccountPostController {
   @PostConstruct
   public void init() {
     
+    this.initApplicationTimeout();
+
+    this.initApplicationPOW();
+  }
+
+  private void initApplicationPOW() { // NYI merge
+    
+    String context = servletContext.getInitParameter("pow-initial-target");
+
+    if (context != null) {
+      
+      try {
+      
+        String pow = context.trim();
+     
+        if (!AnontionStrings.isHex(pow) ||
+            pow.length() != 64) {
+          
+          _applicationPowTarget = AnontionPOW.CONST_TARGET;
+        
+        } else {
+          
+          _applicationPowTarget = pow.toLowerCase();  
+        }
+     
+        _logger.info("Application POW target is " + _applicationPowTarget);
+
+      } catch (Exception e) {
+
+        _applicationPowTarget = AnontionPOW.CONST_TARGET;        
+      }
+    }
+  }
+
+  private void initApplicationTimeout() {
+    
     String context = servletContext.getInitParameter("application-timeout");
 
     if (context != null) {
       
       try {
       
-        applicationTimeout = Integer.parseInt(context);
+        _applicationTimeout = Integer.parseInt(context);
       
       } catch (NumberFormatException e) {
     
-        applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT;
+        _applicationTimeout = AnontionPOW._ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT;
       }
     
     } else {
     
-      applicationTimeout = _ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT; 
+      _applicationTimeout =  AnontionPOW._ACCOUNT_CONTROLLER_ACCOUNT_TIMEOUT; 
     }
 
-    _logger.info("Application timeout is " + applicationTimeout);
+    _logger.info("Application timeout is " + _applicationTimeout);
   }
 
-  public boolean approved(Long ts, Long now) { // TODO expand
-    
-    return ((now - ts) > applicationTimeout);
-  }
-  
   final private static AnontionLog _logger = new AnontionLog(AccountPostController.class.getName());
 }
 

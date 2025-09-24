@@ -27,7 +27,6 @@ import org.bouncycastle.math.ec.ECPoint;
 
 import com.anontion.common.misc.AnontionConfig;
 import com.anontion.common.misc.AnontionLog;
-import com.anontion.common.misc.AnontionStrings; 
 
 abstract public class AnontionSecurityECDSA {
 
@@ -385,12 +384,12 @@ abstract public class AnontionSecurityECDSA {
     return null;
   }
 
-  public static String hash(String name, Long ts, UUID client, String pub) {
-
-    String[] tokens = { name, ts.toString(), client.toString(), pub};
-    
-    return AnontionSecuritySHA.hash(AnontionStrings.concatLowercase(tokens, ":"));
-  }
+//  public static String hash(String name, Long ts, UUID client, String pub) {
+//
+//    String[] tokens = { name, ts.toString(), client.toString(), pub};
+//    
+//    return AnontionSecuritySHA.hash_(AnontionStrings.concatLowercase(tokens, ":"));
+//  }
 
   public static ECPrivateKeyParameters decodeECPrivateKeyParametersFromBase64D(String base64Key) {
 

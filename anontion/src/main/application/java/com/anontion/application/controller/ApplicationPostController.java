@@ -19,6 +19,7 @@ import com.anontion.common.dto.response.ResponsePostDTO;
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.dto.response.Responses;
+import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurityECDSA;
@@ -26,6 +27,8 @@ import com.anontion.common.security.AnontionSecuritySCRYPT;
 import com.anontion.common.security.AnontionPOW;
 import com.anontion.common.dto.response.ResponsePostApplicationBodyDTO;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.ServletContext;
 import jakarta.validation.Valid;
 
 import com.anontion.models.application.model.AnontionApplication;
@@ -38,6 +41,11 @@ public class ApplicationPostController {
   @Autowired
   private AnontionApplicationRepository applicationRepository;
 
+  @Autowired
+  private ServletContext servletContext;
+  
+  private String _applicationPowTarget = "";
+  
   @PostMapping(path = "/application/")
   public ResponseEntity<ResponseDTO> postApplication(@Valid @RequestBody RequestPostApplicationDTO request, 
       BindingResult bindingResult) {
@@ -87,7 +95,7 @@ public class ApplicationPostController {
           "Application already exists!");
     }
 
-    AnontionPOW pow = new AnontionPOW();
+    AnontionPOW pow = new AnontionPOW(_applicationPowTarget);
 
     String clientUID = AnontionStrings.concatLowercase(new String[] { 
         enceyptedName, 
@@ -102,11 +110,13 @@ public class ApplicationPostController {
             clientUID, 
             AnontionSecurityECDSA.sign(clientUID),
             pow.getText(), 
-            pow.getTarget(), 
+            pow.getTarget().toLowerCase(), 
             false);
 
     applicationRepository.save(application);
 
+    _logger.info("DEBUG application post text '" + pow.getText() + "' target '" + pow.getTarget() + "'");
+    
     ResponsePostApplicationBodyDTO body = 
         new ResponsePostApplicationBodyDTO(application.getPowText(), 
             application.getPowTarget(), 
@@ -125,6 +135,44 @@ public class ApplicationPostController {
     return new ResponseEntity<>(response, 
         HttpStatus.OK);    
   }
+  
+  @PostConstruct
+  public void init() {
+    
+    this.initApplicationPOW();
+  }
+
+  private void initApplicationPOW() { // NYI merge
+    
+    String context = servletContext.getInitParameter("pow-initial-target");
+
+    if (context != null) {
+      
+      try {
+      
+        String pow = context.trim();
+     
+        if (!AnontionStrings.isHex(pow) ||
+            pow.length() != 64) {
+
+          _applicationPowTarget = AnontionPOW.CONST_TARGET;
+        
+        } else {
+
+          _applicationPowTarget = pow.toLowerCase();  
+        }
+     
+        _logger.info("Application POW target is " + _applicationPowTarget);
+
+      } catch (Exception e) {
+
+        _applicationPowTarget = AnontionPOW.CONST_TARGET;        
+      }
+    }
+  }
+
+  
+  final private static AnontionLog _logger = new AnontionLog(ApplicationPostController.class.getName());
 }
 
 

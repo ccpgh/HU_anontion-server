@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 @Component
@@ -29,8 +28,11 @@ public class RequestPostAccountBodyDTO {
   @NotBlank(message = "Pow Text cannot be blank.")
   private String powText;
 
-  @Min(0)
-  private Long powTarget;
+  @NotBlank(message = "Pow Target cannot be blank.")
+  private String powTarget;
+
+  @NotBlank(message = "Pow Nonce cannot be blank.")
+  private String powNonce;
 
   @NotBlank(message = "Client Signature cannot be blank.")
   private String clientSignature;
@@ -99,12 +101,12 @@ public class RequestPostAccountBodyDTO {
     this.powText = powText;
   }
 
-  public Long getPowTarget() {
+  public String getPowTarget() {
     
     return powTarget;
   }
 
-  public void setPowTarget(Long powTarget) {
+  public void setPowTarget(String powTarget) {
  
     this.powTarget = powTarget;
   }
@@ -117,6 +119,16 @@ public class RequestPostAccountBodyDTO {
   public void setClientSignature(String clientSignature) {
  
     this.clientSignature = clientSignature;
+  }
+
+  public String getPowNonce() {
+    
+    return powNonce;
+  }
+
+  public void setPownonce(String powNonce) {
+ 
+    this.powNonce = powNonce;
   }
 }
 

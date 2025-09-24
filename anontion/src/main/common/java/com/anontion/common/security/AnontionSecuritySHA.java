@@ -11,7 +11,20 @@ abstract public class AnontionSecuritySHA {
 
   public static String hash(String text) { 
 
+    byte[] hash = hashToBytes(text);
+
+    return Base64.getEncoder().encodeToString(hash);
+  }
+  
+
+  public static byte[] hashToBytes(String text) { 
+
     byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+
+    return hashFromBytesToBytes(bytes);  
+  }
+  
+  public static byte[] hashFromBytesToBytes(byte[] bytes) { 
 
     SHA256Digest digest = new SHA256Digest();
 
@@ -21,9 +34,8 @@ abstract public class AnontionSecuritySHA {
 
     digest.doFinal(hash, 0);
 
-    return Base64.getEncoder().encodeToString(hash);
+    return hash;
   }
-  
   
   @SuppressWarnings("unused") 
   final private static AnontionLog _logger = new AnontionLog(AnontionSecuritySHA.class.getName());

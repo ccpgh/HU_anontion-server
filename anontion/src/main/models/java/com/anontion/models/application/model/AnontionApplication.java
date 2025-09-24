@@ -48,7 +48,7 @@ public class AnontionApplication {
   private String powText;
 
   @Column(name = "pos_target", nullable = false) 
-  private Long powTarget;
+  private String powTarget;
 
   @Column(name = "is_disabled", nullable = false) 
   private boolean isDisabled;
@@ -57,7 +57,7 @@ public class AnontionApplication {
     
   }
 
-  public AnontionApplication(String clientName, Long clientTs, UUID clientId, String clientPub, String clientUID, String serverSignature, String powText, Long powTarget, boolean isDisabled) {
+  public AnontionApplication(String clientName, Long clientTs, UUID clientId, String clientPub, String clientUID, String serverSignature, String powText, String powTarget, boolean isDisabled) {
 
     this.applicationId = UUID.randomUUID();
 
@@ -160,12 +160,12 @@ public class AnontionApplication {
     this.powText = powText;
   }
   
-  public Long getPowTarget() {
+  public String getPowTarget() {
 
     return powTarget;
   }
 
-  public void setPowTarget(Long powTarget) {
+  public void setPowTarget(String powTarget) {
 
     this.powTarget = powTarget;
   }

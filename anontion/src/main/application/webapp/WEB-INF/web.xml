@@ -50,4 +50,9 @@
     <param-value>/WEB-INF/urlrewrite.xml</param-value>
   </context-param>
 
+  <context-param>
+    <param-name>pow-initial-target</param-name>
+    <param-value>000003FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF</param-value>
+  </context-param>
+  
 </web-app>

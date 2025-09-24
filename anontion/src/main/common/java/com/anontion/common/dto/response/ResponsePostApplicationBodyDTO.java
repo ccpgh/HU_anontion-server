@@ -4,7 +4,7 @@ public class ResponsePostApplicationBodyDTO extends ResponseBodyDTO {
 
   private String powText;
 
-  private Long powTarget;
+  private String powTarget;
 
   private String encryptedName;
 
@@ -20,7 +20,7 @@ public class ResponsePostApplicationBodyDTO extends ResponseBodyDTO {
 
   }
 
-  public ResponsePostApplicationBodyDTO(String powText, Long powTarget, String encryptedName, 
+  public ResponsePostApplicationBodyDTO(String powText, String powTarget, String encryptedName, 
       String serverPub, String clientUID, String serverSignature, Long clientTs) {
 
     this.clientUID = clientUID;
@@ -48,12 +48,12 @@ public class ResponsePostApplicationBodyDTO extends ResponseBodyDTO {
     this.powText = powText;
   }
 
-  public Long getPowTarget() {
+  public String getPowTarget() {
     
     return powTarget;
   }
 
-  public void setPowTarget(Long powTarget) {
+  public void setPowTarget(String powTarget) {
     
     this.powTarget = powTarget;
   }

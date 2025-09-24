@@ -104,4 +104,58 @@ public class AnontionStrings {
     
     return DigestUtils.md5DigestAsHex(md5Input.getBytes());
   }
+  
+  public static boolean isHex(String s) {
+    
+    if (s == null || s.isEmpty()) {
+    
+      return false;
+    }
+
+    for (char c : s.toCharArray()) {
+      
+      if (!((c >= '0' && c <= '9') ||
+          (c >= 'a' && c <= 'f') ||
+          (c >= 'A' && c <= 'F'))) {
+      
+        return false;
+      }
+    }
+
+    return true;
+  }
+  
+  public static String toHexString(byte[] bytes) {
+
+    if (bytes == null || bytes.length == 0) {
+      
+      return "";
+    }
+    
+    StringBuilder buffer = new StringBuilder();
+    
+    for (byte b : bytes) {
+    
+      buffer.append(String.format("%02x", b));
+    }
+    
+    return buffer.toString();
+  }
+
+  public static String lpad(String s, int length) {
+
+    return lpad(s, length, "0");
+  }
+  
+  public static String lpad(String s, int length, String pad) {
+    
+    if (s.length() >= length) {
+      
+      return s;
+    }
+
+    String buffer = pad.repeat(length - s.length());
+    
+    return buffer + s;
+  }
 }
