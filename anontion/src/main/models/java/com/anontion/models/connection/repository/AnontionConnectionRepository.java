@@ -39,4 +39,6 @@ public interface AnontionConnectionRepository extends JpaRepository<AnontionConn
   
   @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_b = :sipEndpointB AND sip_signature_b = :sipSignatureB and connection_type = 'indirect' AND sip_endpoint_a != sip_endpoint_b ", nativeQuery = true)
   Optional<AnontionConnection> findIndirectBySipEndpointBAndSipSignatureBRelaxed(@Param("sipEndpointB") String sipEndpointB, @Param("sipSignatureB") String sipSignatureB);  
+
+  Optional<AnontionConnection> findByRollSipEndpoint(String rollSipEndpoint);    
 }

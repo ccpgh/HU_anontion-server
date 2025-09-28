@@ -6,16 +6,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anontion.common.dto.response.ResponseDTO;
+import com.anontion.common.dto.response.ResponseHeaderDTO;
+import com.anontion.common.dto.response.ResponsePostDTO;
 import com.anontion.common.dto.response.Responses;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.models.connection.model.AnontionConnection;
 import com.anontion.models.connection.repository.AnontionConnectionRepository;
 import com.anontion.services.service.ConnectionService;
+import com.anontion.common.dto.response.ResponseGetConnectionBodyDTO;
 
 @RestController
 public class ConnectionGetController {
@@ -90,9 +94,48 @@ public class ConnectionGetController {
   }
 
   @GetMapping(path = "/connection/")
-  public ResponseEntity<ResponseDTO> getConnection() {
+  public ResponseEntity<ResponseDTO> getConnection(@RequestParam("sipUsername") String sipUsername) {
 
-    return Responses.getNYI();    
+    if (sipUsername.isBlank()) {
+
+      _logger.info("failed param check blank");
+
+      return Responses.getBAD_REQUEST(
+          "Failed param check");
+    }
+    
+    String sipEndpoint = AnontionSecurity.encodeToSafeBase64(sipUsername);
+    
+    if (!AnontionSecurity.isSafeBase64(sipEndpoint)) {
+
+      _logger.info("failed param check converted");
+
+      return Responses.getBAD_REQUEST(
+          "Failed param check");
+    }
+    
+    // NYI missing signature check against base row signer and this to make sure both signed by same key.
+    
+    Optional<AnontionConnection> connection0 = connectionRepository.findByRollSipEndpoint(sipEndpoint); 
+    
+    if (connection0.isEmpty()) {
+
+      _logger.info("failed search '" + sipEndpoint + "'");
+
+      return Responses.getBAD_REQUEST(
+          "failed search for " + sipEndpoint);
+    }
+        
+    AnontionConnection connection = connection0.get();
+    
+    ResponseGetConnectionBodyDTO body = new ResponseGetConnectionBodyDTO(connection.getSipEndpointA(), 
+        connection.getSipEndpointB(), 
+        connection.getRollSipEndpoint() != null ? connection.getRollSipEndpoint() : "");
+    
+    ResponsePostDTO response = new ResponsePostDTO(
+        new ResponseHeaderDTO(true, 0, "Ok."), body);
+
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   final private static AnontionLog _logger = new AnontionLog(ConnectionGetController.class.getName());

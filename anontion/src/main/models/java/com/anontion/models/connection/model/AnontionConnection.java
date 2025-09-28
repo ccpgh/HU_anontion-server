@@ -19,7 +19,7 @@ import com.anontion.common.misc.AnontionTime;
 @Entity
 @Table(
   name = "anontion_connection",
-  uniqueConstraints = { @UniqueConstraint(columnNames = {"connection_id"}) }
+  uniqueConstraints = { @UniqueConstraint(columnNames = {"connection_id"}), @UniqueConstraint(columnNames = {"roll_sip_endpoint"}) }
 )
 @IdClass(AnontionConnectionId.class)
 public class AnontionConnection {
@@ -74,6 +74,9 @@ public class AnontionConnection {
   @Column(name = "connection_type", nullable = true, length = 255)
   private String connectionType;
 
+  @Column(name = "roll_sip_endpoint", nullable = true, length = 255)
+  private String rollSipEndpoint;
+
   //
 
   @PrePersist
@@ -85,7 +88,7 @@ public class AnontionConnection {
   }
 
   public AnontionConnection(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, String connectionType) {
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, String connectionType, String rollSipEndpoint) {
     
     this.connectionId = UUID.randomUUID();
 
@@ -118,6 +121,8 @@ public class AnontionConnection {
     //
     
     this.connectionType = connectionType;
+    
+    this.rollSipEndpoint = rollSipEndpoint;
   }
 
   public AnontionConnection() {
@@ -260,6 +265,17 @@ public class AnontionConnection {
     
     this.connectionType = connectionType;
   }
+  
+  public String getRollSipEndpoint() {
+    
+    return rollSipEndpoint;
+  }
+
+  public void setRollSipEndpoint(String rollSipEndpoint) {
+    
+    this.rollSipEndpoint = rollSipEndpoint;
+  }
+  
 }
 
 

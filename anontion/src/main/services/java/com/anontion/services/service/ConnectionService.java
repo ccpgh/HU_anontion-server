@@ -55,7 +55,7 @@ public class ConnectionService {
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean saveTxConnectionIndirectBase(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, StringBuilder buffer) {
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, StringBuilder buffer, String rollSipAddress) {
     
     _logger.info("DEBUG saveTxConnectionIndirectBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
     
@@ -82,7 +82,8 @@ public class ConnectionService {
 
       _logger.info("DEBUG saveTxConnectionIndirectBase empty");
 
-      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, sipSignatureA, sipLabelA, null, sipEndpointB, sipSignatureA, sipLabelB, "indirect");
+      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, sipSignatureA, sipLabelA, null, sipEndpointB, sipSignatureA, sipLabelB, "indirect", 
+          (rollSipAddress != null && !rollSipAddress.isEmpty() ? rollSipAddress : null));
       
       try {
         
@@ -207,7 +208,7 @@ public class ConnectionService {
 
       _logger.info("DEBUG saveTxConnectionDirect empty");
 
-      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, null, "", null, sipEndpointB, null, "", "direct");
+      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, null, "", null, sipEndpointB, null, "", "direct", null);
       
       try {
         
@@ -413,11 +414,11 @@ public class ConnectionService {
 
     if (sipEndpointA != null) {
       
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, connection.getSipEndpointB(), connection.getSipSignatureB(), connection.getSipLabelB(), "indirect");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, connection.getSipEndpointB(), connection.getSipSignatureB(), connection.getSipLabelB(), "indirect", null);
 
     } else if (sipEndpointB != null) {
             
-      newConnection = new AnontionConnection(sipTsB, connection.getSipEndpointA(), connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, "indirect");
+      newConnection = new AnontionConnection(sipTsB, connection.getSipEndpointA(), connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, "indirect", null);
 
     } else {
       
@@ -489,7 +490,7 @@ public class ConnectionService {
 
       _logger.info("DEBUG saveTxConnectionMultipleBase empty");
 
-      AnontionConnection connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, sipEndpointB, sipSignatureA, sipLabelB, "multiple");
+      AnontionConnection connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, sipEndpointB, sipSignatureA, sipLabelB, "multiple", null);
       
       try {
         
@@ -602,11 +603,11 @@ public class ConnectionService {
 
     if (sipSignatureA == null) {
       
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, "multiple");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, "multiple", null);
 
     } else if (sipSignatureB == null) {
             
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsB, sipEndpointB, connection.getSipSignatureB(), connection.getSipLabelB(), "multiple");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsB, sipEndpointB, connection.getSipSignatureB(), connection.getSipLabelB(), "multiple", null);
 
     } else {
       
@@ -820,7 +821,7 @@ public class ConnectionService {
         clientId,
         "", // NYI do later 
         "", // NYI do later ! 
-        localSipAddress, 
+        AnontionSecurity.decodeFromSafeBase64(localSipAddress), 
         localSipAddress, // clientUID // NYI use ? needed?
         AnontionAccount.DEFAULT_defaultExpiration,
         AnontionAccount.DEFAULT_minimumExpiration,
@@ -1009,7 +1010,7 @@ public class ConnectionService {
         clientId,
         "", // NYI do later 
         "", // NYI do later ! 
-        localSipAddress, 
+        AnontionSecurity.decodeFromSafeBase64(localSipAddress), 
         localSipAddress, // clientUID // NYI use ? needed?
         AnontionAccount.DEFAULT_defaultExpiration,
         AnontionAccount.DEFAULT_minimumExpiration,

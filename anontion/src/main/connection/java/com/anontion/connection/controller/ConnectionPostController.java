@@ -99,7 +99,8 @@ public class ConnectionPostController {
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();
     String clientSignature1 = dto.getClientSignature1();   
-    String clientSignature2 = dto.getClientSignature2();   
+    String clientSignature2 = dto.getClientSignature2();  
+    String rollSipAddress = dto.getRollSipAddress(); // NYI reset this to null after final connection step.
     String label = dto.getLabel();
     String connectionType = dto.getConnectionType();   
     Long nowTs = dto.getNowTs();
@@ -635,6 +636,7 @@ public class ConnectionPostController {
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();
     String clientSignature2 = dto.getClientSignature2();   
+    String rollSipAddress = dto.getRollSipAddress();
     String label = dto.getLabel();
     Long nowTs = dto.getNowTs();
 
@@ -650,12 +652,12 @@ public class ConnectionPostController {
 
     AtomicBoolean isRetry = new AtomicBoolean(false);
 
-    _logger.info("DEBUG connection calling saveTxConnectionIndirectBase");
+    _logger.info("DEBUG connection calling saveTxConnectionIndirectBase localSipAddress '" + localSipAddress + "' remoteSipAddress '" + remoteSipAddress + "'");
     
     StringBuilder buffer = new StringBuilder();
     
     if (!connectionService.saveTxConnectionIndirectBase(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
-        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, buffer)) {
+        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, buffer, rollSipAddress)) {
 
       String buffer4 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
