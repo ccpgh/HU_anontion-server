@@ -1,0 +1,12 @@
+#!/bin/bash
+
+../../../../tomcat/current/bin/shutdown.sh
+
+if [[ "$?" != "0" ]]
+then
+  echo "server stop failed"
+  exit 1
+fi
+
+echo "fini."
+
