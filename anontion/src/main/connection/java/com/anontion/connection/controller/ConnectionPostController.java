@@ -81,9 +81,9 @@ public class ConnectionPostController {
       return postDirectConnection(request.getBody());
     }
 
-    if (request.getBody().getConnectionType().equals("indirect")) {
+    if (request.getBody().getConnectionType().equals("indirect") || request.getBody().getConnectionType().equals("roll")) {
      
-      return postIndirectConnection(request.getBody());
+      return postIndirectOrRollConnection(request.getBody());
     }
     
     return Responses.getBAD_REQUEST(
@@ -429,7 +429,7 @@ public class ConnectionPostController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  public ResponseEntity<ResponseDTO> postIndirectConnection(RequestPostConnectionBodyDTO dto) {
+  public ResponseEntity<ResponseDTO> postIndirectOrRollConnection(RequestPostConnectionBodyDTO dto) {
         
     UUID clientId = dto.getClientId();
     String clientName = dto.getClientName();   
@@ -455,10 +455,10 @@ public class ConnectionPostController {
           "bad nowTs"); 
     }
     
-    _logger.info("DEBUG indirect connection nowTs " + nowTs + " tN from message " + AnontionTime.tsN() + " diff " + diff);
+    _logger.info("DEBUG indirect or roll connection nowTs " + nowTs + " tN from message " + AnontionTime.tsN() + " diff " + diff);
 
 
-    _logger.info("DEBUG indirect connection account keys clientTs '" + clientTs + 
+    _logger.info("DEBUG indirect or roll connection account keys clientTs '" + clientTs + 
         "' clientName '" + clientName + "' clientId '" + clientId + "'");
 
     Optional<AnontionAccount> accountO = accountRepository.findByClientTsAndClientNameAndClientId(
@@ -468,7 +468,7 @@ public class ConnectionPostController {
 
     if (accountO.isEmpty()) {
       
-      _logger.info("DEBUG indirect account not found");
+      _logger.info("DEBUG indirect or roll account not found");
       
       String buffer0 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -490,12 +490,12 @@ public class ConnectionPostController {
           "",
           "",
           "",
-          "Indirect connection no account");
+          "Indirect or Roll connection no account");
 
       ResponsePostDTO response = new ResponsePostDTO(
-          new ResponseHeaderDTO(true, 0, "Indirect connection no account."), body);
+          new ResponseHeaderDTO(true, 0, "Indirect or Roll connection no account."), body);
 
-      _logger.info("DEBUG indirect connection no account");
+      _logger.info("DEBUG indirect or roll connection no account");
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -514,7 +514,7 @@ public class ConnectionPostController {
         nowTs.toString() }, 
         "_");
     
-    _logger.info("DEBUG indirect connection signature check 1 '" + buffer1.toString() + "'");
+    _logger.info("DEBUG indirect or roll connection signature check 1 '" + buffer1.toString() + "'");
 
     ECPublicKeyParameters pub = AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(account.getClientPub());
 
@@ -540,7 +540,7 @@ public class ConnectionPostController {
           "",
           "",
           "",
-          "Indirect connection bad master signature.");
+          "Indirect or Roll connection bad master signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "Bad master signature."), body);
@@ -550,14 +550,14 @@ public class ConnectionPostController {
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    _logger.info("DEBUG indirect connection signature1 ok");
+    _logger.info("DEBUG indirect or roll connection signature1 ok");
 
     String buffer6 = AnontionStrings.concat(new String[] { 
         localSipAddress, 
         remoteSipAddress }, 
         "_");
     
-    _logger.info("DEBUG indirect connection signature check 2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + 
+    _logger.info("DEBUG indirect or roll connection signature check 2 '" + buffer6.toString() + "' localSipAddress '" + localSipAddress + 
         "' localSipAddressUnsafe '" + localSipAddressUnsafe + "' remoteSipAddress '" + remoteSipAddress + "'");
 
     String localPubString = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
@@ -586,17 +586,17 @@ public class ConnectionPostController {
           "",
           "",
           "",
-          "indirect connection bad local signature.");
+          "indirect or roll connection bad local signature.");
 
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "Bad local signature."), body);
 
-      _logger.info("DEBUG indirect connection bad local signature");
+      _logger.info("DEBUG indirect or roll connection bad local signature");
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    _logger.info("DEBUG indirect connection signature2 ok");
+    _logger.info("DEBUG indirect or roll connection signature2 ok");
     
     if (!photo.isEmpty()) {
     
@@ -623,20 +623,21 @@ public class ConnectionPostController {
     
     if (!localSipAddress.equals(remoteSipAddress)) {
       
-      return postIndirectConnectionDifferent(dto);
+      return postIndirectOrRollConnectionDifferent(dto);
     }
 
-    return postIndirectConnectionSame(dto);
+    return postIndirectOrRollConnectionSame(dto);
   }
   
-  public ResponseEntity<ResponseDTO> postIndirectConnectionSame(RequestPostConnectionBodyDTO dto) {
+  public ResponseEntity<ResponseDTO> postIndirectOrRollConnectionSame(RequestPostConnectionBodyDTO dto) {
         
-    _logger.info("DEBUG indirect postIndirectConnectionSame called");
+    _logger.info("DEBUG indirect or roll postIndirectConnectionSame called");
 
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();
     String clientSignature2 = dto.getClientSignature2();   
     String rollSipAddress = dto.getRollSipAddress();
+    String connectionType = dto.getConnectionType();
     String label = dto.getLabel();
     Long nowTs = dto.getNowTs();
 
@@ -652,12 +653,12 @@ public class ConnectionPostController {
 
     AtomicBoolean isRetry = new AtomicBoolean(false);
 
-    _logger.info("DEBUG connection calling saveTxConnectionIndirectBase localSipAddress '" + localSipAddress + "' remoteSipAddress '" + remoteSipAddress + "'");
+    _logger.info("DEBUG indirect or roll connection calling saveTxConnectionIndirectOrRollBase localSipAddress '" + localSipAddress + "' remoteSipAddress '" + remoteSipAddress + "'");
     
     StringBuilder buffer = new StringBuilder();
     
-    if (!connectionService.saveTxConnectionIndirectBase(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
-        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, buffer, rollSipAddress)) {
+    if (!connectionService.saveTxConnectionIndirectOrRollBase(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
+        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, buffer, rollSipAddress, connectionType)) {
 
       String buffer4 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -682,14 +683,14 @@ public class ConnectionPostController {
           "Connection db base insert not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
-          new ResponseHeaderDTO(true, 0, "connection db base insert not completed."), body);
+          new ResponseHeaderDTO(true, 0, "connection indirect or roll db base insert not completed."), body);
 
-      _logger.info("DEBUG connection db base insert not completed");
+      _logger.info("DEBUG indirect or roll connection db base insert not completed");
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    _logger.info("DEBUG connection OK with returned buffer '" + buffer.toString() + "'");
+    _logger.info("DEBUG indirect or roll connection OK with returned buffer '" + buffer.toString() + "'");
 
     String buffer5 = AnontionStrings.concat(new String[] { 
         localSipAddress, 
@@ -716,18 +717,19 @@ public class ConnectionPostController {
     ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 0, "Ok."), body);
 
-    _logger.info("DEBUG connection Ok. Even values.");
+    _logger.info("DEBUG indirect or roll connection Ok. Even values.");
 
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
   
-  public ResponseEntity<ResponseDTO> postIndirectConnectionDifferent(RequestPostConnectionBodyDTO dto) {
+  public ResponseEntity<ResponseDTO> postIndirectOrRollConnectionDifferent(RequestPostConnectionBodyDTO dto) {
 
-    _logger.info("DEBUG indirect postIndirectConnectionDifferent called");
+    _logger.info("DEBUG indirect postIndirectOrRollConnectionDifferent called");
 
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();
     String clientSignature2 = dto.getClientSignature2();   
+    String connectionType = dto.getConnectionType();
     String label = dto.getLabel();
     Long nowTs = dto.getNowTs();
 
@@ -770,7 +772,7 @@ public class ConnectionPostController {
     
     AtomicBoolean isRetry = new AtomicBoolean(false);
     
-    _logger.info("DEBUG connection indirect calling saveTxConnectionIndirectUpdate");
+    _logger.info("DEBUG connection indirect or roll calling saveTxConnectionIndirectUpdate");
     
     StringBuilder returnPassword = new StringBuilder();
 
@@ -813,13 +815,13 @@ public class ConnectionPostController {
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "Ok."), body);
 
-      _logger.info("DEBUG direct connection and account ok");
+      _logger.info("DEBUG indirect or roll connection and account ok");
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
-    if (!connectionService.saveTxConnectionIndirectUpdate(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
-        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, localSipAddress, remoteSipAddress)) {
+    if (!connectionService.saveTxConnectionIndirectOrRollUpdate(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
+        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, localSipAddress, remoteSipAddress, connectionType)) {
 
       String buffer4 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -841,17 +843,17 @@ public class ConnectionPostController {
           "",
           "",
           "",
-          "Connection base update not completed");
+          "Connection indirect or roll base update not completed");
 
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "connection base update not completed."), body);
 
-      _logger.info("DEBUG connection indirect base update not completed");
+      _logger.info("DEBUG connection indirect or roll base update not completed");
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    _logger.info("DEBUG connection OK");
+    _logger.info("DEBUG indirect or roll connection OK");
 
     String buffer5 = AnontionStrings.concat(new String[] { 
         localSipAddress, 
@@ -873,7 +875,7 @@ public class ConnectionPostController {
         "",
         "",
         "",
-        "Ok. Connection indirect connected. Odd values.");
+        "Ok. Connection indirect or roll connected. Odd values.");
 
     ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 0, "Ok."), body);
@@ -1083,7 +1085,7 @@ public class ConnectionPostController {
   
   public ResponseEntity<ResponseDTO> postMultipleConnectionDifferent(RequestPostConnectionBodyDTO dto) {
     
-    _logger.info("DEBUG indirect postMasterConnectionDifferent called");
+    _logger.info("DEBUG multiple postMasterConnectionDifferent called");
 
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();

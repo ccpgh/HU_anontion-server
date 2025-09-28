@@ -70,7 +70,7 @@ public class AnontionConnection {
 
   //
   
-  @Pattern(regexp = "direct|indirect|multiple", message = "connectionType must be 'direct', 'indirect', or 'multiple'")
+  @Pattern(regexp = "direct|indirect|multiple|roll", message = "connectionType must be 'direct', 'indirect', 'roll' or 'multiple'")
   @Column(name = "connection_type", nullable = true, length = 255)
   private String connectionType;
 
