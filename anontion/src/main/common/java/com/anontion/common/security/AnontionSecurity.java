@@ -247,9 +247,9 @@ public class AnontionSecurity {
     
     } else {
     
-      _logger.info("DEBUG converted sipAddress '" + sipAddress + "' to Username '' - nothing");
+      //_logger.info("DEBUG converted sipAddress '" + sipAddress + "' to Username '' - nothing");
 
-      return "";
+      //return "";
     }
 
     buffer = extractToColon(extractToSemiColon(
