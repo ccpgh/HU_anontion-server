@@ -226,7 +226,7 @@ public class AccountPostController {
             AnontionAccount.DEFAULT_defaultExpiration,
             AnontionAccount.DEFAULT_minimumExpiration,
             AnontionAccount.DEFAULT_maximumExpiration,
-            false);
+            false, "anonymous");
               
         AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
             AnontionSecurity.makeSafeIfRequired(account.getClientPub()),

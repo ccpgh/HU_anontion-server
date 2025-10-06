@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.UUID;
 
@@ -62,6 +63,10 @@ public class AnontionAccount {
   @Column(name = "is_disabled", nullable = false)
   private boolean isDisabled;
 
+  @Pattern(regexp = "anonymous|state", message = "accountType must be 'anonymous' or 'state'")
+  @Column(name = "account_type", nullable = false, length = 255)
+  private String accountType;
+  
   //
   
   public final static Integer DEFAULT_defaultExpiration = 300;
@@ -76,7 +81,7 @@ public class AnontionAccount {
 
   public AnontionAccount(Long clientTs, String clientName, UUID clientId, String clientSignature, 
       String serverSignature, String clientPub, String clientUID, Integer defaultExpiration, 
-      Integer minimumExpiration, Integer maximumExpiration, boolean isDisabled) {
+      Integer minimumExpiration, Integer maximumExpiration, boolean isDisabled, String accountType) {
 
     this.clientTs = clientTs;
 
@@ -98,6 +103,8 @@ public class AnontionAccount {
     
     this.maximumExpiration = maximumExpiration;
 
+    this.accountType = accountType;
+    
     this.isDisabled = isDisabled;
   }
 
@@ -232,5 +239,16 @@ public class AnontionAccount {
     
     return Math.max(getDefaultExpiration()/3, getMinimumExpiration());
   }
+  
+  public String getAccountType() {
+    
+    return accountType;
+  }
+
+  public void setAccountType(String accountType) {
+   
+    this.accountType = accountType;
+  }
+
 }
 

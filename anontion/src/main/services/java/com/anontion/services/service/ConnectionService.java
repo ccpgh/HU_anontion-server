@@ -826,7 +826,7 @@ public class ConnectionService {
         AnontionAccount.DEFAULT_defaultExpiration,
         AnontionAccount.DEFAULT_minimumExpiration,
         AnontionAccount.DEFAULT_maximumExpiration,
-        false);
+        false, "anonymous");
     
     AsteriskEndpoint endpoint = endpointBean.createAsteriskEndppint(
         AnontionSecurity.makeSafeIfRequired(localSipAddress),
@@ -1015,7 +1015,7 @@ public class ConnectionService {
         AnontionAccount.DEFAULT_defaultExpiration,
         AnontionAccount.DEFAULT_minimumExpiration,
         AnontionAccount.DEFAULT_maximumExpiration,
-        false);
+        false, "anonymous");
     
     AsteriskEndpoint endpoint = endpointBean.createAsteriskEndppint(
         AnontionSecurity.makeSafeIfRequired(localSipAddress),
