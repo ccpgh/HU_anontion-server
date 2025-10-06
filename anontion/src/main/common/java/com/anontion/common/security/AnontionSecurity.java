@@ -317,17 +317,17 @@ public class AnontionSecurity {
 
   private static boolean isPrefixPjsip(String buffer) {
 
-    return buffer.startsWith(AnontionConfig._CONTACT_CONNECTION_PJSIP_NAME);
+    return buffer.startsWith(AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX);
   }
 
   private static String removePrefixPjsip(String buffer) {
 
-    if (buffer.length() < AnontionConfig._CONTACT_CONNECTION_PJSIP_NAME.length()) {
+    if (buffer.length() < AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX.length()) {
     
       return "";
     }
     
-    return buffer.substring(AnontionConfig._CONTACT_CONNECTION_PJSIP_NAME.length());
+    return buffer.substring(AnontionConfig._CONTACT_CONNECTION_PJSIP_PREFIX.length());
   }
 
   private static boolean isPrefixSips(String buffer) {
@@ -337,12 +337,12 @@ public class AnontionSecurity {
 
   private static String removePrefixSips(String buffer) {
 
-    if (buffer.length() < AnontionConfig._CONTACT_CONNECTION_SIPS_NAME.length()) {
+    if (buffer.length() < AnontionConfig._CONTACT_CONNECTION_SIPS_PREFIX.length()) {
     
       return "";
     }
     
-    return buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIPS_NAME.length());
+    return buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIPS_PREFIX.length());
   }
 
   private static boolean isPrefixSip(String buffer) {
@@ -352,12 +352,12 @@ public class AnontionSecurity {
 
   private static String removePrefixSip(String buffer) {
 
-    if (buffer.length() < AnontionConfig._CONTACT_CONNECTION_SIP_NAME.length()) {
+    if (buffer.length() < AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX.length()) {
     
       return "";
     }
     
-    return buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIP_NAME.length());
+    return buffer.substring(AnontionConfig._CONTACT_CONNECTION_SIP_PREFIX.length());
   }
   
   final private static AnontionLog _logger = new AnontionLog(AnontionSecurity.class.getName());
