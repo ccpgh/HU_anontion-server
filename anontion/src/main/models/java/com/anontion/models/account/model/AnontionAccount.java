@@ -63,7 +63,7 @@ public class AnontionAccount {
   @Column(name = "is_disabled", nullable = false)
   private boolean isDisabled;
 
-  @Pattern(regexp = "anonymous|state", message = "accountType must be 'anonymous' or 'state'")
+  @Pattern(regexp = "anonymous|authorized", message = "accountType must be 'anonymous' or 'authorized'")
   @Column(name = "account_type", nullable = false, length = 255)
   private String accountType;
   
