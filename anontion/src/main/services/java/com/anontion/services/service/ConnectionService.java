@@ -16,6 +16,7 @@ import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.security.AnontionSecurityECIES_ECDH;
 import com.anontion.models.account.model.AnontionAccount;
+import com.anontion.models.account.repository.AnontionAccountRepository;
 import com.anontion.models.connection.model.AnontionConnection;
 import com.anontion.models.connection.repository.AnontionConnectionRepository;
 import com.anontion.models.image.model.AnontionImage;
@@ -37,6 +38,9 @@ public class ConnectionService {
    
   @Autowired
   private AnontionConnectionRepository connectionRepository;
+
+  @Autowired
+  private AnontionAccountRepository accountRepository;
 
   @Autowired
   private AnontionImageRepository imageRepository;
@@ -462,8 +466,9 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionMultipleBase(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry) {
+  public boolean saveTxConnectionMultipleOrBroadcastBase(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String connectionType, 
+      Double latitude, Double longitude, Long timeoutTs) {
     
     _logger.info("DEBUG saveTxConnectionMultipleBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
     
@@ -471,13 +476,13 @@ public class ConnectionService {
 
     try {
 
-      connection0 = connectionRepository.findMultipleBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB);
+      connection0 = connectionRepository.findBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB, connectionType);
       
     } catch (Exception e) {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-      _logger.info("DEBUG saveTxConnectionMultipleBase exception " + e.toString() + " when trying to find connection.");
+      _logger.info("DEBUG saveTxConnectionMultipleOrBroadcastBase exception " + e.toString() + " when trying to find connection.");
       
       _logger.exception(e);
 
@@ -488,9 +493,30 @@ public class ConnectionService {
     
     if (connection0.isEmpty()) {
 
-      _logger.info("DEBUG saveTxConnectionMultipleBase empty");
+      _logger.info("DEBUG saveTxConnectionMultipleOrBroadcastBase empty");
 
-      AnontionConnection connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, sipEndpointB, sipSignatureA, sipLabelB, "multiple", null);
+      AnontionConnection connection = null;
+      
+      if (connectionType.equals("multiple")) {
+        
+        connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, sipEndpointB, 
+            sipSignatureA, sipLabelB, connectionType, null);
+      
+      } else if (connectionType.equals("broadcast")) {
+        
+        connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, sipEndpointB, 
+            sipSignatureA, sipLabelB, connectionType, null, latitude, longitude, timeoutTs);
+      
+      } else {
+        
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+        _logger.info("DEBUG saveTxConnectionMultipleOrBroadcastBase connection type unknown '" + connectionType + "'");
+        
+        isRetry.set(false);
+        
+        return false;
+      }
       
       try {
         
@@ -521,17 +547,49 @@ public class ConnectionService {
         return false;
       }
     }
-    
-    _logger.info("DEBUG saveTxConnectionMultipleBase matched");
+        
+    _logger.info("DEBUG saveTxConnectionMultipleOrBroadcastBase not empty");
 
-    isRetry.set(false);
+    try {
     
-    return true;
+      AnontionConnection connection = connection0.get();
+      
+      connection.setLongitude(longitude);
+      
+      connection.setLatitude(latitude);
+
+      connection = connectionRepository.save(connection);
+
+      isRetry.set(false);
+      
+      return true;
+
+    } catch (DataIntegrityViolationException e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(true);
+      
+      return false;
+    }
+    catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean saveTxConnectionMultipleUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String localSipAddress, 
+      String remoteSipAddress, String connectionType) {
 
     _logger.info("DEBUG saveTxConnectionMultipleUpdate called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
 
@@ -539,7 +597,7 @@ public class ConnectionService {
 
     try {
 
-      connection0 = connectionRepository.findMultipleBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, remoteSipAddress);
+      connection0 = connectionRepository.findBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, remoteSipAddress, connectionType);
       
     } catch (Exception e) {
 
@@ -571,7 +629,7 @@ public class ConnectionService {
 
     try {
 
-      connection1 = connectionRepository.findMultipleBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB);
+      connection1 = connectionRepository.findBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB, connectionType);
       
     } catch (Exception e) {
 
@@ -888,10 +946,33 @@ public class ConnectionService {
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean createTxAccountIfConnected(String sipEndpoint, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress, StringBuilder returnPassword, 
-      StringBuilder returnSipUserId, StringBuilder returnSipLabel, StringBuilder returnPhoto, Long clientTs, String clientName, UUID clientId, String clientUID) {
+      StringBuilder returnSipUserId, StringBuilder returnSipLabel, StringBuilder returnPhoto, Long clientTs, String clientName, UUID clientId, String clientUID,
+      StringBuilder returnTimeoutTs, String connectionType) {
 
     _logger.info("DEBUG createTxAccountIfConnected called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpoint '" + sipEndpoint + "'");
 
+    if (connectionType.equals("broadcast")) {
+      
+      // NOTE: if account exists exit ... a horrible hack !!! 
+      
+      Optional<AnontionAccount> account0 = accountRepository.findByClientTsAndClientNameAndClientId(clientTs, localSipAddress, clientId);
+      
+      if (!account0.isEmpty()) {
+
+        returnPassword.append("blah");
+
+        returnSipUserId.append("blah");
+
+        returnSipLabel.append("blah");
+        
+        returnTimeoutTs.append("0");
+        
+        isRetry.set(false);
+        
+        return true;        
+      }
+    }
+    
     Optional<AnontionConnection> connection0 = null;
 
     try {
@@ -985,6 +1066,8 @@ public class ConnectionService {
     returnSipUserId.append(foreignKey2);
 
     returnSipLabel.append(connection.getSipLabelA());
+    
+    returnTimeoutTs.append(connection.getTimeoutTs().toString());
     
     Optional<AnontionImage> image0 = imageRepository.findById(remoteSipAddress);
     

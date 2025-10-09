@@ -22,10 +22,10 @@ public interface AnontionConnectionRepository extends JpaRepository<AnontionConn
   @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and connection_type = 'direct' ", nativeQuery = true)
   Optional<AnontionConnection> findDirectBySipEndpointAAndSipEndpointBRelaxed(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB);  
 
-  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and connection_type = 'multiple' ", nativeQuery = true)
-  Optional<AnontionConnection> findMultipleBySipEndpointAAndSipEndpointBRelaxed(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB);  
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and connection_type = :connectionType ", nativeQuery = true)
+  Optional<AnontionConnection> findBySipEndpointAAndSipEndpointBRelaxed(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB, @Param("connectionType") String connectionType);  
 
-  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a != sip_endpoint_b AND sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and sip_signature_A IS NOT NULL and sip_signature_B IS NOT NULL and sip_ts_A IS NOT NULL and sip_ts_B IS NOT NULL", nativeQuery = true)
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a != sip_endpoint_b AND sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and sip_signature_A IS NOT NULL and sip_signature_B IS NOT NULL and sip_ts_A IS NOT NULL and sip_ts_B IS NOT NULL AND connection_type != 'broadcast' ", nativeQuery = true)
   Optional<AnontionConnection> findBySipEndpointAAndSipEndpointB(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB);  
 
   @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = sip_endpoint_b AND sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointA and sip_signature_A IS NOT NULL and sip_signature_B IS NOT NULL and sip_ts_A IS NOT NULL and sip_ts_B IS NOT NULL", nativeQuery = true)

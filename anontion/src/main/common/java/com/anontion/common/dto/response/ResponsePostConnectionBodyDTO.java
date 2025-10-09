@@ -28,9 +28,19 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
   
   private String serverMessage;
 
+  private Long timeoutTs;
+
   public ResponsePostConnectionBodyDTO(String localSipAddress, String remoteSipAddress, 
       Long nowTs, String serverSignature, boolean isRejected, boolean isConnected, boolean isRetry,
       String returnPassword, String returnSipUserId, String returnSipLabel, String returnPhoto, String serverMessage) {
+    
+    this (localSipAddress, remoteSipAddress, nowTs, serverSignature, isRejected, isConnected, isRetry, 
+        returnPassword, returnSipUserId, returnSipLabel, returnPhoto, serverMessage, 0L);
+  }
+  
+  public ResponsePostConnectionBodyDTO(String localSipAddress, String remoteSipAddress, 
+      Long nowTs, String serverSignature, boolean isRejected, boolean isConnected, boolean isRetry,
+      String returnPassword, String returnSipUserId, String returnSipLabel, String returnPhoto, String serverMessage, Long timeoutTs) {
     
     this.localSipAddress = localSipAddress;
     
@@ -55,6 +65,8 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
     this.returnPhoto = returnPhoto;
 
     this.serverMessage = serverMessage;
+    
+    this.timeoutTs = timeoutTs;
   }
   
   public String getLocalSipAddress() {
@@ -183,5 +195,14 @@ public class ResponsePostConnectionBodyDTO extends ResponseBodyDTO {
     this.returnPhoto = returnPhoto;
   }
 
+  public Long getTimeoutTs() {
+    
+    return timeoutTs;
+  }
+
+  public void setTimeoutTs(Long timeoutTs) {
+ 
+    this.timeoutTs = timeoutTs;
+  }
 }
 

@@ -71,23 +71,25 @@ public class ConnectionPostController {
           message);      
     }
     
-    if (request.getBody().getConnectionType().equals("multiple")) {
+    String connectionType = request.getBody().getConnectionType();
+    
+    if (connectionType.equals("multiple") || connectionType.equals("broadcast")) {
       
-      return postMultipleConnection(request.getBody());
+      return postMultipleOrBroadcastConnection(request.getBody());
     }
 
-    if (request.getBody().getConnectionType().equals("direct")) {
+    if (connectionType.equals("direct")) {
       
       return postDirectConnection(request.getBody());
     }
 
-    if (request.getBody().getConnectionType().equals("indirect") || request.getBody().getConnectionType().equals("roll")) {
+    if (connectionType.equals("indirect") || connectionType.equals("roll")) {
      
       return postIndirectOrRollConnection(request.getBody());
     }
     
     return Responses.getBAD_REQUEST(
-        "Invalid parameters!"); 
+        "Invalid parameters as connection type '" + connectionType + "' is unknown!"); 
   }
   
 
@@ -883,7 +885,7 @@ public class ConnectionPostController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  public ResponseEntity<ResponseDTO> postMultipleConnection(RequestPostConnectionBodyDTO dto) {
+  public ResponseEntity<ResponseDTO> postMultipleOrBroadcastConnection(RequestPostConnectionBodyDTO dto) {
 
     UUID clientId = dto.getClientId();
     String clientName = dto.getClientName();   
@@ -1080,7 +1082,7 @@ public class ConnectionPostController {
       return postMultipleConnectionDifferent(dto);
     }
 
-    return postMultipleConnectionSame(dto);
+    return postMultipleOrBroadcastConnectionSame(dto);
   }
   
   public ResponseEntity<ResponseDTO> postMultipleConnectionDifferent(RequestPostConnectionBodyDTO dto) {
@@ -1090,6 +1092,7 @@ public class ConnectionPostController {
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();
     String clientSignature2 = dto.getClientSignature2();   
+    String connectionType = dto.getConnectionType();
     Long nowTs = dto.getNowTs();
 
     UUID clientId = dto.getClientId();
@@ -1133,7 +1136,7 @@ public class ConnectionPostController {
     AtomicBoolean isRetry = new AtomicBoolean(false);
     
     if (!connectionService.saveTxConnectionMultipleUpdate(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
-        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, localSipAddress, remoteSipAddress)) {
+        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, localSipAddress, remoteSipAddress, connectionType)) {
 
       String buffer4 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -1243,13 +1246,16 @@ public class ConnectionPostController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
   
-  public ResponseEntity<ResponseDTO> postMultipleConnectionSame(RequestPostConnectionBodyDTO dto) {
+  public ResponseEntity<ResponseDTO> postMultipleOrBroadcastConnectionSame(RequestPostConnectionBodyDTO dto) {
  
-    _logger.info("DEBUG multiple postMasterConnectionSame called");
+    _logger.info("DEBUG multiple postMultipleOrBroadcastConnectionSame called");
 
     String localSipAddress = dto.getLocalSipAddress();   
     String remoteSipAddress = dto.getRemoteSipAddress();
-    String clientSignature2 = dto.getClientSignature2();   
+    String clientSignature2 = dto.getClientSignature2();  
+    String connectionType = dto.getConnectionType();   
+    Double latitude = dto.getLatitude();
+    Double longitude = dto.getLongitude();
     String sipLabel = dto.getLabel();
     Long nowTs = dto.getNowTs();
 
@@ -1269,10 +1275,12 @@ public class ConnectionPostController {
     
     AtomicBoolean isRetry = new AtomicBoolean(false);
     
-    _logger.info("DEBUG connection multiple calling saveTxConnectionMultipleBase");
+    _logger.info("DEBUG connection multiple or broadcast calling saveTxConnectionMultipleOrBroadcastBase");
         
-    if (!connectionService.saveTxConnectionMultipleBase(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
-        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry)) {
+    Long timeoutTs = AnontionTime.tsN() + AnontionConfig._CONTACT_CONNECTION_BROADCAST_TIMEOUT;
+    
+    if (!connectionService.saveTxConnectionMultipleOrBroadcastBase(sipTsA, sipEndpointA, sipSignatureA, sipLabelA,
+        sipTsB, sipEndpointB, sipSignatureB, sipLabelB, isRetry, connectionType, latitude, longitude, timeoutTs)) {
 
       String buffer4 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -1294,17 +1302,18 @@ public class ConnectionPostController {
           "",
           "",
           "",
-          "Connection db base insert not completed");
+          "Connection db base insert not completed",
+          timeoutTs);
 
       ResponsePostDTO response = new ResponsePostDTO(
          new ResponseHeaderDTO(true, 0, "connection db base insert not completed."), body);
 
-      _logger.info("DEBUG connection multiple db base insert not completed");
+      _logger.info("DEBUG connection multiple or broadcast db base insert not completed");
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    _logger.info("DEBUG connection multiple OK");
+    _logger.info("DEBUG connection multiple or broadcast OK");
 
     StringBuilder returnPassword = new StringBuilder();
 
@@ -1314,13 +1323,15 @@ public class ConnectionPostController {
 
     StringBuilder returnPhoto = new StringBuilder();
 
+    StringBuilder returnTimeoutTs = new StringBuilder();
+
     String clientUID = AnontionStrings.concatLowercase(new String[] { 
         clientName, 
         nowTs.toString(), 
         clientId.toString() }, ":");
 
     if (connectionService.createTxAccountIfConnected(sipEndpointA, isRetry, localSipAddress, remoteSipAddress,
-        returnPassword, returnSipUserId, returnSipLabel, returnPhoto, clientTs, clientName, clientId, clientUID)) { 
+        returnPassword, returnSipUserId, returnSipLabel, returnPhoto, clientTs, clientName, clientId, clientUID, returnTimeoutTs, connectionType)) { 
       
       String buffer5 = AnontionStrings.concat(new String[] { 
           localSipAddress, 
@@ -1342,12 +1353,13 @@ public class ConnectionPostController {
           returnSipUserId.toString(),
           returnSipLabel.toString(),
           returnPhoto.toString(),
-          "Ok connection connected and account exists.");
+          "Ok connection connected and account exists.",
+          returnTimeoutTs.isEmpty() ? 0 : Long.parseLong(returnTimeoutTs.toString()));
 
       ResponsePostDTO response = new ResponsePostDTO(
           new ResponseHeaderDTO(true, 0, "Ok."), body);
 
-      _logger.info("DEBUG multiple connection and account ok.");
+      _logger.info("DEBUG multiple or broadcast connection and account ok.");
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -1372,12 +1384,13 @@ public class ConnectionPostController {
         "",
         "",
         "",
-        "OK. connection connected.");
+        "OK. connection connected.",
+        returnTimeoutTs.isEmpty() ? 0 : Long.parseLong(returnTimeoutTs.toString()));
 
     ResponsePostDTO response = new ResponsePostDTO(
         new ResponseHeaderDTO(true, 0, "Ok."), body);
 
-    _logger.info("DEBUG connection Ok. Even values.");
+    _logger.info("DEBUG connection multiple or broadcast Ok. Even values.");
 
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
