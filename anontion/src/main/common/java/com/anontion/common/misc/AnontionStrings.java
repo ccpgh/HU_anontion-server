@@ -125,6 +125,24 @@ public class AnontionStrings {
     return true;
   }
   
+  public static boolean isDigits(String s) {
+    
+    if (s == null || s.isEmpty()) {
+    
+      return false;
+    }
+
+    for (char c : s.toCharArray()) {
+      
+      if (!(c >= '0' && c <= '9')) {
+      
+        return false;
+      }
+    }
+
+    return true;
+  }
+  
   public static String toHexString(byte[] bytes) {
 
     if (bytes == null || bytes.length == 0) {

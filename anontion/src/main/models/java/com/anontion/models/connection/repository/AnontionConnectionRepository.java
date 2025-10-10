@@ -3,6 +3,7 @@ package com.anontion.models.connection.repository;
 import com.anontion.models.connection.model.AnontionConnection;
 import com.anontion.models.connection.model.AnontionConnectionId;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,14 +32,17 @@ public interface AnontionConnectionRepository extends JpaRepository<AnontionConn
   @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = sip_endpoint_b AND sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointA and sip_signature_A IS NOT NULL and sip_signature_B IS NOT NULL and sip_ts_A IS NOT NULL and sip_ts_B IS NOT NULL", nativeQuery = true)
   Optional<AnontionConnection> findBySipEndpointAAndSipEndpointBIdentical(@Param("sipEndpointA") String sipEndpointA);  
 
-  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB and connection_type = :connectionType ", nativeQuery = true)
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_endpoint_b = :sipEndpointB AND connection_type = :connectionType ", nativeQuery = true)
   Optional<AnontionConnection> findIndirectBySipEndpointAAndSipEndpointBRelaxed(@Param("sipEndpointA") String sipEndpointA, @Param("sipEndpointB") String sipEndpointB, @Param("connectionType") String connectionType);  
 
-  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_signature_a = :sipSignatureA and connection_type = :connectionType AND sip_endpoint_a != sip_endpoint_b ", nativeQuery = true)
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpointA AND sip_signature_a = :sipSignatureA AND connection_type = :connectionType AND sip_endpoint_a != sip_endpoint_b ", nativeQuery = true)
   Optional<AnontionConnection> findIndirectBySipEndpointAAndSipSignatureARelaxed(@Param("sipEndpointA") String sipEndpointA, @Param("sipSignatureA") String sipSignatureA, @Param("connectionType") String connectionType);  
   
-  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_b = :sipEndpointB AND sip_signature_b = :sipSignatureB and connection_type = :connectionType AND sip_endpoint_a != sip_endpoint_b ", nativeQuery = true)
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_b = :sipEndpointB AND sip_signature_b = :sipSignatureB AND connection_type = :connectionType AND sip_endpoint_a != sip_endpoint_b ", nativeQuery = true)
   Optional<AnontionConnection> findIndirectBySipEndpointBAndSipSignatureBRelaxed(@Param("sipEndpointB") String sipEndpointB, @Param("sipSignatureB") String sipSignatureB, @Param("connectionType") String connectionType);  
 
   Optional<AnontionConnection> findByRollSipEndpoint(String rollSipEndpoint);    
+  
+  @Query(value = "SELECT * FROM anontion_connection WHERE latitude >= :latitudeMin AND latitude <= :latitudeMax AND longitude >= :longitudeMin AND longitude <= :longitudeMax AND connection_type = 'broadcast' AND sip_endpoint_a = sip_endpoint_b AND timeout_ts >= :timeoutTs ", nativeQuery = true)
+  List<AnontionConnection> findByGPSBox(@Param("latitudeMin") Double latitudeMin, @Param("latitudeMax") Double latitudeMax, @Param("longitudeMin") Double longitudeMin, @Param("longitudeMax") Double longitudeMax, @Param("timeoutTs") Long timeoutTs);
 }
