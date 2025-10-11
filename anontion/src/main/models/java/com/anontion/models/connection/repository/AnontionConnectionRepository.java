@@ -45,4 +45,7 @@ public interface AnontionConnectionRepository extends JpaRepository<AnontionConn
   
   @Query(value = "SELECT * FROM anontion_connection WHERE latitude >= :latitudeMin AND latitude <= :latitudeMax AND longitude >= :longitudeMin AND longitude <= :longitudeMax AND connection_type = 'broadcast' AND sip_endpoint_a = sip_endpoint_b AND timeout_ts >= :timeoutTs ", nativeQuery = true)
   List<AnontionConnection> findByGPSBox(@Param("latitudeMin") Double latitudeMin, @Param("latitudeMax") Double latitudeMax, @Param("longitudeMin") Double longitudeMin, @Param("longitudeMax") Double longitudeMax, @Param("timeoutTs") Long timeoutTs);
+  
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpoint AND sip_endpoint_b = :sipEndpoint AND connection_type = 'broadcast' AND timeout_ts >= :timeoutTs ", nativeQuery = true)
+  Optional<AnontionConnection> findBroadcastBySipEndpoint(@Param("sipEndpoint") String sipEndpoint, @Param("timeoutTs") Long timeoutTs);  
 }

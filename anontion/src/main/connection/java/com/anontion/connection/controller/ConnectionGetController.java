@@ -105,23 +105,64 @@ public class ConnectionGetController {
           "Failed param check");
     }
     
-    Optional<AnontionConnection> connection0 = 
-        (sipEndpointA.compareTo(sipEndpointB) < 0) ? connectionRepository.findBySipEndpointAAndSipEndpointB(sipEndpointA, sipEndpointB)
-            : connectionRepository.findBySipEndpointAAndSipEndpointB(sipEndpointB, sipEndpointA);
+    boolean isALessThanB = sipEndpointA.compareTo(sipEndpointB) < 0;
+    
+    String lowerEndppint = isALessThanB ? sipEndpointA : sipEndpointB;
+    
+    String upperEndppint = !isALessThanB ? sipEndpointA : sipEndpointB;
+    
+    Optional<AnontionConnection> connection0 = connectionRepository.findBySipEndpointAAndSipEndpointB(lowerEndppint, upperEndppint);
 
     if (connection0.isEmpty()) {
 
-      _logger.info("failed search '" + sipEndpointA + "', '" + sipEndpointB + "'");
+      _logger.info("failed ordered search lower '" + sipEndpointA + "', upper '" + sipEndpointB + "' = trying broadcast");
 
+      Long nowTs = AnontionTime.tsN();
+      
+      Optional<AnontionConnection> broadcastLower = connectionRepository.findBroadcastBySipEndpoint(lowerEndppint, nowTs);
+
+      Optional<AnontionConnection> broadcastUpper = connectionRepository.findBroadcastBySipEndpoint(upperEndppint, nowTs);
+
+      if ((!broadcastLower.isEmpty() && broadcastUpper.isEmpty()) || (broadcastLower.isEmpty() && !broadcastUpper.isEmpty())) {
+        
+        if (!broadcastLower.isEmpty()) {
+          
+          return isExistsBroadcast(broadcastLower.get(), upperEndppint);
+        }
+        
+        return isExistsBroadcast(broadcastUpper.get(), lowerEndppint);
+      }
+        
       return Responses.getBAD_REQUEST(
-          "failed search");
+          "failed searches ordered and broadcast");
     }
       
-    _logger.info("ok");
+    _logger.info("ok matched ordered search lowerEndppint '" + lowerEndppint + "' upperEndppint '" + upperEndppint + "'");
 
     return Responses.getOK();    
   }
+  
+  private ResponseEntity<ResponseDTO> isExistsBroadcast(AnontionConnection broadcast, String sipUsername) {
+    
+    String safeSipUsername = AnontionSecurity.encodeToSafeBase64(sipUsername);
+    
+    String unsafeSipUsername = AnontionSecurity.decodeFromSafeBase64(safeSipUsername);
+    
+    Optional<AnontionAccount> account0 = accountRepository.findByClientPubAuthorized(unsafeSipUsername);
 
+    if (!account0.isEmpty()) {
+      
+      _logger.info("ok matched broadcast search");
+
+      return Responses.getOK();    
+    }
+
+    _logger.info("failed searches ordered and broadcast");
+
+    return Responses.getBAD_REQUEST(
+        "failed searches ordered and broadcast");
+  }
+  
   @GetMapping(path = "/connection/")
   public ResponseEntity<ResponseDTO> getConnection(@RequestParam("sipUsername") String sipUsername) {
 
