@@ -330,7 +330,8 @@ public class ConnectionGetController {
       if (distance < AnontionGPS._CONNECTION_SEARCH_CIRCLE) {
 
         ResponseGetConnectionBroadcastBodyDTO broadcast = 
-            new ResponseGetConnectionBroadcastBodyDTO(connection.getConnectionId(), connection.getLatitude(), connection.getLongitude(), distance, connection.getSipEndpointA());
+            new ResponseGetConnectionBroadcastBodyDTO(connection.getConnectionId(), connection.getLatitude(), 
+                connection.getLongitude(), distance, connection.getSipEndpointA(), connection.getTimeoutTs());
         
         broadcasts.add(broadcast);
       }      

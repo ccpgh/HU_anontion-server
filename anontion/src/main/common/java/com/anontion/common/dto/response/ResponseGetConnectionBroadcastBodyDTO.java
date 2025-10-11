@@ -13,8 +13,10 @@ public class ResponseGetConnectionBroadcastBodyDTO {
   private double distance;
 
   private String sipUsername;
+  
+  private Long timeoutTs;
 
-  public ResponseGetConnectionBroadcastBodyDTO(UUID id, double latitude, double longitude, double distance, String sipUsername) {
+  public ResponseGetConnectionBroadcastBodyDTO(UUID id, double latitude, double longitude, double distance, String sipUsername, Long timeoutTs) {
   
     this.id = id;
     
@@ -25,6 +27,8 @@ public class ResponseGetConnectionBroadcastBodyDTO {
     this.distance = distance;
     
     this.sipUsername = sipUsername;
+    
+    this.timeoutTs = timeoutTs;
   }
 
   public UUID getId() {
@@ -75,5 +79,15 @@ public class ResponseGetConnectionBroadcastBodyDTO {
   public void setSipUsername(String sipUsername) {
   
     this.sipUsername = sipUsername;
+  }
+  
+  public Long getTimeoutTs() {
+    
+    return timeoutTs;
+  }
+  
+  public void setTimeoutTs(Long timeoutTs) {
+  
+    this.timeoutTs = timeoutTs;
   }
 }
