@@ -22,7 +22,7 @@ public class AnontionConfig {
   public static String _ASTERISK_PASSWORD_ENCODING_AUTHTYPE = "md5";
   public static String _ASTERISK_PASSWORD_ENCODING_REALM = "asterisk";
   
-  public static Long _CONTACT_CONNECTION_BROADCAST_TIMEOUT = 3000000L; // 5 minutes possible to make new call.
+  public static Long _CONTACT_CONNECTION_BROADCAST_TIMEOUT = 300L; // 5 minutes possible to make new call.
   public static Long _CONTACT_CONNECTION_BROADCAST_TIMEOUT_NOTIMEOUT = 0L;
   
   public static Double _CONTACT_GPS_NULL_LONGITUDE = 1800.0;
