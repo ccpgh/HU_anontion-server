@@ -85,7 +85,7 @@ public class AnontionPOW {
       
       boolean isSolved = hexValue.compareTo(target) < 0;
       
-      _logger.info("DEBUG pow calc '" + AnontionStrings.lpad(hexValue.toString(16), 64) + 
+      _logger.info("POW calc '" + AnontionStrings.lpad(hexValue.toString(16), 64) +
           "' target '" + powTarget + "' is solved '" + isSolved + "' @ nonce '" + nonce.toString(16) + "'");
       
       return isSolved;

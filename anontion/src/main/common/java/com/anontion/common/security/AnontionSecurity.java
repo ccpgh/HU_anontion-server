@@ -245,17 +245,12 @@ public class AnontionSecurity {
 
       buffer = removePrefixSip(buffer);
     
-    } else {
-    
-      //_logger.info("DEBUG converted sipAddress '" + sipAddress + "' to Username '' - nothing");
-
-      //return "";
     }
 
     buffer = extractToColon(extractToSemiColon(
         extractToAt(buffer)));
 
-    _logger.info("DEBUG converted sipAddress '" + sipAddress + "' to Username '" + buffer + "'");
+    _logger.info("converted sip address '" + sipAddress + "' to sip username '" + buffer + "'");
     
     return buffer;
   }

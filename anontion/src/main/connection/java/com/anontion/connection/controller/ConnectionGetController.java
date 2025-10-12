@@ -59,7 +59,7 @@ public class ConnectionGetController {
   @GetMapping(path = "/connection/exists")
   public ResponseEntity<ResponseDTO> isExists(@RequestParam("sipUsername1") String sipUsername1, @RequestParam("sipUsername2") String sipUsername2) {
 
-    _logger.info("DEBUG called isExists '" + sipUsername1 + "', '" + sipUsername2 + "'");
+    _logger.info("isExists with '" + sipUsername1 + "', '" + sipUsername2 + "'");
 
     if (sipUsername1.isBlank() ||
         sipUsername2.isBlank()) {
@@ -152,12 +152,8 @@ public class ConnectionGetController {
 
     if (!account0.isEmpty()) {
       
-      _logger.info("ok matched broadcast search");
-
-      return Responses.getOK();    
+      return Responses.getOK();
     }
-
-    _logger.info("failed searches ordered and broadcast");
 
     return Responses.getBAD_REQUEST(
         "failed searches ordered and broadcast");
@@ -211,7 +207,7 @@ public class ConnectionGetController {
   @GetMapping(path = "/connection/broadcast")
   public ResponseEntity<ResponseDTO> getBroadcasts(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude, @RequestParam("token") String token ) {
 
-    _logger.info("DEBUG called latitude '" + latitude + "', longitude '" + longitude + "' token " + token + "'");
+    _logger.info("broadcasts latitude '" + latitude + "', longitude '" + longitude + "'");
 
     if (token.isBlank()) {
 

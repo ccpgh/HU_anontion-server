@@ -115,9 +115,7 @@ public class ApplicationPostController {
 
     applicationRepository.save(application);
 
-    _logger.info("DEBUG application post text '" + pow.getText() + "' target '" + pow.getTarget() + "'");
-    
-    ResponsePostApplicationBodyDTO body = 
+    ResponsePostApplicationBodyDTO body =
         new ResponsePostApplicationBodyDTO(application.getPowText(), 
             application.getPowTarget(), 
             enceyptedName, 
