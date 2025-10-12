@@ -544,8 +544,6 @@ public class ConnectionService {
     
     if (connection0.isEmpty()) {
 
-      Optional<AnontionConnection> connection1 = null;
-      
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
       isRetry.set(true);
