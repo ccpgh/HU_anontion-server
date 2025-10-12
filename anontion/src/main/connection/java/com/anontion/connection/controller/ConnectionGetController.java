@@ -241,8 +241,6 @@ public class ConnectionGetController {
           "Failed param token invalid");
     }
     
-    _logger.info("DEBUG cleartext '" + cleartext + "'");
-    
     String[] tokens = cleartext.split("\n");
     
     if (tokens.length != 4 || 
@@ -309,8 +307,6 @@ public class ConnectionGetController {
     
     String md5Password = AnontionSecurity.generateMD5Password(userId, password);
     
-    _logger.info("DEBUG md5Password '" + md5Password + "'");
-
     if (!auth.getMd5Cred().equals(md5Password)) {
       
       _logger.info("failed param bad password");
@@ -333,11 +329,7 @@ public class ConnectionGetController {
     
     String id = endpoint.getId();
     
-    _logger.info("DEBUG id '" + id + "'");
-    
     String unsafeId = AnontionSecurity.decodeFromSafeBase64(AnontionSecurity.encodeToSafeBase64(id));
-
-    _logger.info("DEBUG unsafeId '" + unsafeId + "'");
 
     Optional<AnontionAccount> account0 = accountRepository.findByClientPubAuthorized(unsafeId);
     
@@ -351,12 +343,8 @@ public class ConnectionGetController {
     
     AnontionGPSBox box = new AnontionGPSBox(latitude, longitude, AnontionGPS._CONNECTION_SEARCH_CIRCLE);
 
-    _logger.info("DEBUG box '" + box + "'");
-    
     Long nowTs = AnontionTime.tsN();
     
-    _logger.info("DEBUG nowTs '" + nowTs + "'");
-
     List<AnontionConnection> connections = connectionRepository.findByGPSBox(
         box.getLatitudeMin(), box.getLatitudeMax(), box.getLongitudeMin(), box.getLongitudeMax(), nowTs); 
 
@@ -366,8 +354,6 @@ public class ConnectionGetController {
       
       double distance = AnontionGPS.getDistance(latitude, longitude, connection.getLatitude(), connection.getLongitude());
       
-      _logger.info("DEBUG distance '" + distance + "'");
-
       if (distance < AnontionGPS._CONNECTION_SEARCH_CIRCLE) {
 
         ResponseGetConnectionBroadcastBodyDTO broadcast = 
