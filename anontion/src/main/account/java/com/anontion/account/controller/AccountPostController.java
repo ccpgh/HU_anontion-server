@@ -123,7 +123,7 @@ public class AccountPostController {
         !AnontionStrings.isHex(powHigh) || 
         !AnontionStrings.isHex(powNonce)) {
       
-      _logger.info("DEBUG account post mismnatch application text '" + 
+      _logger.info("account post mismnatch application text '" + 
           application.getPowText() + 
           "' vs. '" + 
           dto.getPowText() + 
@@ -226,7 +226,7 @@ public class AccountPostController {
             AnontionAccount.DEFAULT_defaultExpiration,
             AnontionAccount.DEFAULT_minimumExpiration,
             AnontionAccount.DEFAULT_maximumExpiration,
-            false);
+            false, "anonymous");
               
         AsteriskEndpoint endpoints = endpointBean.createAsteriskEndppint(
             AnontionSecurity.makeSafeIfRequired(account.getClientPub()),

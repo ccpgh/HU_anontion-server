@@ -60,8 +60,6 @@ public class AccountGetController {
 
     AsteriskAuth auth = auth0.get();
 
-    _logger.info("DEBUG Found account with auth id = '" + auth.getId() + "'");
-
     Optional<AsteriskEndpoint> endpoint0 = 
         endpointRepository.findByAuth(auth.getId());
     

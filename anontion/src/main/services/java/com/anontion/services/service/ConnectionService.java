@@ -16,6 +16,7 @@ import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.security.AnontionSecurityECIES_ECDH;
 import com.anontion.models.account.model.AnontionAccount;
+import com.anontion.models.account.repository.AnontionAccountRepository;
 import com.anontion.models.connection.model.AnontionConnection;
 import com.anontion.models.connection.repository.AnontionConnectionRepository;
 import com.anontion.models.image.model.AnontionImage;
@@ -39,6 +40,9 @@ public class ConnectionService {
   private AnontionConnectionRepository connectionRepository;
 
   @Autowired
+  private AnontionAccountRepository accountRepository;
+
+  @Autowired
   private AnontionImageRepository imageRepository;
 
   @Autowired
@@ -54,23 +58,19 @@ public class ConnectionService {
   private AccountService accountService;
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionIndirectBase(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, StringBuilder buffer) {
-    
-    _logger.info("DEBUG saveTxConnectionIndirectBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
+  public boolean saveTxConnectionIndirectOrRollBase(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, StringBuilder buffer, String rollSipAddress, String connectionType) {
     
     Optional<AnontionConnection> connection0 = null;
 
     try {
 
-      connection0 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB);
+      connection0 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB, connectionType);
       
     } catch (Exception e) {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-      _logger.info("DEBUG saveTxConnectionIndirectBase exception " + e.toString() + " when trying to find connection.");
-      
       _logger.exception(e);
 
       isRetry.set(false);
@@ -80,9 +80,8 @@ public class ConnectionService {
     
     if (connection0.isEmpty()) {
 
-      _logger.info("DEBUG saveTxConnectionIndirectBase empty");
-
-      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, sipSignatureA, sipLabelA, null, sipEndpointB, sipSignatureA, sipLabelB, "indirect");
+      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, sipSignatureA, sipLabelA, null, sipEndpointB, sipSignatureA, sipLabelB, connectionType,
+          (rollSipAddress != null && !rollSipAddress.isEmpty() ? rollSipAddress : null));
       
       try {
         
@@ -114,17 +113,15 @@ public class ConnectionService {
       }
     }
     
-    _logger.info("DEBUG saveTxConnectionIndirectBase found connection");
-
     AnontionConnection connection = connection0.get();
 
     if (connection.getSipEndpointA().equals(sipEndpointA) && connection.getSipEndpointB().equals(sipEndpointB) && sipEndpointA.equals(sipEndpointB)) {
 
-      Optional<AnontionConnection> connection1 = connectionRepository.findIndirectBySipEndpointAAndSipSignatureARelaxed(sipEndpointA, sipSignatureA);
+      Optional<AnontionConnection> connection1 = connectionRepository.findIndirectBySipEndpointAAndSipSignatureARelaxed(sipEndpointA, sipSignatureA, connectionType);
       
       if (connection1.isEmpty()) {
         
-        connection1 = connectionRepository.findIndirectBySipEndpointBAndSipSignatureBRelaxed(sipEndpointA, sipSignatureA);
+        connection1 = connectionRepository.findIndirectBySipEndpointBAndSipSignatureBRelaxed(sipEndpointA, sipSignatureA, connectionType);
 
         if (!connection1.isEmpty()) {
 
@@ -139,8 +136,6 @@ public class ConnectionService {
       if (connection1.isEmpty()) {
 
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
-        _logger.info("DEBUG saveTxConnectionIndirectBase match on base connection but did not find corresponding update connection");
 
         isRetry.set(true);
 
@@ -162,15 +157,11 @@ public class ConnectionService {
         return false;
       }
       
-      _logger.info("DEBUG saveTxConnectionIndirectBase got corresponding remote '" + buffer.toString() + "'");
-      
       isRetry.set(true);
 
       return true;      
     }
 
-    _logger.info("DEBUG saveTxConnectionIndirectBase not match on state 1");
-    
     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
     isRetry.set(false);
@@ -182,8 +173,6 @@ public class ConnectionService {
   public boolean saveTxConnectionDirect(Long sipTsA, String sipEndpointA, String sipSignatureA, Long sipTsB, 
       String sipEndpointB, String sipSignatureB, AtomicBoolean isRetry) {
 
-    _logger.info("DEBUG saveTxConnectionDirect called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
-    
     Optional<AnontionConnection> connection0 = null;
     
     try {
@@ -194,8 +183,6 @@ public class ConnectionService {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-      _logger.info("DEBUG saveTxConnectionDirect exception " + e.toString() + " when trying to find for update.");
-      
       _logger.exception(e);
 
       isRetry.set(false);
@@ -205,9 +192,7 @@ public class ConnectionService {
     
     if (connection0.isEmpty()) {
 
-      _logger.info("DEBUG saveTxConnectionDirect empty");
-
-      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, null, "", null, sipEndpointB, null, "", "direct");
+      AnontionConnection connection = new AnontionConnection(null, sipEndpointA, null, "", null, sipEndpointB, null, "", "direct", null);
       
       try {
         
@@ -239,14 +224,10 @@ public class ConnectionService {
       }
     }
 
-    _logger.info("DEBUG saveTxConnectionDirect not empty");
-
     AnontionConnection connection = connection0.get();
     
     if (connection.getSipTsA() != null && connection.getSipSignatureA() != null &&
         connection.getSipTsB() != null && connection.getSipSignatureB() != null) { 
-
-      _logger.info("DEBUG saveTxConnection all populated");
 
       isRetry.set(false);
       
@@ -255,26 +236,18 @@ public class ConnectionService {
 
     if (sipTsA != null && sipSignatureA != null) {
       
-      _logger.info("DEBUG saveTxConnectionDirect A update");
-
       if (connection.getSipTsA() == null) {
        
-        _logger.info("DEBUG saveTxConnectionDirect A update 1");
-
         connection.setSipTsA(sipTsA);
       }
       
       if (connection.getSipSignatureA() == null) {
-
-        _logger.info("DEBUG saveTxConnectionDirect A update 2");
 
         connection.setSipSignatureA(sipSignatureA);
       }
       
       try {
       
-        _logger.info("DEBUG saveTxConnectionDirect A update save");
-
         connectionRepository.save(connection);
         
       } catch (Exception e) {
@@ -291,26 +264,18 @@ public class ConnectionService {
 
     if (sipTsB != null && sipSignatureB != null) {
 
-      _logger.info("DEBUG saveTxConnectionDirect B update");
-
       if (connection.getSipTsB() == null) {
-
-        _logger.info("DEBUG saveTxConnectionDirect B update 1");
 
         connection.setSipTsB(sipTsB);
       }
       
       if (connection.getSipSignatureB() == null) {
         
-        _logger.info("DEBUG saveTxConnectionDirect B update 2");
-        
         connection.setSipSignatureB(sipSignatureB);
       }
       
       try {
         
-        _logger.info("DEBUG saveTxConnectionDirect B update save");
-
         connectionRepository.save(connection);
         
       } catch (Exception e) {
@@ -327,30 +292,24 @@ public class ConnectionService {
 
     // NOTE: as the saying goes - should not get here!
     
-    _logger.info("DEBUG saveTxConnectionDirect hit bottom");
-    
     isRetry.set(false);
     
     return false;
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionIndirectUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA, Long sipTsB, String sipEndpointB, 
-      String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
-    
-    _logger.info("DEBUG saveTxConnectionIndirectUpdate called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
-    
+  public boolean saveTxConnectionIndirectOrRollUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA, Long sipTsB, String sipEndpointB, 
+      String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress, String connectionType) {
+        
     Optional<AnontionConnection> connection0 = null;
 
     try {
 
-      connection0 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, remoteSipAddress);
+      connection0 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, remoteSipAddress, connectionType);
       
     } catch (Exception e) {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
-      _logger.info("DEBUG saveTxConnectionIndirectUpdate exception " + e.toString() + " when trying to find connection.");
       
       _logger.exception(e);
 
@@ -361,24 +320,20 @@ public class ConnectionService {
     
     if (connection0.isEmpty()) {
 
-      _logger.info("DEBUG saveTxConnectionIndirectUpdate empty");
-      
       Optional<AnontionConnection> connection1 = null;
 
       try {
         
         if (localSipAddress.compareTo(remoteSipAddress) < 0) {
 
-          connection1 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(localSipAddress, remoteSipAddress);
+          connection1 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(localSipAddress, remoteSipAddress, connectionType);
         
         } else {
                     
-          connection1 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, localSipAddress);
+          connection1 = connectionRepository.findIndirectBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, localSipAddress, connectionType);
         }
 
         if (connection1.isEmpty()) {
-
-          _logger.info("DEBUG saveTxConnectionIndirectUpdate not matched on stage 2 indirect connection");
 
           TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
@@ -386,8 +341,6 @@ public class ConnectionService {
         
           return false;
         }
-        
-        _logger.info("DEBUG saveTxConnectionIndirectUpdate matched on stage 2 indirect connection");
         
         isRetry.set(false);
         
@@ -397,8 +350,6 @@ public class ConnectionService {
       
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-        _logger.info("DEBUG saveTxConnectionIndirectUpdate exception " + e.toString() + " when trying to find indirect unequal connection.");
-        
         _logger.exception(e);
 
         isRetry.set(false);
@@ -413,17 +364,15 @@ public class ConnectionService {
 
     if (sipEndpointA != null) {
       
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, connection.getSipEndpointB(), connection.getSipSignatureB(), connection.getSipLabelB(), "indirect");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, connection.getSipEndpointB(), connection.getSipSignatureB(), connection.getSipLabelB(), connectionType, null);
 
     } else if (sipEndpointB != null) {
             
-      newConnection = new AnontionConnection(sipTsB, connection.getSipEndpointA(), connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, "indirect");
+      newConnection = new AnontionConnection(sipTsB, connection.getSipEndpointA(), connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, connectionType, null);
 
     } else {
       
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
-      _logger.info("DEBUG either setSipEndpointA set or setSipEndpointB set must be set");
 
       isRetry.set(false);
       
@@ -461,23 +410,20 @@ public class ConnectionService {
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
-  public boolean saveTxConnectionMultipleBase(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry) {
-    
-    _logger.info("DEBUG saveTxConnectionMultipleBase called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
+  public boolean saveTxConnectionMultipleOrBroadcastBase(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String connectionType, 
+      Double latitude, Double longitude, Long timeoutTs) {
     
     Optional<AnontionConnection> connection0 = null;
 
     try {
 
-      connection0 = connectionRepository.findMultipleBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB);
+      connection0 = connectionRepository.findBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB, connectionType);
       
     } catch (Exception e) {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-      _logger.info("DEBUG saveTxConnectionMultipleBase exception " + e.toString() + " when trying to find connection.");
-      
       _logger.exception(e);
 
       isRetry.set(false);
@@ -487,9 +433,26 @@ public class ConnectionService {
     
     if (connection0.isEmpty()) {
 
-      _logger.info("DEBUG saveTxConnectionMultipleBase empty");
+      AnontionConnection connection = null;
+      
+      if (connectionType.equals("multiple")) {
+        
+        connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, sipEndpointB, 
+            sipSignatureA, sipLabelB, connectionType, null);
+      
+      } else if (connectionType.equals("broadcast")) {
+        
+        connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, sipEndpointB, 
+            sipSignatureA, sipLabelB, connectionType, null, latitude, longitude, timeoutTs);
+      
+      } else {
+        
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-      AnontionConnection connection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsA, sipEndpointB, sipSignatureA, sipLabelB, "multiple");
+        isRetry.set(false);
+        
+        return false;
+      }
       
       try {
         
@@ -520,32 +483,58 @@ public class ConnectionService {
         return false;
       }
     }
+        
+    try {
     
-    _logger.info("DEBUG saveTxConnectionMultipleBase matched");
+      AnontionConnection connection = connection0.get();
+      
+      connection.setLongitude(longitude);
+      
+      connection.setLatitude(latitude);
 
-    isRetry.set(false);
-    
-    return true;
+      connection = connectionRepository.save(connection);
+
+      isRetry.set(false);
+      
+      return true;
+
+    } catch (DataIntegrityViolationException e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(true);
+      
+      return false;
+    }
+    catch (Exception e) {
+
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+      _logger.exception(e);
+
+      isRetry.set(false);
+      
+      return false;
+    }
   }
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean saveTxConnectionMultipleUpdate(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress) {
-
-    _logger.info("DEBUG saveTxConnectionMultipleUpdate called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, AtomicBoolean isRetry, String localSipAddress, 
+      String remoteSipAddress, String connectionType) {
 
     Optional<AnontionConnection> connection0 = null;
 
     try {
 
-      connection0 = connectionRepository.findMultipleBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, remoteSipAddress);
+      connection0 = connectionRepository.findBySipEndpointAAndSipEndpointBRelaxed(remoteSipAddress, remoteSipAddress, connectionType);
       
     } catch (Exception e) {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-      _logger.info("DEBUG saveTxConnectionMultipleUpdate exception " + e.toString() + " when trying to find remote multiple connection '" + remoteSipAddress + "'");
-      
       _logger.exception(e);
 
       isRetry.set(false);
@@ -555,8 +544,6 @@ public class ConnectionService {
     
     if (connection0.isEmpty()) {
 
-      _logger.info("DEBUG saveTxConnectionMultipleUpdate empty");
-      
       Optional<AnontionConnection> connection1 = null;
       
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -570,13 +557,11 @@ public class ConnectionService {
 
     try {
 
-      connection1 = connectionRepository.findMultipleBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB);
+      connection1 = connectionRepository.findBySipEndpointAAndSipEndpointBRelaxed(sipEndpointA, sipEndpointB, connectionType);
       
     } catch (Exception e) {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
-      _logger.info("DEBUG saveTxConnectionMultipleUpdate exception " + e.toString() + " when trying to find existing multiple connection '" + sipEndpointA + " and " + sipEndpointB + "'");
       
       _logger.exception(e);
 
@@ -587,8 +572,6 @@ public class ConnectionService {
     
     if (!connection1.isEmpty()) {
 
-      _logger.info("DEBUG saveTxConnectionMultipleUpdate connection already exists.");
-      
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
       isRetry.set(false);
@@ -602,17 +585,15 @@ public class ConnectionService {
 
     if (sipSignatureA == null) {
       
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, "multiple");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, connection.getSipSignatureA(), connection.getSipLabelA(), sipTsB, sipEndpointB, sipSignatureB, sipLabelB, "multiple", null);
 
     } else if (sipSignatureB == null) {
             
-      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsB, sipEndpointB, connection.getSipSignatureB(), connection.getSipLabelB(), "multiple");
+      newConnection = new AnontionConnection(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsB, sipEndpointB, connection.getSipSignatureB(), connection.getSipLabelB(), "multiple", null);
 
     } else {
       
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
-      _logger.info("DEBUG saveTxConnectionMultipleUpdate either sipSignatureA set or sipSignatureB set must be null");
 
       isRetry.set(false);
       
@@ -653,8 +634,6 @@ public class ConnectionService {
   public boolean createTxAccountIfConnected(String sipEndpointA, String sipEndpointB, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress, StringBuilder returnPassword, 
       StringBuilder returnSipUserId, StringBuilder returnSipLabel, StringBuilder returnPhoto, Long clientTs, String clientName, UUID clientId, String clientUID) {
 
-    _logger.info("DEBUG createTxAccountIfConnected called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpointA " + sipEndpointA + " sipEndpointB " + sipEndpointB);
-
     Optional<AnontionConnection> connection0 = null;
 
     try {
@@ -664,8 +643,6 @@ public class ConnectionService {
     } catch (Exception e) {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
-      _logger.info("DEBUG createTxAccountIfConnected exception " + e.toString() + " when trying to find existing connection '" + sipEndpointA + " and " + sipEndpointB + "'");
       
       _logger.exception(e);
 
@@ -675,8 +652,6 @@ public class ConnectionService {
     }   
     
     if (connection0.isEmpty()) {
-
-      _logger.info("DEBUG createTxAccountIfConnected no connection exists");
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
@@ -695,20 +670,14 @@ public class ConnectionService {
     
     String md5Passsword = AnontionStrings.generateAsteriskMD5(foreignKey2, AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM, password);
     
-    _logger.info("DEBUG createTxAccountIfConnected updating with foreignKey1 '" + foreignKey1 + "' foreignKey2 '" + foreignKey2 + "' md5Passsword '" + md5Passsword + "'");
-
     if (sipEndpointA.equals(localSipAddress)) {
       
-      _logger.info("DEBUG createTxAccountIfConnected updating A with endpoint '" + localSipAddress + "'");
-
       if (!connection.getSipPasswordA().isEmpty()) {
         
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
         returnPassword.append(connection.getSipPasswordA());
         
-        _logger.info("DEBUG createTxAccountIfConnected set connection foreignKey2 " + foreignKey2);
-
         isRetry.set(false);
 
         return true;
@@ -751,22 +720,16 @@ public class ConnectionService {
         }
       }
 
-      _logger.info("DEBUG createTxAccountIfConnected set NOT connection foreignKey2 " + foreignKey2);
-
       connection.setSipPasswordA(passwordA);
       
     } else if (sipEndpointB.equals(localSipAddress)) {
 
-      _logger.info("DEBUG createTxAccountIfConnected updating B with endpoint '" + localSipAddress + "'");
-      
       if (!connection.getSipPasswordB().isEmpty()) {
         
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
         returnPassword.append(connection.getSipPasswordB());
         
-        _logger.info("DEBUG createTxAccountIfConnected set connection foreignKey2 " + foreignKey2);
-
         isRetry.set(false);
 
         return true;
@@ -809,8 +772,6 @@ public class ConnectionService {
         }
       }
 
-      _logger.info("DEBUG createTxAccountIfConnected set NOT connection foreignKey2 " + foreignKey2);
-
       connection.setSipPasswordB(passwordB);
     }
     
@@ -820,12 +781,12 @@ public class ConnectionService {
         clientId,
         "", // NYI do later 
         "", // NYI do later ! 
-        localSipAddress, 
+        AnontionSecurity.decodeFromSafeBase64(localSipAddress), 
         localSipAddress, // clientUID // NYI use ? needed?
         AnontionAccount.DEFAULT_defaultExpiration,
         AnontionAccount.DEFAULT_minimumExpiration,
         AnontionAccount.DEFAULT_maximumExpiration,
-        false);
+        false, "anonymous");
     
     AsteriskEndpoint endpoint = endpointBean.createAsteriskEndppint(
         AnontionSecurity.makeSafeIfRequired(localSipAddress),
@@ -887,10 +848,31 @@ public class ConnectionService {
   
   @Transactional(transactionManager = "transactionManagerService", rollbackFor = { Exception.class } )
   public boolean createTxAccountIfConnected(String sipEndpoint, AtomicBoolean isRetry, String localSipAddress, String remoteSipAddress, StringBuilder returnPassword, 
-      StringBuilder returnSipUserId, StringBuilder returnSipLabel, StringBuilder returnPhoto, Long clientTs, String clientName, UUID clientId, String clientUID) {
+      StringBuilder returnSipUserId, StringBuilder returnSipLabel, StringBuilder returnPhoto, Long clientTs, String clientName, UUID clientId, String clientUID,
+      StringBuilder returnTimeoutTs, String connectionType) {
 
-    _logger.info("DEBUG createTxAccountIfConnected called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive() + " with sipEndpoint '" + sipEndpoint + "'");
+    if (connectionType.equals("broadcast")) {
+      
+      // NOTE: if account exists exit ... a horrible hack !!! 
+      
+      Optional<AnontionAccount> account0 = accountRepository.findByClientTsAndClientNameAndClientId(clientTs, localSipAddress, clientId);
+      
+      if (!account0.isEmpty()) {
 
+        returnPassword.append("blah");
+
+        returnSipUserId.append("blah");
+
+        returnSipLabel.append("blah");
+        
+        returnTimeoutTs.append("0");
+        
+        isRetry.set(false);
+        
+        return true;        
+      }
+    }
+    
     Optional<AnontionConnection> connection0 = null;
 
     try {
@@ -901,8 +883,6 @@ public class ConnectionService {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-      _logger.info("DEBUG createTxAccountIfConnected exception " + e.toString() + " when trying to find existing connection '" + sipEndpoint + "'");
-      
       _logger.exception(e);
 
       isRetry.set(false);
@@ -911,8 +891,6 @@ public class ConnectionService {
     }   
     
     if (connection0.isEmpty()) {
-
-      _logger.info("DEBUG createTxAccountIfConnected no connection exists");
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
@@ -931,11 +909,7 @@ public class ConnectionService {
     
     String md5Passsword = AnontionStrings.generateAsteriskMD5(foreignKey2, AnontionConfig._ASTERISK_PASSWORD_ENCODING_REALM, password);
     
-    _logger.info("DEBUG createTxAccountIfConnected updating with foreignKey1 '" + foreignKey1 + "' foreignKey2 '" + foreignKey2 + "' md5Passsword '" + md5Passsword + "'");
-
-    _logger.info("DEBUG createTxAccountIfConnected updating with endpoint '" + localSipAddress + "'");
-
-    if (!connection.getSipPasswordA().isEmpty() && 
+    if (!connection.getSipPasswordA().isEmpty() &&
         !connection.getSipPasswordA().equals(connection.getSipPasswordB())) {
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -948,8 +922,6 @@ public class ConnectionService {
     if (!connection.getSipPasswordA().isEmpty()) {
 
       returnPassword.append(connection.getSipPasswordA());
-
-      _logger.info("DEBUG createTxAccountIfConnected set connection foreignKey2 " + foreignKey2);
 
       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
@@ -985,6 +957,8 @@ public class ConnectionService {
 
     returnSipLabel.append(connection.getSipLabelA());
     
+    returnTimeoutTs.append(connection.getTimeoutTs().toString());
+    
     Optional<AnontionImage> image0 = imageRepository.findById(remoteSipAddress);
     
     if (!image0.isEmpty()) {
@@ -997,9 +971,7 @@ public class ConnectionService {
       }
     }
 
-    _logger.info("DEBUG createTxAccountIfConnected set NOT connection foreignKey2 " + foreignKey2);
-
-    connection.setSipPasswordA(passwordA); 
+    connection.setSipPasswordA(passwordA);
 
     connection.setSipPasswordB(passwordA); 
 
@@ -1009,12 +981,12 @@ public class ConnectionService {
         clientId,
         "", // NYI do later 
         "", // NYI do later ! 
-        localSipAddress, 
+        AnontionSecurity.decodeFromSafeBase64(localSipAddress), 
         localSipAddress, // clientUID // NYI use ? needed?
         AnontionAccount.DEFAULT_defaultExpiration,
         AnontionAccount.DEFAULT_minimumExpiration,
         AnontionAccount.DEFAULT_maximumExpiration,
-        false);
+        false, "anonymous");
     
     AsteriskEndpoint endpoint = endpointBean.createAsteriskEndppint(
         AnontionSecurity.makeSafeIfRequired(localSipAddress),

@@ -45,8 +45,6 @@ public class AccountService {
 
     try {
       
-      _logger.info("DEBUG saveTxAccountAndEndpoint called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
-
       if(application != null) {
       
         applicationRepository.delete(application);
@@ -79,8 +77,6 @@ public class AccountService {
     
     try {
       
-      _logger.info("DEBUG deleteTxApplicationAndAccountAndEndpoint called is transaction active " + TransactionSynchronizationManager.isActualTransactionActive());
-
       if (account != null) {
 
         accountRepository.delete(account);

@@ -1,11 +1,12 @@
 package com.anontion.asterisk.repository;
 
-import com.anontion.asterisk.model.AsteriskAuth;
 import com.anontion.asterisk.model.AsteriskEndpoint;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface AsteriskEndpointRepository extends JpaRepository<AsteriskEndpoint, String> {
 
@@ -13,5 +14,6 @@ public interface AsteriskEndpointRepository extends JpaRepository<AsteriskEndpoi
 
   Optional<AsteriskEndpoint> findById(String id);  
   
-  Optional<AsteriskEndpoint> findByAuth(String auth);
+  @Query(value = "SELECT * FROM ps_endpoints WHERE auth = :auth LIMIT 1 ", nativeQuery = true)
+  Optional<AsteriskEndpoint> findByAuth(@Param("auth") String auth);
 }

@@ -43,6 +43,15 @@ public class RequestPostConnectionBodyDTO {
   @NotBlank(message = "Client Signature2 cannot be blank.")
   private String clientSignature2;
 
+  @NotNull(message = "RollSipAddress cannot be null.")
+  private String rollSipAddress;
+
+  @NotNull(message = "Latitude cannot be null.")
+  private Double latitude;
+
+  @NotNull(message = "Longitude cannot be null.")
+  private Double longitude;
+
   public RequestPostConnectionBodyDTO() {
     
   }
@@ -155,6 +164,36 @@ public class RequestPostConnectionBodyDTO {
   public void setPhoto(String photo) {
  
     this.photo = photo;
+  }
+
+  public Double getLatitude() {
+    
+    return latitude;
+  }
+
+  public void setLatitude(Double latitude) {
+ 
+    this.latitude = latitude;
+  }
+  
+  public Double getLongitude() {
+    
+    return longitude;
+  }
+
+  public void setLongitude(Double longitude) {
+ 
+    this.longitude = longitude;
+  }
+  
+  public String getRollSipAddress() {
+    
+    return rollSipAddress;
+  }
+
+  public void setRollSipAddress(String rollSipAddress) {
+ 
+    this.rollSipAddress = rollSipAddress;
   }
 
 }

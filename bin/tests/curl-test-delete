@@ -1,6 +1,0 @@
-#!/bin/bash
-
-echo running curl --request "DELETE" "http://localhost:8080/account/nvsbv8lnjc3oj0oncp2jekgobrmxwuxoxu0qdf6ams4=%3A1751000000%3Ae9ca55be-f9d3-47a0-bb7a-b78184b57b3a%3Abpfaczww28rzoawoskjxdum1wspebt+acsu0q1poglxif3exqq4xqnueghxrq4nf9235yor2mafh5odqufzjzug=?"
-
-curl --request "DELETE" "http://localhost:8080/account/nvsbv8lnjc3oj0oncp2jekgobrmxwuxoxu0qdf6ams4=%3A1751000000%3Ae9ca55be-f9d3-47a0-bb7a-b78184b57b3a%3Abpfaczww28rzoawoskjxdum1wspebt+acsu0q1poglxif3exqq4xqnueghxrq4nf9235yor2mafh5odqufzjzug=?"
-

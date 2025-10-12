@@ -13,13 +13,13 @@ import jakarta.validation.constraints.Pattern;
 
 import java.util.UUID;
 
-
+import com.anontion.common.misc.AnontionConfig;
 import com.anontion.common.misc.AnontionTime;
 
 @Entity
 @Table(
   name = "anontion_connection",
-  uniqueConstraints = { @UniqueConstraint(columnNames = {"connection_id"}) }
+  uniqueConstraints = { @UniqueConstraint(columnNames = {"connection_id"}), @UniqueConstraint(columnNames = {"roll_sip_endpoint"}) }
 )
 @IdClass(AnontionConnectionId.class)
 public class AnontionConnection {
@@ -70,12 +70,28 @@ public class AnontionConnection {
 
   //
   
-  @Pattern(regexp = "direct|indirect|multiple", message = "connectionType must be 'direct', 'indirect', or 'multiple'")
+  @Column(name = "timeout_ts", nullable = false)
+  private Long timeoutTs;
+
+  //
+  
+  @Pattern(regexp = "direct|indirect|multiple|roll|broadcast", message = "connectionType must be 'direct', 'indirect', 'roll', 'broadcast' or 'multiple'")
   @Column(name = "connection_type", nullable = true, length = 255)
   private String connectionType;
 
+  @Column(name = "roll_sip_endpoint", nullable = true, length = 255)
+  private String rollSipEndpoint;
+
   //
 
+  @Column(name = "latitude", nullable = false)
+  private Double latitude;
+
+  @Column(name = "longitude", nullable = false)
+  private Double longitude;
+    
+  //
+  
   @PrePersist
   @PreUpdate
   private void validateSipOrder() {
@@ -85,7 +101,16 @@ public class AnontionConnection {
   }
 
   public AnontionConnection(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
-      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, String connectionType) {
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, String connectionType, String rollSipEndpoint) {
+    
+    this(sipTsA, sipEndpointA, sipSignatureA, sipLabelA, sipTsB, sipEndpointB, sipSignatureB, sipLabelB, 
+        connectionType, rollSipEndpoint, AnontionConfig._CONTACT_GPS_NULL_LATITUDE, 
+        AnontionConfig._CONTACT_GPS_NULL_LONGITUDE, AnontionConfig._CONTACT_CONNECTION_BROADCAST_TIMEOUT_NOTIMEOUT);
+  }
+  
+  public AnontionConnection(Long sipTsA, String sipEndpointA, String sipSignatureA, String sipLabelA,
+      Long sipTsB, String sipEndpointB, String sipSignatureB, String sipLabelB, String connectionType, 
+      String rollSipEndpoint, Double latitude, Double longitude, Long timeoutTs) {
     
     this.connectionId = UUID.randomUUID();
 
@@ -118,6 +143,16 @@ public class AnontionConnection {
     //
     
     this.connectionType = connectionType;
+    
+    this.rollSipEndpoint = rollSipEndpoint;
+    
+    //
+    
+    this.latitude = latitude;
+    
+    this.longitude = longitude;
+    
+    this.timeoutTs = timeoutTs;
   }
 
   public AnontionConnection() {
@@ -260,6 +295,49 @@ public class AnontionConnection {
     
     this.connectionType = connectionType;
   }
+  
+  public String getRollSipEndpoint() {
+    
+    return rollSipEndpoint;
+  }
+
+  public void setRollSipEndpoint(String rollSipEndpoint) {
+    
+    this.rollSipEndpoint = rollSipEndpoint;
+  }
+  
+  //
+
+  public Double getLatitude() {
+    
+    return latitude;
+  }
+
+  public void setLatitude(Double latitude) {
+    
+    this.latitude = latitude;
+  }
+  
+  public Double getLongitude() {
+    
+    return longitude;
+  }
+
+  public void setLongitude(Double longitude) {
+    
+    this.longitude = longitude;
+  }
+
+  public Long getTimeoutTs() {
+    
+    return timeoutTs;
+  }
+
+  public void setTimeoutTs(Long timeoutTs) {
+    
+    this.timeoutTs = timeoutTs;
+  }
+
 }
 
 
