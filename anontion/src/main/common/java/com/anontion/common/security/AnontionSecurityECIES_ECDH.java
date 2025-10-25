@@ -47,6 +47,11 @@ abstract public class AnontionSecurityECIES_ECDH {
       
       ECPoint q = params.getG().multiply(d).normalize();
 
+      if (!q.isValid()) {
+        
+        throw new IllegalArgumentException("Invalid public key point");
+      }
+      
       ECPrivateKeyParameters ekey = new ECPrivateKeyParameters(d, params);
       
       ECPublicKeyParameters epub = new ECPublicKeyParameters(q, params);
@@ -136,6 +141,11 @@ abstract public class AnontionSecurityECIES_ECDH {
       byte[] ciphertext = Arrays.copyOfRange(data, 77, data.length);
 
       ECPoint ephQ = params.getCurve().decodePoint(ephPubBytes).normalize();
+      
+      if (!ephQ.isValid()) {
+      
+        throw new IllegalArgumentException("Invalid public key point");
+      }
       
       ECPublicKeyParameters epub = new ECPublicKeyParameters(ephQ, params);
 
