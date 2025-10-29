@@ -49,6 +49,10 @@ public class AsteriskEndpointBean {
     
     String callerId = null;
 
+    String mediaEncryption = "sdes";
+    
+    String mediaEncryptionOptimistic = "no";
+
     if (pub.length() > 1) {
 
       callerId = pub.substring(0, Math.min(39, pub.length())); // TODO magic !!
@@ -60,6 +64,6 @@ public class AsteriskEndpointBean {
     
     return new AsteriskEndpoint(pub, transport, aor, auth, context, messageContext, disallow,
         allow, directMedia, trustIdOutbound, dtmfMode, forceRport, rtpSymmetric, sendRpid, iceSupport,
-        tosVideo, cosVideo, allowSubscribe, callerId);
+        tosVideo, cosVideo, allowSubscribe, callerId, mediaEncryption, mediaEncryptionOptimistic);
   }
 }

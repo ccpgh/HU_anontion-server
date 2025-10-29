@@ -85,7 +85,11 @@ public class AsteriskEndpoint {
   @Column(nullable = false, name = "media_encryption", columnDefinition = "enum('no', 'sdes', 'dtls')")
   @Pattern(regexp = "^no|sdes|dtls$")
   private String mediaEncryption;
-  
+
+  @Column(nullable = false, name = "media_encryption_optimistic", columnDefinition = "enum('0', '1', 'off', 'on', 'false', 'true', 'no', 'yes')")
+  @Pattern(regexp = "^0|1|off|on|false|true|no|yes$")
+  private String mediaEncryptionOptimistic;  
+
   public AsteriskEndpoint() {
 
   }
@@ -93,7 +97,7 @@ public class AsteriskEndpoint {
   public AsteriskEndpoint(String pub, String transport, String aors, String auth, String context, String messageContext,
       String disallow, String allow, String directMedia, String trustIdOutbound, String dtmfMode, String forceRport,
       String rtpSymmetric, String sendRpid, String iceSupport, String tosVideo, Integer cosVideo, 
-      String allowSubscribe, String callerId) {
+      String allowSubscribe, String callerId, String mediaEncryption, String mediaEncryptionOptimistic) {
 
     this.id = pub;
 
@@ -133,7 +137,9 @@ public class AsteriskEndpoint {
 
     this.callerId = callerId;
     
-    this.mediaEncryption = "sdes";
+    this.mediaEncryption = mediaEncryption;
+    
+    this.mediaEncryptionOptimistic = mediaEncryptionOptimistic;
   }
 
   public String getId() {
@@ -334,6 +340,16 @@ public class AsteriskEndpoint {
   public void setMediaEncryption(String mediaEncryption) {
     
     this.mediaEncryption = mediaEncryption;
+  }
+  
+  public String getMediaEncryptionOptimistic() {
+    
+    return mediaEncryptionOptimistic;
+  }
+
+  public void setMediaEncryptionOptimistic(String mediaEncryptionOptimistic) {
+    
+    this.mediaEncryptionOptimistic = mediaEncryptionOptimistic;
   }
 
 }
