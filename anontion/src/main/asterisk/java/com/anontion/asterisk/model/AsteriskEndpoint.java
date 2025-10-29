@@ -82,6 +82,10 @@ public class AsteriskEndpoint {
   @Column(nullable = false, name = "callerid", length = 40)
   private String callerId;
 
+  @Column(nullable = false, name = "media_encryption", columnDefinition = "enum('no', 'sdes', 'dtls')")
+  @Pattern(regexp = "^no|sdes|dtls$")
+  private String mediaEncryption;
+  
   public AsteriskEndpoint() {
 
   }
@@ -128,6 +132,8 @@ public class AsteriskEndpoint {
     this.allowSubscribe = allowSubscribe;
 
     this.callerId = callerId;
+    
+    this.mediaEncryption = "sdes";
   }
 
   public String getId() {
@@ -318,6 +324,16 @@ public class AsteriskEndpoint {
   public void setCallerId(String callerId) {
     
     this.callerId = callerId;
+  }
+
+  public String getMediaEncryption() {
+    
+    return mediaEncryption;
+  }
+
+  public void setMediaEncryption(String mediaEncryption) {
+    
+    this.mediaEncryption = mediaEncryption;
   }
 
 }
