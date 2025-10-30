@@ -111,6 +111,11 @@ sourceSets {
             srcDir 'src/main/services/java'
         }
     }
+    admin {
+        java {
+            srcDir 'src/main/admin/java'
+        }
+    }
     asterisk {
         java {
             srcDir 'src/main/asterisk/java'
@@ -168,6 +173,16 @@ task compileServices(type: JavaCompile) {
     files("$buildDir/classes/common")
 }
 
+task compileAdmin(type: JavaCompile) {
+    dependsOn compileCommon, compileModels, compileAsterisk
+    source sourceSets.admin.java
+    destinationDirectory = file("$buildDir/classes/admin")
+    classpath = sourceSets.main.compileClasspath +
+    files("$buildDir/classes/asterisk") +
+    files("$buildDir/classes/models") +
+    files("$buildDir/classes/common")
+}
+
 task compileApplication(type: JavaCompile) {
     dependsOn compileCommon, compileAsterisk, compileModels, compileServices
     source sourceSets.application.java
@@ -192,12 +207,13 @@ task compileAccount(type: JavaCompile) {
 }
 
 task compileConnection(type: JavaCompile) {
-    dependsOn compileApplication, compileAccount 
+    dependsOn compileApplication, compileAccount, compileAdmin
     source sourceSets.connection.java
     destinationDirectory = file("$buildDir/classes/connection")
     classpath = sourceSets.main.compileClasspath +
             files("$buildDir/classes/asterisk") +
             files("$buildDir/classes/services") +
+            files("$buildDir/classes/admin") +
             files("$buildDir/classes/models") +
             files("$buildDir/classes/common") +
             files("$buildDir/classes/application") +
@@ -215,7 +231,7 @@ task compileSystem(type: JavaCompile) {
 }
 
 tasks.withType(War) {
-    dependsOn compileCommon, compileModels, compileServices, compileAsterisk, compileApplication, compileAccount, compileConnection, compileSystem
+    dependsOn compileCommon, compileModels, compileServices, compileAsterisk, compileApplication, compileAccount, compileConnection, compileSystem, compileAdmin
 }
 
 task commonJar(type: Jar) {
@@ -260,6 +276,21 @@ task servicesJar(type: Jar) {
     }
 
     archiveBaseName = 'anontion-services'
+    archiveVersion = '1.0.0'
+}
+
+task adminJar(type: Jar) {
+    dependsOn compileAdmin
+
+    from("$buildDir/classes/admin") {
+        include '**/*.class'
+    }
+
+    from("$projectDir/src/main/admin/resources") {
+        include '**/*'
+    }
+
+    archiveBaseName = 'anontion-admin'
     archiveVersion = '1.0.0'
 }
 
@@ -416,6 +447,7 @@ task accountWar(type: War) {
 task connectionWar(type: War) {
     dependsOn commonJar
     dependsOn modelsJar
+    dependsOn adminJar
     dependsOn servicesJar
     dependsOn asteriskJar
     dependsOn accountWar
@@ -482,6 +514,11 @@ task connectionWar(type: War) {
 
     from("$buildDir/libs") {
         include '**/anontion-models-1.0.0.jar'
+        into 'WEB-INF/lib'
+    }
+
+    from("$buildDir/libs") {
+        include '**/anontion-admin-1.0.0.jar'
         into 'WEB-INF/lib'
     }
 
@@ -554,7 +591,7 @@ task systemWar(type: War) {
     archiveVersion = '1.0.0'
 }
 
-build.dependsOn commonJar, asteriskJar, servicesJar, modelsJar, applicationWar, accountWar, connectionWar, systemWar
+build.dependsOn commonJar, asteriskJar, servicesJar, adminJar, modelsJar, applicationWar, accountWar, connectionWar, systemWar
 
 tasks.named('war') {
     enabled = false

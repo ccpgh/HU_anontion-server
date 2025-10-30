@@ -48,4 +48,7 @@ public interface AnontionConnectionRepository extends JpaRepository<AnontionConn
   
   @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpoint AND sip_endpoint_b = :sipEndpoint AND connection_type = 'broadcast' AND timeout_ts >= :timeoutTs ", nativeQuery = true)
   Optional<AnontionConnection> findBroadcastBySipEndpoint(@Param("sipEndpoint") String sipEndpoint, @Param("timeoutTs") Long timeoutTs);  
+
+  @Query(value = "SELECT * FROM anontion_connection WHERE sip_endpoint_a = :sipEndpoint AND sip_endpoint_b = :sipEndpoint AND connection_type = 'broadcast' AND timeout_ts < :timeoutTs ", nativeQuery = true)
+  List<AnontionConnection> findBroadcastByTimeout(@Param("timeoutTs") Long timeoutTs);  
 }

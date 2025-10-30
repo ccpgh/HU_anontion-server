@@ -8,6 +8,8 @@ public class AnontionConfig {
   public static int _CONTACT_CONNECTION_MAX = 60;
   public static int _CONTACT_CONNECTION_MIN = -15;
 
+  public static int _CONTACT_CONNECTION_LOOP_DELAY_MS = 60 * 1000;
+
   public static String _CONTACT_CONNECTION_SIP_NAME = "sip";
   public static String _CONTACT_CONNECTION_SIPS_NAME = "sips";
   public static String _CONTACT_CONNECTION_PJSIP_NAME = "pjsip";
