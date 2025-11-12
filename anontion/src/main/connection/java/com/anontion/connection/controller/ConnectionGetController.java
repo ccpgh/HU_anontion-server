@@ -115,22 +115,15 @@ public class ConnectionGetController {
 
     if (connection0.isEmpty()) {
 
-      _logger.info("failed ordered search lower '" + sipEndpointA + "', upper '" + sipEndpointB + "' = trying broadcast");
+      _logger.info("failed ordered search sipEndpointA '" + sipEndpointA + "', sipEndpointB '" + sipEndpointB + "' = trying broadcast target");
 
       Long nowTs = AnontionTime.tsN();
       
-      Optional<AnontionConnection> broadcastLower = connectionRepository.findBroadcastBySipEndpoint(lowerEndppint, nowTs);
+      Optional<AnontionConnection> broadcast = connectionRepository.findBroadcastBySipEndpoint(sipEndpointB, nowTs);
 
-      Optional<AnontionConnection> broadcastUpper = connectionRepository.findBroadcastBySipEndpoint(upperEndppint, nowTs);
-
-      if ((!broadcastLower.isEmpty() && broadcastUpper.isEmpty()) || (broadcastLower.isEmpty() && !broadcastUpper.isEmpty())) {
-        
-        if (!broadcastLower.isEmpty()) {
+      if (!broadcast.isEmpty()) {
           
-          return isExistsBroadcast(broadcastLower.get(), upperEndppint);
-        }
-        
-        return isExistsBroadcast(broadcastUpper.get(), lowerEndppint);
+        return isExistsAuthorizedAccount(sipEndpointA);
       }
         
       return Responses.getBAD_REQUEST(
@@ -161,7 +154,7 @@ public class ConnectionGetController {
     return Responses.getOK();    
   }
   
-  private ResponseEntity<ResponseDTO> isExistsBroadcast(AnontionConnection broadcast, String sipUsername) {
+  private ResponseEntity<ResponseDTO> isExistsAuthorizedAccount(String sipUsername) {
     
     String safeSipUsername = AnontionSecurity.encodeToSafeBase64(sipUsername);
     
