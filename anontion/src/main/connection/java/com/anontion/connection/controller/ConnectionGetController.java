@@ -59,7 +59,7 @@ public class ConnectionGetController {
   @GetMapping(path = "/connection/exists")
   public ResponseEntity<ResponseDTO> isExists(@RequestParam("sipUsername1") String sipUsername1, @RequestParam("sipUsername2") String sipUsername2) {
 
-    _logger.info("isExists with '" + sipUsername1 + "', '" + sipUsername2 + "'");
+    _logger.info("/connection/exists with '" + sipUsername1 + "', '" + sipUsername2 + "'");
 
     if (sipUsername1.isBlank() ||
         sipUsername2.isBlank()) {
@@ -137,8 +137,25 @@ public class ConnectionGetController {
           "failed searches ordered and broadcast");
     }
       
-    _logger.info("ok matched ordered search lowerEndppint '" + lowerEndppint + "' upperEndppint '" + upperEndppint + "'");
+    AnontionConnection connection = connection0.get();
+    
+    if (connection.getConnectionType().equals("multiple")) {
+      
+      Optional<AnontionConnection> connection1 = connectionRepository.findMultipleBySipEndpoint(sipEndpointB);
+      
+      if (connection1.isEmpty()) {
 
+        return Responses.getBAD_REQUEST(
+            "failed searches ordered and multiple");
+      }
+      
+      _logger.info("ok matched ordered search multiple lowerEndppint '" + lowerEndppint + "' upperEndppint '" + upperEndppint + "'");
+    
+    } else {
+      
+      _logger.info("ok matched ordered search lowerEndppint '" + lowerEndppint + "' upperEndppint '" + upperEndppint + "'");
+    }
+    
     return Responses.getOK();    
   }
   
