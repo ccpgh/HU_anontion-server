@@ -145,6 +145,8 @@ public class ConnectionGetController {
       
       if (connection1.isEmpty()) {
 
+        _logger.info("failed matched ordered search multiple lowerEndppint '" + lowerEndppint + "' upperEndppint '" + upperEndppint + "'");
+
         return Responses.getBAD_REQUEST(
             "failed searches ordered and multiple");
       }
