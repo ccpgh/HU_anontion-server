@@ -163,6 +163,8 @@ public class AccountPostController {
 
     if (!AnontionSecurityECDSA.checkSignature(application.getClientUID(), dto.getClientSignature(), publicKey)) {
 
+      _logger.info("Invalid client signature for pub " + publicKey + ".");
+      
       return Responses.getBAD_REQUEST(
           "Bad signature.", 
           "Client signature of proof token invalid.");
