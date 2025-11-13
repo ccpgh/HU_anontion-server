@@ -108,7 +108,7 @@ public class ConnectionPostController {
         diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
 
       return Responses.getBAD_REQUEST(
-          "Invalid parameters time diff " + diff.toString(), 
+          "Invalid parameters time",
           "bad nowTs"); 
     }
 
@@ -412,7 +412,7 @@ public class ConnectionPostController {
         diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
 
       return Responses.getBAD_REQUEST(
-          "Invalid parameters time diff " + diff.toString(), 
+          "Invalid parameters time",
           "bad nowTs"); 
     }
     
@@ -819,7 +819,7 @@ public class ConnectionPostController {
         diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
 
       return Responses.getBAD_REQUEST(
-          "Invalid parameters time diff " + diff.toString(), 
+          "Invalid parameters time", 
           "bad nowTs"); 
     }
     

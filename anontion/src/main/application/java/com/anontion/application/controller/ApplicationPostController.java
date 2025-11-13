@@ -78,18 +78,16 @@ public class ApplicationPostController {
         diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
 
       return Responses.getBAD_REQUEST(
-          "Invalid parameters time diff " + diff.toString(), 
+          "Invalid parameters time", 
           "bad nowTs"); 
     }
     
-    if (nonceCache.getIfPresent(nonce) != null) {
+    if (nonceCache.getIfPresent(nonce) != null || nonce.isBlank()) {
 
       return Responses.getBAD_REQUEST("Bad message");
     }
     
     nonceCache.put(nonce, true);
-    
-    _logger.info("nonceCache size " + nonceCache.estimatedSize());
     
     while (true) { 
       
