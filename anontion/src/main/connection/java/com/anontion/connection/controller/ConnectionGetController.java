@@ -401,24 +401,24 @@ public class ConnectionGetController {
           "Failed param account lookup failed");
     }
     
-    AnontionAccount account = account0.get();
-    
-    ECPublicKeyParameters publicKey = 
-        AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(account.getClientPub());
-
-    if (publicKey == null) {
-
-      return Responses.getBAD_REQUEST(
-          "Bad pub.", 
-          "Pub invalid.");
-    }
-    
-    if (!AnontionSecurityECDSA.checkSignature(nonce, signature, publicKey)) {
-
-      return Responses.getBAD_REQUEST(
-          "Bad signature.", 
-          "Signature invalid.");
-    } 
+//    AnontionAccount account = account0.get();
+//    
+//    ECPublicKeyParameters publicKey = 
+//        AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(account.getClientPub());
+//
+//    if (publicKey == null) {
+//
+//      return Responses.getBAD_REQUEST(
+//          "Bad pub.", 
+//          "Pub invalid.");
+//    }
+//    
+//    if (!AnontionSecurityECDSA.checkSignature(nonce, signature, publicKey)) {
+//
+//      return Responses.getBAD_REQUEST(
+//          "Bad signature.", 
+//          "Signature invalid.");
+//    } 
 
     AnontionGPSBox box = new AnontionGPSBox(latitude, longitude, AnontionGPS._CONNECTION_SEARCH_CIRCLE);
 
