@@ -44,7 +44,7 @@ public class AccountGetController {
   @Autowired
   private AnontionAccountRepository accountRepository;
 
-  Cache<String, Boolean> nonceCache = Caffeine.newBuilder()
+  private Cache<String, Boolean> nonceCache = Caffeine.newBuilder()
       .expireAfterWrite(AnontionConfig._REQUEST_TS_VALIDITY_MARGIN, TimeUnit.SECONDS)
       .build();
   
@@ -56,7 +56,7 @@ public class AccountGetController {
         !AnontionStrings.isValidPassword(sipPassword)) {
       
       return Responses.getBAD_REQUEST(
-          "Parameters Username/Password failed validity check.", 
+          "Parameters failed validity check.", 
           "Transaction rejected.");
     }
     

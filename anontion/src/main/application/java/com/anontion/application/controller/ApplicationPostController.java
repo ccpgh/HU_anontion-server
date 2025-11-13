@@ -51,7 +51,7 @@ public class ApplicationPostController {
   
   private String _applicationPowTarget = "";
     
-  Cache<String, Boolean> nonceCache = Caffeine.newBuilder()
+  private Cache<String, Boolean> nonceCache = Caffeine.newBuilder()
       .expireAfterWrite(AnontionConfig._REQUEST_TS_VALIDITY_MARGIN, TimeUnit.SECONDS)
       .build();
   
