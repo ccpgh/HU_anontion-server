@@ -13,6 +13,9 @@ public class RequestPostAccountBodyDTO {
   @NotNull(message = "Client Id cannot be null.")
   private UUID clientId;
 
+  @NotNull(message = "Now Timestamp cannot be null.")
+  private Long nowTs;
+
   @NotNull(message = "Client Timestamp cannot be null.")
   private Long clientTs;
   
@@ -33,6 +36,9 @@ public class RequestPostAccountBodyDTO {
 
   @NotBlank(message = "Pow Nonce cannot be blank.")
   private String powNonce;
+
+  @NotBlank(message = "Nonce cannot be blank.")
+  private String nonce;
 
   @NotBlank(message = "Client Signature cannot be blank.")
   private String clientSignature;
@@ -129,6 +135,26 @@ public class RequestPostAccountBodyDTO {
   public void setPownonce(String powNonce) {
  
     this.powNonce = powNonce;
+  }
+  
+  public Long getNowTs() {
+    
+    return nowTs;
+  }
+
+  public void setNowTs(Long nowTs) {
+    
+    this.nowTs = nowTs;
+  }
+
+  public String getNonce() {
+    
+    return nonce;
+  }
+
+  public void setNonce(String nonce) {
+ 
+    this.nonce = nonce;
   }
 }
 

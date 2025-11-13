@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
@@ -22,6 +23,8 @@ import com.anontion.common.dto.request.RequestPostAccountDTO;
 
 import com.anontion.models.application.repository.AnontionApplicationRepository;
 import com.anontion.services.service.AccountService;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.anontion.asterisk.bean.AsteriskAorBean;
 import com.anontion.asterisk.bean.AsteriskAuthBean;
 import com.anontion.asterisk.bean.AsteriskEndpointBean;
@@ -80,6 +83,10 @@ public class AccountPostController {
   
   private String _applicationPowTarget = "";
   
+  private Cache<String, Boolean> nonceCache = Caffeine.newBuilder()
+      .expireAfterWrite(AnontionConfig._REQUEST_TS_VALIDITY_MARGIN, TimeUnit.SECONDS)
+      .build();
+  
   @PostMapping(path = "/account/")
   public ResponseEntity<ResponseDTO> postAccount(@Valid @RequestBody RequestPostAccountDTO request,
       BindingResult bindingResult) {
@@ -95,11 +102,30 @@ public class AccountPostController {
     }
 
     RequestPostAccountBodyDTO dto = request.getBody();
-    
+
+    Long clientTs = dto.getNowTs();
     String powLow  = dto.getPowLow();
     String powHigh = dto.getPowHigh();
     String powNonce = dto.getPowNonce();
+    String nonce = dto.getNonce();
 
+    Long diff = clientTs - AnontionTime.tsN();
+
+    if (diff > AnontionConfig._REQUEST_TS_VALIDITY_MAX ||
+        diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
+
+      return Responses.getBAD_REQUEST(
+          "Invalid parameters time", 
+          "bad nowTs"); 
+    }
+    
+    if (nonce.isBlank() || nonceCache.getIfPresent(nonce) != null) {
+
+      return Responses.getBAD_REQUEST("Bad message");
+    }
+    
+    nonceCache.put(nonce, true);
+    
     AnontionApplicationId primaryKey = new AnontionApplicationId(
         dto.getClientName(),
         dto.getClientTs(),
@@ -170,8 +196,6 @@ public class AccountPostController {
           "Client signature of proof token invalid.");
     } 
     
-    Long nowTs = AnontionTime.tsN();
-
     Optional<AnontionAccount> accountO = accountRepository.findByClientTsAndClientNameAndClientId(
         dto.getClientTs(),
         dto.getClientName(),
@@ -211,7 +235,7 @@ public class AccountPostController {
       
     } else {
 
-      if (AnontionPOW.isApprovedTime(dto.getClientTs(), nowTs, _applicationTimeout) && 
+      if (AnontionPOW.isApprovedTime(dto.getClientTs(), AnontionTime.tsN(), _applicationTimeout) && 
           AnontionPOW.isApprovedPow(powLow, powHigh, application.getPowText(), application.getPowTarget(), powNonce)) {
 
         String foreignKey1 = AnontionSecurity.generateForeignKey();
