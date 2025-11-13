@@ -53,7 +53,8 @@ public class AccountGetController {
       @RequestParam("sipPassword") String sipPassword, @RequestParam("nowTs") Long nowTs, @RequestParam("nonce") String nonce) {
 
     if (!AnontionStrings.isValidName(sipUserId) ||
-        !AnontionStrings.isValidPassword(sipPassword)) {
+        !AnontionStrings.isValidPassword(sipPassword) ||
+        nowTs <= 0) {
       
       return Responses.getBAD_REQUEST(
           "Parameters failed validity check.", 
@@ -72,7 +73,7 @@ public class AccountGetController {
     
     if (nonce.isBlank() || nonceCache.getIfPresent(nonce) != null) {
 
-      return Responses.getBAD_REQUEST("Bad message");
+      return Responses.getBAD_REQUEST("Bad nonce");
     }
     
     nonceCache.put(nonce, true);

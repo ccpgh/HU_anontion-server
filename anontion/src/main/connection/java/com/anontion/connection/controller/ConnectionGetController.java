@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,6 +34,8 @@ import com.anontion.common.security.AnontionSecurityECDSA;
 import com.anontion.common.security.AnontionSecurityECIES_ECDH;
 import com.anontion.models.connection.model.AnontionConnection;
 import com.anontion.models.connection.repository.AnontionConnectionRepository;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.anontion.models.account.model.AnontionAccount;
 import com.anontion.models.account.repository.AnontionAccountRepository;
 import com.anontion.common.dto.response.ResponseGetConnectionBodyDTO;
@@ -53,6 +57,10 @@ public class ConnectionGetController {
   
   @Autowired
   private AsteriskEndpointRepository endpointRepository;
+  
+  private Cache<String, Boolean> nonceCache = Caffeine.newBuilder()
+      .expireAfterWrite(AnontionConfig._REQUEST_TS_VALIDITY_MARGIN, TimeUnit.SECONDS)
+      .build();
   
   @GetMapping(path = "/connection/exists")
   public ResponseEntity<ResponseDTO> isExists(@RequestParam("sipUsername1") String sipUsername1, @RequestParam("sipUsername2") String sipUsername2) {
@@ -170,15 +178,36 @@ public class ConnectionGetController {
   }
   
   @GetMapping(path = "/connection/")
-  public ResponseEntity<ResponseDTO> getConnection(@RequestParam("sipUsername") String sipUsername) {
+  public ResponseEntity<ResponseDTO> getConnection(@RequestParam("sipUsername") String sipUsername,
+      @RequestParam("nowTs") Long nowTs, @RequestParam("nonce") String nonce, @RequestParam("signature") String signature) {
+    
+    if (sipUsername.isBlank() ||
+        nonce.isBlank() ||
+        //signature.isBlank() ||
+        nowTs <= 0) {
 
-    if (sipUsername.isBlank()) {
-
-      _logger.info("failed param check blank");
+      _logger.info("failed params check");
 
       return Responses.getBAD_REQUEST(
-          "Failed param check");
+          "Failed params check");
     }
+    
+    Long diff = nowTs - AnontionTime.tsN();
+
+    if (diff > AnontionConfig._REQUEST_TS_VALIDITY_MAX ||
+        diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
+
+      return Responses.getBAD_REQUEST(
+          "Invalid parameters time", 
+          "bad nowTs"); 
+    }
+    
+    if (nonce.isBlank() || nonceCache.getIfPresent(nonce) != null) {
+
+      return Responses.getBAD_REQUEST("Bad nonce");
+    }
+    
+    nonceCache.put(nonce, true);
     
     String sipEndpoint = AnontionSecurity.encodeToSafeBase64(sipUsername);
     
@@ -190,7 +219,7 @@ public class ConnectionGetController {
           "Failed param check");
     }
     
-    // NYI missing signature check against base row signer and this to make sure both signed by same key.
+    // NYI missing signature check
     
     Optional<AnontionConnection> connection0 = connectionRepository.findByRollSipEndpoint(sipEndpoint); 
     
@@ -215,17 +244,42 @@ public class ConnectionGetController {
   }
 
   @GetMapping(path = "/connection/broadcast")
-  public ResponseEntity<ResponseDTO> getBroadcasts(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude, @RequestParam("token") String token ) {
+  public ResponseEntity<ResponseDTO> getBroadcasts(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude, @RequestParam("token") String token, 
+      @RequestParam("nowTs") Long nowTs, @RequestParam("nonce") String nonce, @RequestParam("signature") String signature) {
 
+    //_logger.info("broadcasts latitude '" + latitude + "', longitude '" + longitude + "' token = '" + token + "' nonce '" + nonce + "' signature '" + signature + "' nowTs " + nowTs);
+    
     _logger.info("broadcasts latitude '" + latitude + "', longitude '" + longitude + "'");
 
-    if (token.isBlank()) {
+    if (token.isBlank() ||
+        nonce.isBlank() ||
+        //signature.isBlank() ||
+        nowTs <= 0) {
 
-      _logger.info("failed param token check blank");
+      _logger.info("failed params check blank");
 
       return Responses.getBAD_REQUEST(
-          "Failed param token check");
+          "Failed params check");
     }
+    
+    Long diff = nowTs - AnontionTime.tsN();
+
+    if (diff > AnontionConfig._REQUEST_TS_VALIDITY_MAX ||
+        diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
+
+      return Responses.getBAD_REQUEST(
+          "Invalid parameters time", 
+          "bad nowTs"); 
+    }
+    
+    if (nonce.isBlank() || nonceCache.getIfPresent(nonce) != null) {
+
+      return Responses.getBAD_REQUEST("Bad nonce");
+    }
+    
+    nonceCache.put(nonce, true);
+    
+    // NYI missing signature check
     
     if (!AnontionGPS.isValidGPS(latitude, longitude)) {
 
@@ -265,7 +319,7 @@ public class ConnectionGetController {
     
     String password = tokens[1];
 
-    String nonce = tokens[2];
+    String nonce_DEFUNCT = tokens[2];
 
     String ts = tokens[3];
 
@@ -347,12 +401,29 @@ public class ConnectionGetController {
           "Failed param account lookup failed");
     }
     
+    AnontionAccount account = account0.get();
+    
+    ECPublicKeyParameters publicKey = 
+        AnontionSecurityECDSA.decodeECPublicKeyParametersFromBase64XY(account.getClientPub());
+
+    if (publicKey == null) {
+
+      return Responses.getBAD_REQUEST(
+          "Bad pub.", 
+          "Pub invalid.");
+    }
+    
+    if (!AnontionSecurityECDSA.checkSignature(nonce, signature, publicKey)) {
+
+      return Responses.getBAD_REQUEST(
+          "Bad signature.", 
+          "Signature invalid.");
+    } 
+
     AnontionGPSBox box = new AnontionGPSBox(latitude, longitude, AnontionGPS._CONNECTION_SEARCH_CIRCLE);
 
-    Long nowTs = AnontionTime.tsN();
-    
     List<AnontionConnection> connections = connectionRepository.findByGPSBox(
-        box.getLatitudeMin(), box.getLatitudeMax(), box.getLongitudeMin(), box.getLongitudeMax(), nowTs); 
+        box.getLatitudeMin(), box.getLatitudeMax(), box.getLongitudeMin(), box.getLongitudeMax(), AnontionTime.tsN()); 
 
     List<ResponseGetConnectionBroadcastBodyDTO> broadcasts = new ArrayList<ResponseGetConnectionBroadcastBodyDTO>();
     

@@ -63,7 +63,8 @@ public class AccountDeleteController {
       .build();
   
   @DeleteMapping("/account/{id}")
-  public ResponseEntity<ResponseDTO> deleteAccount(@PathVariable("id") String id, @RequestParam("nowTs") Long nowTs, @RequestParam("nonce") String nonce, @RequestParam("signature") String signature) {
+  public ResponseEntity<ResponseDTO> deleteAccount(@PathVariable("id") String id, @RequestParam("nowTs") Long nowTs, 
+      @RequestParam("nonce") String nonce, @RequestParam("signature") String signature) {
 
     if (nowTs <= 0 ||
         nonce.isBlank() ||
@@ -86,7 +87,7 @@ public class AccountDeleteController {
     
     if (nonce.isBlank() || nonceCache.getIfPresent(nonce) != null) {
 
-      return Responses.getBAD_REQUEST("Bad message");
+      return Responses.getBAD_REQUEST("Bad nonce");
     }
     
     nonceCache.put(nonce, true);

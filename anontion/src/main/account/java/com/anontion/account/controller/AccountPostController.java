@@ -121,7 +121,7 @@ public class AccountPostController {
     
     if (nonce.isBlank() || nonceCache.getIfPresent(nonce) != null) {
 
-      return Responses.getBAD_REQUEST("Bad message");
+      return Responses.getBAD_REQUEST("Bad nonce");
     }
     
     nonceCache.put(nonce, true);
