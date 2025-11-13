@@ -29,6 +29,8 @@ import com.anontion.models.account.repository.AnontionAccountRepository;
 import com.anontion.common.dto.request.RequestPostConnectionBodyDTO;
 import com.anontion.common.dto.response.ResponsePostConnectionBodyDTO;
 import com.anontion.services.service.ConnectionService;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.anontion.models.image.model.AnontionImage;
 import com.anontion.models.image.repository.AnontionImageRepository;
 
@@ -38,6 +40,7 @@ import jakarta.validation.Valid;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
@@ -51,6 +54,10 @@ public class ConnectionPostController {
 
   @Autowired
   private AnontionImageRepository imageRepository;
+  
+  private Cache<String, Boolean> nonceCache = Caffeine.newBuilder()
+      .expireAfterWrite(AnontionConfig._REQUEST_TS_VALIDITY_MARGIN, TimeUnit.SECONDS)
+      .build();
   
   @PostMapping(path = "/connection/")
   public ResponseEntity<ResponseDTO> postConnection(@Valid @RequestBody RequestPostConnectionDTO request,
@@ -67,6 +74,15 @@ public class ConnectionPostController {
     }
     
     String connectionType = request.getBody().getConnectionType();
+    
+    String nonce = request.getBody().getNonce();   
+
+    if (nonce.isBlank() || nonceCache.getIfPresent(nonce) != null) {
+
+      return Responses.getBAD_REQUEST("Bad message");
+    }
+    
+    nonceCache.put(nonce, true);
     
     if (connectionType.equals("multiple") || connectionType.equals("broadcast")) {
       

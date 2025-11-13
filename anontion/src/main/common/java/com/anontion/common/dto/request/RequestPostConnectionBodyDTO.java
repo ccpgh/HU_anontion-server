@@ -52,6 +52,9 @@ public class RequestPostConnectionBodyDTO {
   @NotNull(message = "Longitude cannot be null.")
   private Double longitude;
 
+  @NotBlank(message = "Nonce cannot be blank.")
+  private String nonce;
+  
   public RequestPostConnectionBodyDTO() {
     
   }
@@ -194,6 +197,16 @@ public class RequestPostConnectionBodyDTO {
   public void setRollSipAddress(String rollSipAddress) {
  
     this.rollSipAddress = rollSipAddress;
+  }
+
+  public String getNonce() {
+    
+    return nonce;
+  }
+
+  public void setNonce(String nonce) {
+ 
+    this.nonce = nonce;
   }
 
 }
