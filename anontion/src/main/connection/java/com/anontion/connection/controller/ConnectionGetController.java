@@ -34,12 +34,10 @@ import com.anontion.models.connection.model.AnontionConnection;
 import com.anontion.models.connection.repository.AnontionConnectionRepository;
 import com.anontion.models.account.model.AnontionAccount;
 import com.anontion.models.account.repository.AnontionAccountRepository;
-import com.anontion.services.service.ConnectionService;
 import com.anontion.common.dto.response.ResponseGetConnectionBodyDTO;
 import com.anontion.common.dto.response.ResponseGetConnectionBroadcastBodyDTO;
 import com.anontion.asterisk.repository.AsteriskEndpointRepository;
 import com.anontion.common.dto.response.ResponseGetConnectionBroadcastsBodyDTO;
-import com.anontion.common.dto.response.ResponseGetConnectionBroadcastBodyDTO;
 
 @RestController
 public class ConnectionGetController {
@@ -285,7 +283,7 @@ public class ConnectionGetController {
       
       Long gap = AnontionTime.tsN() - timestamp;
       
-      if (gap < AnontionConfig._CONTACT_CONNECTION_MIN || gap > AnontionConfig._CONTACT_CONNECTION_MAX ) {
+      if (gap < AnontionConfig._REQUEST_TS_VALIDITY_MIN || gap > AnontionConfig._REQUEST_TS_VALIDITY_MAX ) {
         
         _logger.info("failed param ts not valid");
 

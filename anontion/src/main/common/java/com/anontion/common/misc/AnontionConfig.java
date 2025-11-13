@@ -5,8 +5,11 @@ public class AnontionConfig {
 
   public static String _ECDSA_CURVE = "secp256k1";
   
-  public static int _CONTACT_CONNECTION_MAX = 60;
-  public static int _CONTACT_CONNECTION_MIN = -15;
+  public static int _REQUEST_TS_VALIDITY_MAX = 300;
+  public static int _REQUEST_TS_VALIDITY_MIN = -300;
+  public static int _REQUEST_TS_VALIDITY_MARGIN = Math.abs(AnontionConfig._REQUEST_TS_VALIDITY_MIN) + 
+      Math.abs(AnontionConfig._REQUEST_TS_VALIDITY_MAX) * 4;
+
 
   public static int _CONTACT_CONNECTION_LOOP_DELAY_MS = 60 * 1000;
 

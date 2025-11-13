@@ -9,6 +9,12 @@ import jakarta.validation.constraints.NotBlank;
 
 @Component
 public class RequestPostApplicationBodyDTO {
+
+  @NotBlank(message = "Nonce cannot be blank.")
+  private String nonce;
+
+  @NotNull(message = "Now Timestamp cannot be null.")
+  private Long nowTs;
   
   @NotNull(message = "Client Id cannot be null.")
   private UUID clientId;
@@ -39,4 +45,24 @@ public class RequestPostApplicationBodyDTO {
  
     this.clientPub = clientPub;
   }
+  
+  public String getNonce() {
+    
+    return nonce;
+  }
+
+  public void setNonce(String nonce) {
+ 
+    this.nonce = nonce;
+  }
+  
+  public Long getNowTs() {
+    
+    return nowTs;
+  }
+
+  public void setNowTs(Long nowTs) {
+    
+    this.nowTs = nowTs;
+  } 
 }

@@ -19,6 +19,7 @@ import com.anontion.common.dto.response.ResponsePostDTO;
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
 import com.anontion.common.dto.response.Responses;
+import com.anontion.common.misc.AnontionConfig;
 import com.anontion.common.misc.AnontionLog;
 import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
@@ -35,6 +36,10 @@ import com.anontion.models.application.model.AnontionApplication;
 import com.anontion.models.application.model.AnontionApplicationId;
 import com.anontion.models.application.repository.AnontionApplicationRepository;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.concurrent.TimeUnit;
+
 @RestController
 public class ApplicationPostController {
 
@@ -45,6 +50,10 @@ public class ApplicationPostController {
   private ServletContext servletContext;
   
   private String _applicationPowTarget = "";
+    
+  Cache<String, Boolean> nonceCache = Caffeine.newBuilder()
+      .expireAfterWrite(AnontionConfig._REQUEST_TS_VALIDITY_MARGIN, TimeUnit.SECONDS)
+      .build();
   
   @PostMapping(path = "/application/")
   public ResponseEntity<ResponseDTO> postApplication(@Valid @RequestBody RequestPostApplicationDTO request, 
@@ -59,9 +68,28 @@ public class ApplicationPostController {
       return Responses.getBAD_REQUEST("Bad arguments", message);
     }
 
+    String nonce  = request.getBody().getNonce();  
     UUID   clientId   = request.getBody().getClientId();
     String clientPub  = request.getBody().getClientPub();  
     String enceyptedName = null;
+    Long diff = request.getBody().getNowTs() - AnontionTime.tsN();
+
+    if (diff > AnontionConfig._REQUEST_TS_VALIDITY_MAX ||
+        diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
+
+      return Responses.getBAD_REQUEST(
+          "Invalid parameters time diff " + diff.toString(), 
+          "bad nowTs"); 
+    }
+    
+    if (nonceCache.getIfPresent(nonce) != null) {
+
+      return Responses.getBAD_REQUEST("Bad message");
+    }
+    
+    nonceCache.put(nonce, true);
+    
+    _logger.info("nonceCache size " + nonceCache.estimatedSize());
     
     while (true) { 
       

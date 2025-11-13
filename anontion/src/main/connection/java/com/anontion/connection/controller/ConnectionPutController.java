@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.Responses;
-import com.anontion.common.misc.AnontionLog;
 
 @RestController
 public class ConnectionPutController {

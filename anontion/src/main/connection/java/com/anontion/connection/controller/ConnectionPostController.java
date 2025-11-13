@@ -13,9 +13,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.anontion.asterisk.bean.AsteriskEndpointBean;
-import com.anontion.common.dto.request.RequestPostAccountBodyDTO;
-import com.anontion.common.dto.request.RequestPostAccountDTO;
 import com.anontion.common.dto.request.RequestPostConnectionDTO;
 import com.anontion.common.dto.response.ResponseDTO;
 import com.anontion.common.dto.response.ResponseHeaderDTO;
@@ -27,7 +24,6 @@ import com.anontion.common.misc.AnontionStrings;
 import com.anontion.common.misc.AnontionTime;
 import com.anontion.common.security.AnontionSecurity;
 import com.anontion.common.security.AnontionSecurityECDSA;
-import com.anontion.common.security.AnontionSecurityECIES_ECDH;
 import com.anontion.models.account.model.AnontionAccount;
 import com.anontion.models.account.repository.AnontionAccountRepository;
 import com.anontion.common.dto.request.RequestPostConnectionBodyDTO;
@@ -38,7 +34,6 @@ import com.anontion.models.image.repository.AnontionImageRepository;
 
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 
-import jakarta.persistence.Column;
 import jakarta.validation.Valid;
 
 import java.util.Optional;
@@ -106,13 +101,11 @@ public class ConnectionPostController {
     String label = dto.getLabel();
     String connectionType = dto.getConnectionType();   
     Long nowTs = dto.getNowTs();
+    
+    Long diff = - AnontionTime.tsN();
 
-    String localSipAddressUnsafe = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
-
-    Long diff = nowTs - AnontionTime.tsN();
-
-    if (diff > AnontionConfig._CONTACT_CONNECTION_MAX ||
-        diff < AnontionConfig._CONTACT_CONNECTION_MIN) {
+    if (diff > AnontionConfig._REQUEST_TS_VALIDITY_MAX ||
+        diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
 
       return Responses.getBAD_REQUEST(
           "Invalid parameters time diff " + diff.toString(), 
@@ -413,12 +406,10 @@ public class ConnectionPostController {
     String connectionType = dto.getConnectionType();   
     Long nowTs = dto.getNowTs();
         
-    String localSipAddressUnsafe = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
-
     Long diff = nowTs - AnontionTime.tsN();
 
-    if (diff > AnontionConfig._CONTACT_CONNECTION_MAX ||
-        diff < AnontionConfig._CONTACT_CONNECTION_MIN) {
+    if (diff > AnontionConfig._REQUEST_TS_VALIDITY_MAX ||
+        diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
 
       return Responses.getBAD_REQUEST(
           "Invalid parameters time diff " + diff.toString(), 
@@ -822,12 +813,10 @@ public class ConnectionPostController {
     String connectionType = dto.getConnectionType();   
     Long nowTs = dto.getNowTs();
             
-    String localSipAddressUnsafe = AnontionSecurity.decodeFromSafeBase64(localSipAddress);
-
     Long diff = nowTs - AnontionTime.tsN();
 
-    if (diff > AnontionConfig._CONTACT_CONNECTION_MAX ||
-        diff < AnontionConfig._CONTACT_CONNECTION_MIN) {
+    if (diff > AnontionConfig._REQUEST_TS_VALIDITY_MAX ||
+        diff < AnontionConfig._REQUEST_TS_VALIDITY_MIN) {
 
       return Responses.getBAD_REQUEST(
           "Invalid parameters time diff " + diff.toString(), 
