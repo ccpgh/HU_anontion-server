@@ -82,7 +82,7 @@ public class ApplicationPostController {
           "bad nowTs"); 
     }
     
-    if (nonceCache.getIfPresent(nonce) != null || nonce.isBlank()) {
+    if (nonce.isBlank() || nonceCache.getIfPresent(nonce) != null) {
 
       return Responses.getBAD_REQUEST("Bad message");
     }
